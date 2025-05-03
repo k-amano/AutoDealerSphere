@@ -1,0 +1,40 @@
+﻿@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using System.ComponentModel.DataAnnotations
+
+<div class="user form">
+	<SfDataForm ID="MyForm" Width="50%"
+				Model="@Item" OnValidSubmit="OnValidated" OnInvalidSubmit="OnUnvalidated" >
+		<FormValidator>
+			<DataAnnotationsValidator></DataAnnotationsValidator>
+		</FormValidator>
+		<FormItems>
+			@if (this.OnClickDelete.HasDelegate)
+			{
+				<FormItem Field="@nameof(@Item.Id)" IsEnabled="false"></FormItem>
+			}
+			<FormItem Field="@nameof(@Item.Name)"></FormItem>
+			<FormItem Field="@nameof(@Item.Email)"></FormItem>
+		</FormItems>
+		<FormButtons>
+			<SfButton OnClick="OnRegister">Register</SfButton>
+			@if (this.OnClickDelete.HasDelegate)
+				{
+					<SfButton OnClick="OnOpenDialogue">Delete</SfButton>
+				}
+			<SfButton OnClick="OnCancel">Cancel</SfButton>
+		</FormButtons>
+	</SfDataForm>
+	<SfDialog Width="250px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@IsVisible">
+		<DialogTemplates>
+			<Header> 確認 </Header>
+			<Content> 削除してもよろしいですか? </Content>
+		</DialogTemplates>
+		<DialogButtons>
+			<DialogButton Content="OK" IsPrimary="true" OnClick="@OnDelete" />
+			<DialogButton Content="Cancel" OnClick="@OnCloseDialogue" />
+		</DialogButtons>
+	</SfDialog>
+</div>

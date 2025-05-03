@@ -1,0 +1,63 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.DataForm
+@using Newtonsoft.Json
+@using Syncfusion.Blazor.Navigations
+
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/"/>
+        <BreadcrumbItem Text="ユーザ管理" Url="/"/>
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>ユーザ管理</h2>
+<h3>UserList</h3>
+
+<div>
+	<SfDataForm ID="MyForm" Width="50%" Model="@Item">
+		<FormItems>
+			<FormItem Field="@nameof(@Item.Id)"></FormItem>
+			<FormItem Field="@nameof(@Item.Name)"></FormItem>
+			<FormItem Field="@nameof(@Item.Email)"></FormItem>
+		</FormItems>
+		<FormButtons>
+			<SfButton @onclick="() => this.OnClickSearch(Item)">Search</SfButton>
+		</FormButtons>
+	</SfDataForm>
+</div>
+<br />
+@if (_initialized)
+{
+	@if (0 < _users.Count())
+	{
+		<SfGrid DataSource="@_users">
+			<GridColumns>
+				<GridColumn Field=@nameof(User.Id) HeaderText="ID" TextAlign="TextAlign.Right" Width="20"></GridColumn>
+				<GridColumn Field=@nameof(User.Name) HeaderText="Name" Width="100"></GridColumn>
+				<GridColumn Field=@nameof(User.Email) HeaderText="Email" Width="130"></GridColumn>
+				<GridColumn HeaderText="Actions" TextAlign="TextAlign.Center" Width="120">
+					<Template>
+						@{
+							User? user = (context as User);
+							if (null != user)
+							{
+								<button @onclick="() => this.OnClickEdit(user)">Edit</button>
+							}
+						}
+					</Template>
+				</GridColumn>
+			</GridColumns>
+		</SfGrid>
+	}
+	else
+	{
+		<p class="error-message">ユーザ情報が見つかりません。</p>
+	}
+}
+<br />
+<div>
+	<SfButton OnClick="AddUserHandler">ユーザの追加</SfButton>
+</div>

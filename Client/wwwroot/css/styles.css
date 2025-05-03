@@ -1,0 +1,44 @@
+﻿.heading10 {
+	position: relative;
+	padding-top: 30px;
+	font-size: 26px;
+	border-bottom: 1px solid rgba(5,62,98,1);
+}
+
+.heading10 span {
+	position: relative;
+	z-index: 2;
+}
+
+.heading10::before {
+	content: attr(data-en);
+	position: absolute;
+	top: 0px;
+	left: 0;
+	color: rgba(5,62,98,0.2);
+	font-size: 40px;
+	text-transform: uppercase;
+	z-index: 1;
+}
+
+h2 {
+	padding: 0.4em 0.5em; /*文字の上下 左右の余白*/
+	background: #f4f4f4; /*背景色*/
+	border-left: solid 5px #7db4e6; /*左線*/
+}
+
+h3 {
+	font-size: 20px;
+	font-weight: bold;
+	padding: 0 10px;
+	margin-bottom: 1em;
+	border-bottom: 1px solid #d7d7d7;
+}
+
+a {
+	text-decoration: none !important;
+}
+
+a:hover {
+	text-decoration: underline !important;
+}
