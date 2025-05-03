@@ -1,0 +1,27 @@
+﻿@page "/user/{UserId:int}"
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+@using Syncfusion.Blazor.Navigations
+
+<SfBreadcrumb>
+	<BreadcrumbItems>
+		<BreadcrumbItem IconCss="e-icons e-home" Url="/" />
+		<BreadcrumbItem Text="ユーザ管理" Url="/" />
+		<BreadcrumbItem Text="編集" Url="./" />
+	</BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>ユーザ管理</h2>
+<h3>EditUser</h3>
+@if (_initialized)
+{
+	@if (_item != null)
+	{
+		<UserForm Item="_item" OnClickOK="this.OnClickOK" OnClickDelete="this.OnClickDelete" />
+	}
+	else
+	{
+		<p class="error-message">ユーザ情報が見つかりません。</p>
+	}
+}
