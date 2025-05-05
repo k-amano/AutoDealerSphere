@@ -14,6 +14,7 @@ namespace AutoDealerSphere.Server.Services
 			Configuration = configuration;
 		}
 		public virtual DbSet<User> Users { get; set; }
+		public virtual DbSet<AutoDealerSphere.Shared.Models.Client> Clients { get; set; }
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			if (!optionsBuilder.IsConfigured)
@@ -26,6 +27,13 @@ namespace AutoDealerSphere.Server.Services
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<User>(b =>
+			{
+				b.HasKey(e => e.Id);
+				b.Property(e => e.Id)
+				.UseIdentityColumn();
+			});
+
+			modelBuilder.Entity<AutoDealerSphere.Shared.Models.Client>(b =>
 			{
 				b.HasKey(e => e.Id);
 				b.Property(e => e.Id)

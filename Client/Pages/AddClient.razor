@@ -1,0 +1,19 @@
+@page "/client/0"
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using System.ComponentModel.DataAnnotations
+@using Syncfusion.Blazor.Navigations
+
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/"/>
+        <BreadcrumbItem Text="顧客管理" Url="/"/>
+        <BreadcrumbItem Text="新規登録" Url="./"/>
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>顧客管理</h2>
+<h3>新規登録</h3>
+<ClientForm Item="@Client" OnClickOK="OnOK" />
