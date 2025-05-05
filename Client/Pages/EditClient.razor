@@ -1,0 +1,32 @@
+@page "/client/{ClientId:int}"
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using System.ComponentModel.DataAnnotations
+@using Syncfusion.Blazor.Navigations
+
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/"/>
+        <BreadcrumbItem Text="顧客管理" Url="/"/>
+        <BreadcrumbItem Text="編集" Url="./"/>
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>顧客管理</h2>
+<h3>編集</h3>
+@if (_initialized)
+{
+    @if (_item != null)
+    {
+        <ClientForm Item="_item" OnClickOK="OnClickOK" OnClickDelete="OnClickDelete" />
+    }
+    else
+    {
+        <p class="error-message">顧客情報が見つかりません。</p>
+    }
+}
+
+@code {
+}

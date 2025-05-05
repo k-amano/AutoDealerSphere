@@ -1,0 +1,59 @@
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.DropDowns
+@using System.ComponentModel.DataAnnotations
+
+<div class="client-form">
+	<SfDataForm ID="ClientForm" Width="50%"
+				Model="@Item" OnValidSubmit="OnValidated" OnInvalidSubmit="OnUnvalidated">
+		<FormValidator>
+			<DataAnnotationsValidator></DataAnnotationsValidator>
+		</FormValidator>
+		<FormItems>
+			@if (this.OnClickDelete.HasDelegate)
+			{
+				<FormItem Field="@nameof(@Item.Id)" IsEnabled="false"></FormItem>
+			}
+			<FormItem Field="@nameof(@Item.Name)"></FormItem>
+			<FormItem Field="@nameof(@Item.Kana)"></FormItem>
+			<FormItem Field="@nameof(@Item.Email)"></FormItem>
+			<FormItem Field="@nameof(@Item.Zip)"></FormItem>
+			<FormItem Field="@nameof(@Item.Prefecture)">
+				<Template>
+					<SfDropDownList TValue="int" TItem="PrefectureItem" DataSource="@Prefectures" 
+						@bind-Value="@Item.Prefecture" TextField="Name" ValueField="Code">
+					</SfDropDownList>
+				</Template>
+			</FormItem>
+			<FormItem Field="@nameof(@Item.Address)"></FormItem>
+			<FormItem Field="@nameof(@Item.Building)"></FormItem>
+			<FormItem Field="@nameof(@Item.Phone)"></FormItem>
+		</FormItems>
+		<FormButtons>
+			<SfButton OnClick="OnRegister">登録</SfButton>
+			@if (this.OnClickDelete.HasDelegate)
+			{
+				<SfButton OnClick="OnOpenDialogue">削除</SfButton>
+			}
+			<SfButton OnClick="OnCancel">キャンセル</SfButton>
+		</FormButtons>
+	</SfDataForm>
+	<SfDialog Width="250px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@IsVisible">
+		<DialogTemplates>
+			<Header> 確認 </Header>
+			<Content> 削除してもよろしいですか? </Content>
+		</DialogTemplates>
+		<DialogButtons>
+			<DialogButton Content="OK" IsPrimary="true" OnClick="@OnDelete" />
+			<DialogButton Content="Cancel" OnClick="@OnCloseDialogue" />
+		</DialogButtons>
+	</SfDialog>
+</div>
+
+<style>
+.client-form {
+    padding: 20px;
+}
+</style>

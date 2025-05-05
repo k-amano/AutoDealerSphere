@@ -1,0 +1,65 @@
+@page "/clientlist"
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using Newtonsoft.Json
+@using AutoDealerSphere.Shared.Models
+
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/" />
+        <BreadcrumbItem Text="顧客管理" Url="/" />
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>顧客管理</h2>
+<h3>顧客一覧</h3>
+
+<div>
+    <SfDataForm ID="ClientSearchForm" Width="50%" Model="@Search">
+        <FormItems>
+            <FormItem Field="@nameof(Search.Id)"></FormItem>
+            <FormItem Field="@nameof(Search.Name)"></FormItem>
+            <FormItem Field="@nameof(Search.Email)"></FormItem>
+        </FormItems>
+        <FormButtons>
+            <SfButton @onclick="() => OnSearch(Search)">検索</SfButton>
+        </FormButtons>
+    </SfDataForm>
+</div>
+<br />
+
+<div class="toolbar">
+    <SfButton OnClick="AddClient" CssClass="e-primary">新規追加</SfButton>
+</div>
+<br />
+
+@if (Clients.Any())
+{
+    <SfGrid DataSource="@Clients" AllowPaging="true" AllowSorting="true">
+        <GridColumns>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Id)" HeaderText="ID" Width="100"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Name)" HeaderText="名前" Width="150"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Email)" HeaderText="メールアドレス" Width="200"></GridColumn>
+            <GridColumn HeaderText="操作" Width="100">
+                <Template>
+                    @if (context is AutoDealerSphere.Shared.Models.Client client)
+                    {
+                        <SfButton OnClick="@(EventCallback.Factory.Create<MouseEventArgs>(this, async (e) => await EditClient(client.Id)))" CssClass="e-small">編集</SfButton>
+                    }
+                </Template>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
+}
+else
+{
+    <p class="error-message">顧客情報が見つかりません。</p>
+}
+
+@code {
+}
