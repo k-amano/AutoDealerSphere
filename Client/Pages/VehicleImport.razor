@@ -1,83 +1,145 @@
 @page "/vehicle-import"
 @layout MainLayout
 @using System.Net.Http.Headers
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Cards
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
-<div class="card">
-    <div class="card-header">
-        <h3>車両データインポート</h3>
-    </div>
-    <div class="card-body">
-        <p>CSVまたはTXTファイルから顧客情報と車両データをインポートします。</p>
-        
-        <div class="mb-3">
-            <label class="form-label">インポートファイルを選択</label>
-            <InputFile OnChange="@OnFileSelected" accept=".csv,.txt" class="form-control" />
-        </div>
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/" />
+        <BreadcrumbItem Text="車両データインポート" Url="/vehicle-import" />
+    </BreadcrumbItems>
+</SfBreadcrumb>
 
-        @if (!string.IsNullOrEmpty(selectedFileName))
-        {
-            <div class="alert alert-info">
-                選択されたファイル: @selectedFileName
-            </div>
-        }
+<h2>車両データインポート</h2>
+<h3>CSVファイルからのデータ取込</h3>
 
-        <div class="mb-3">
-            <button class="btn btn-primary" @onclick="ImportFile" disabled="@(isImporting || selectedFile == null)">
-                @if (isImporting)
+<div class="row">
+    <div class="col-md-8">
+        <SfCard>
+            <CardHeader Title="ファイル選択" />
+            <CardContent>
+                <p>CSVまたはTXTファイルから顧客情報と車両データをインポートします。</p>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">インポートファイルを選択してください</label>
+                    <InputFile OnChange="@OnFileSelected" accept=".csv,.txt" class="form-control" />
+                </div>
+
+                @if (!string.IsNullOrEmpty(selectedFileName))
                 {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <span>インポート中...</span>
+                    <div class="alert alert-info d-flex align-items-center">
+                        <span class="e-icons e-file me-2"></span>
+                        <span>選択されたファイル: <strong>@selectedFileName</strong></span>
+                    </div>
                 }
-                else
-                {
-                    <span>インポート開始</span>
-                }
-            </button>
-            <button class="btn btn-secondary ms-2" @onclick="Cancel">キャンセル</button>
-        </div>
+
+                <br />
+                
+                <div style="text-align: center;">
+                    <SfButton IsPrimary="true" IconCss="e-icons e-upload" 
+                             Disabled="@(isImporting || selectedFile == null)"
+                             OnClick="ImportFile">
+                        @if (isImporting)
+                        {
+                            <span>インポート中...</span>
+                        }
+                        else
+                        {
+                            <span>インポート開始</span>
+                        }
+                    </SfButton>
+                    <SfButton CssClass="ms-2" OnClick="Cancel">キャンセル</SfButton>
+                </div>
+            </CardContent>
+        </SfCard>
 
         @if (importResult != null)
         {
-            <div class="alert @(importResult.Success ? "alert-success" : "alert-danger")">
-                <h5>インポート結果</h5>
-                <p>@importResult.Message</p>
-                @if (importResult.ClientsImported > 0 || importResult.VehiclesImported > 0)
-                {
-                    <ul>
-                        <li>新規顧客: @importResult.ClientsImported 件</li>
-                        <li>車両データ: @importResult.VehiclesImported 件</li>
-                    </ul>
-                }
-                @if (importResult.Errors?.Any() == true)
-                {
-                    <h6>エラー:</h6>
-                    <ul>
-                        @foreach (var error in importResult.Errors.Take(10))
-                        {
-                            <li>@error</li>
-                        }
-                        @if (importResult.Errors.Count > 10)
-                        {
-                            <li>...他 @(importResult.Errors.Count - 10) 件のエラー</li>
-                        }
-                    </ul>
-                }
-            </div>
+            <SfCard CssClass="mt-4">
+                <CardHeader Title="インポート結果" />
+                <CardContent>
+                    <div class="@(importResult.Success ? "text-success" : "text-danger")">
+                        <h5 class="mb-3">
+                            <span class="e-icons @(importResult.Success ? "e-check" : "e-close") me-2"></span>
+                            @importResult.Message
+                        </h5>
+                    </div>
+                    
+                    @if (importResult.ClientsImported > 0 || importResult.VehiclesImported > 0)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div class="p-3 border rounded bg-light">
+                                    <h6 class="text-primary">新規顧客</h6>
+                                    <h3 class="mb-0">@importResult.ClientsImported 件</h3>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 border rounded bg-light">
+                                    <h6 class="text-success">車両データ</h6>
+                                    <h3 class="mb-0">@importResult.VehiclesImported 件</h3>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (importResult.Errors?.Any() == true)
+                    {
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">エラー詳細:</h6>
+                            <ul class="mb-0">
+                                @foreach (var error in importResult.Errors.Take(10))
+                                {
+                                    <li>@error</li>
+                                }
+                                @if (importResult.Errors.Count > 10)
+                                {
+                                    <li><em>...他 @(importResult.Errors.Count - 10) 件のエラー</em></li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </CardContent>
+            </SfCard>
         }
+    </div>
 
-        <div class="mt-4">
-            <h5>インポートファイルの形式</h5>
-            <p>以下のカラムを含むCSVまたはTXTファイルを準備してください：</p>
-            <ul>
-                <li>fld_顧客ID - 顧客を識別する一意のID</li>
-                <li>fld_氏名 - 顧客の氏名</li>
-                <li>fld_郵便番号 - 顧客の郵便番号</li>
-                <li>fld_所有者の住所 - 顧客の住所</li>
-                <li>その他の車両情報カラム（車両番号、車体番号、車検証情報など）</li>
-            </ul>
-        </div>
+    <div class="col-md-4">
+        <SfCard>
+            <CardHeader Title="インポートファイルの形式" />
+            <CardContent>
+                <p class="text-muted">以下のカラムを含むCSVまたはTXTファイルを準備してください：</p>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td><strong>fld_顧客ID</strong></td>
+                            <td class="text-muted">顧客を識別する一意のID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>fld_氏名</strong></td>
+                            <td class="text-muted">顧客の氏名</td>
+                        </tr>
+                        <tr>
+                            <td><strong>fld_郵便番号</strong></td>
+                            <td class="text-muted">顧客の郵便番号</td>
+                        </tr>
+                        <tr>
+                            <td><strong>fld_所有者の住所</strong></td>
+                            <td class="text-muted">顧客の住所</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-muted">
+                                <small>その他の車両情報カラム（車両番号、車体番号、車検証情報など）</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </CardContent>
+        </SfCard>
     </div>
 </div>
 

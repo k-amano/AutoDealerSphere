@@ -16,10 +16,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Syncfusion.Blazor.DataForm" Version="25.1.42" />
-    <PackageReference Include="Syncfusion.Blazor.Grid" Version="25.1.42" />
-    <PackageReference Include="Syncfusion.Blazor.Themes" Version="25.1.42" />
-    <PackageReference Include="System.Text.Json" Version="8.0.3" />
+    <PackageReference Include="Syncfusion.Blazor.Cards" Version="30.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.DataForm" Version="30.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="30.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="30.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="30.1.41" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup>
