@@ -15,6 +15,7 @@ namespace AutoDealerSphere.Server.Services
 		}
 		public virtual DbSet<User> Users { get; set; }
 		public virtual DbSet<AutoDealerSphere.Shared.Models.Client> Clients { get; set; }
+		public virtual DbSet<Vehicle> Vehicles { get; set; }
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			if (!optionsBuilder.IsConfigured)
@@ -38,6 +39,18 @@ namespace AutoDealerSphere.Server.Services
 				b.HasKey(e => e.Id);
 				b.Property(e => e.Id)
 				.UseIdentityColumn();
+			});
+
+			modelBuilder.Entity<Vehicle>(b =>
+			{
+				b.HasKey(e => e.Id);
+				b.Property(e => e.Id)
+				.UseIdentityColumn();
+				
+				b.HasOne(v => v.Client)
+					.WithMany()
+					.HasForeignKey(v => v.ClientId)
+					.OnDelete(DeleteBehavior.Cascade);
 			});
 		}
 	}

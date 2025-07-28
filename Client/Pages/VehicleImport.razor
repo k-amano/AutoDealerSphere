@@ -1,0 +1,156 @@
+@page "/vehicle-import"
+@layout MainLayout
+@using System.Net.Http.Headers
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<div class="card">
+    <div class="card-header">
+        <h3>車両データインポート</h3>
+    </div>
+    <div class="card-body">
+        <p>CSVまたはTXTファイルから顧客情報と車両データをインポートします。</p>
+        
+        <div class="mb-3">
+            <label class="form-label">インポートファイルを選択</label>
+            <InputFile OnChange="@OnFileSelected" accept=".csv,.txt" class="form-control" />
+        </div>
+
+        @if (!string.IsNullOrEmpty(selectedFileName))
+        {
+            <div class="alert alert-info">
+                選択されたファイル: @selectedFileName
+            </div>
+        }
+
+        <div class="mb-3">
+            <button class="btn btn-primary" @onclick="ImportFile" disabled="@(isImporting || selectedFile == null)">
+                @if (isImporting)
+                {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span>インポート中...</span>
+                }
+                else
+                {
+                    <span>インポート開始</span>
+                }
+            </button>
+            <button class="btn btn-secondary ms-2" @onclick="Cancel">キャンセル</button>
+        </div>
+
+        @if (importResult != null)
+        {
+            <div class="alert @(importResult.Success ? "alert-success" : "alert-danger")">
+                <h5>インポート結果</h5>
+                <p>@importResult.Message</p>
+                @if (importResult.ClientsImported > 0 || importResult.VehiclesImported > 0)
+                {
+                    <ul>
+                        <li>新規顧客: @importResult.ClientsImported 件</li>
+                        <li>車両データ: @importResult.VehiclesImported 件</li>
+                    </ul>
+                }
+                @if (importResult.Errors?.Any() == true)
+                {
+                    <h6>エラー:</h6>
+                    <ul>
+                        @foreach (var error in importResult.Errors.Take(10))
+                        {
+                            <li>@error</li>
+                        }
+                        @if (importResult.Errors.Count > 10)
+                        {
+                            <li>...他 @(importResult.Errors.Count - 10) 件のエラー</li>
+                        }
+                    </ul>
+                }
+            </div>
+        }
+
+        <div class="mt-4">
+            <h5>インポートファイルの形式</h5>
+            <p>以下のカラムを含むCSVまたはTXTファイルを準備してください：</p>
+            <ul>
+                <li>fld_顧客ID - 顧客を識別する一意のID</li>
+                <li>fld_氏名 - 顧客の氏名</li>
+                <li>fld_郵便番号 - 顧客の郵便番号</li>
+                <li>fld_所有者の住所 - 顧客の住所</li>
+                <li>その他の車両情報カラム（車両番号、車体番号、車検証情報など）</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@code {
+    private IBrowserFile? selectedFile;
+    private string selectedFileName = string.Empty;
+    private bool isImporting = false;
+    private ImportResult? importResult;
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        selectedFileName = e.File.Name;
+        importResult = null;
+    }
+
+    private async Task ImportFile()
+    {
+        if (selectedFile == null) return;
+
+        isImporting = true;
+        importResult = null;
+
+        try
+        {
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // 10MB max
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            content.Add(fileContent, "file", selectedFile.Name);
+
+            var response = await Http.PostAsync("api/VehicleImport/upload", content);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                importResult = await response.Content.ReadFromJsonAsync<ImportResult>();
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                importResult = new ImportResult
+                {
+                    Success = false,
+                    Message = $"インポートに失敗しました: {response.StatusCode}",
+                    Errors = new List<string> { errorContent }
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            importResult = new ImportResult
+            {
+                Success = false,
+                Message = "インポート中にエラーが発生しました",
+                Errors = new List<string> { ex.Message }
+            };
+        }
+        finally
+        {
+            isImporting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private class ImportResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public int ClientsImported { get; set; }
+        public int VehiclesImported { get; set; }
+        public List<string> Errors { get; set; } = new();
+    }
+}
