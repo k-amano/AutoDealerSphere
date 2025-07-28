@@ -22,8 +22,13 @@
 			<FormItem Field="@nameof(@Item.Zip)"></FormItem>
 			<FormItem Field="@nameof(@Item.Prefecture)">
 				<Template>
-					<SfDropDownList TValue="int" TItem="PrefectureItem" DataSource="@Prefectures" 
-						@bind-Value="@Item.Prefecture" TextField="Name" ValueField="Code">
+					<label>都道府県</label>
+					<SfDropDownList TValue="int" TItem="PrefectureItem" 
+						@bind-Value="@Item.Prefecture" 
+						DataSource="@Prefectures"
+						Placeholder="都道府県を選択">
+						<DropDownListFieldSettings Value="Code" Text="Name">
+						</DropDownListFieldSettings>
 					</SfDropDownList>
 				</Template>
 			</FormItem>

@@ -3,16 +3,18 @@
 @using AutoDealerSphere.Client.Shared
 
 <div class="layout-container">
-    <div class="sidebar">
-        <div class="logo">
-            <h1 class="heading10" data-en="AutoDealerSphere"><span>Blazor Customer Relation Management System</span></h1>
-        </div>
-        <SfMenu Items="MenuItems">
-            <MenuFieldSettings Text="Text" Url="Url" IconCss="IconCss"></MenuFieldSettings>
-        </SfMenu>
+    <div class="header">
+        <h1 class="heading10" data-en="AutoDealerSphere"><span>自動車販売管理システム</span></h1>
     </div>
-    <div class="main-content">
-        @Body
+    <div class="main-container">
+        <div class="sidebar">
+            <SfMenu Items="MenuItems" Orientation="Orientation.Vertical">
+                <MenuFieldSettings Text="Text" Url="Url" IconCss="IconCss"></MenuFieldSettings>
+            </SfMenu>
+        </div>
+        <div class="main-content">
+            @Body
+        </div>
     </div>
 </div>
 
@@ -43,7 +45,20 @@
 <style>
 .layout-container {
     display: flex;
+    flex-direction: column;
     height: 100vh;
+}
+
+.header {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    padding: 20px;
+}
+
+.main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
 }
 
 .sidebar {
@@ -51,20 +66,30 @@
     background-color: #f5f5f5;
     padding: 20px;
     border-right: 1px solid #ddd;
-}
-
-.logo {
-    padding: 20px 0;
-    border-bottom: 1px solid #ddd;
+    overflow-y: auto;
 }
 
 .main-content {
     flex: 1;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .heading10 {
     margin: 0;
     font-size: 1.5em;
+}
+
+/* SfMenuの縦型表示用スタイル */
+.sidebar .e-menu-wrapper {
+    width: 100%;
+}
+
+.sidebar .e-menu {
+    width: 100%;
+}
+
+.sidebar .e-menu-item {
+    width: 100%;
 }
 </style>
