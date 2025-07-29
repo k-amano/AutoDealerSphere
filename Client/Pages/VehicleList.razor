@@ -1,0 +1,85 @@
+@page "/vehiclelist"
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using Newtonsoft.Json
+@using AutoDealerSphere.Shared.Models
+
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/" />
+        <BreadcrumbItem Text="車両管理" Url="/" />
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>車両管理</h2>
+<h3>車両一覧</h3>
+
+<div>
+    <SfDataForm ID="VehicleSearchForm" Width="50%" Model="@Search">
+        <FormItems>
+            <FormItem Field="@nameof(Search.VehicleName)"></FormItem>
+            <FormItem Field="@nameof(Search.LicensePlateNumber)"></FormItem>
+            <FormItem Field="@nameof(Search.ClientName)"></FormItem>
+        </FormItems>
+        <FormButtons>
+            <SfButton @onclick="() => OnSearch(Search)">検索</SfButton>
+        </FormButtons>
+    </SfDataForm>
+</div>
+<br />
+
+<div class="toolbar">
+    <SfButton OnClick="AddVehicle" CssClass="e-primary">新規追加</SfButton>
+</div>
+<br />
+
+@if (Vehicles.Any())
+{
+    <SfGrid DataSource="@Vehicles" AllowPaging="true" AllowSorting="true" AllowResizing="true">
+        <GridColumns>
+            <GridColumn Field="@nameof(Vehicle.Id)" HeaderText="ID" Width="60"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.VehicleName)" HeaderText="車名" Width="120"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.VehicleModel)" HeaderText="型式" Width="100"></GridColumn>
+            <GridColumn HeaderText="ナンバー" Width="120">
+                <Template>
+                    @GetLicensePlateFromContext(context)
+                </Template>
+            </GridColumn>
+            <GridColumn HeaderText="所有者" Width="120">
+                <Template>
+                    @GetClientNameFromContext(context)
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(Vehicle.FirstRegistrationDate)" HeaderText="初度登録" Format="d" Width="100"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.InspectionExpiryDate)" HeaderText="車検満了日" Format="d" Width="100"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.Mileage)" HeaderText="走行距離" Width="100" Format="N0">
+                <Template>
+                    @{
+                        var vehicle = context as Vehicle;
+                        if (vehicle?.Mileage != null)
+                        {
+                            <span>@($"{vehicle.Mileage:N0} km")</span>
+                        }
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn HeaderText="操作" Width="80" IsPrimaryKey="false">
+                <Template>
+                    <SfButton OnClick="@(() => EditVehicleFromContext(context))" CssClass="e-small">編集</SfButton>
+                </Template>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
+}
+else
+{
+    <p class="error-message">車両情報が見つかりません。</p>
+}
+
+@code {
+}
