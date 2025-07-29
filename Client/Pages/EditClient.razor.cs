@@ -20,7 +20,13 @@ namespace AutoDealerSphere.Client.Pages
                 {
                     Id = client.Id,
                     Name = client.Name,
-                    Email = client.Email
+                    Kana = client.Kana,
+                    Email = client.Email,
+                    Zip = client.Zip,
+                    Prefecture = client.Prefecture,
+                    Address = client.Address,
+                    Building = client.Building,
+                    Phone = client.Phone
                 };
             }
             _initialized = true;
