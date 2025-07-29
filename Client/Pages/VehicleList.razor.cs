@@ -27,14 +27,20 @@ namespace AutoDealerSphere.Client.Pages
         {
             var query = new List<string>();
             
-            if (!string.IsNullOrWhiteSpace(search.VehicleName))
-                query.Add($"vehicleName={Uri.EscapeDataString(search.VehicleName)}");
+            if (!string.IsNullOrWhiteSpace(search.VehicleNameOrModel))
+                query.Add($"vehicleNameOrModel={Uri.EscapeDataString(search.VehicleNameOrModel)}");
             
-            if (!string.IsNullOrWhiteSpace(search.LicensePlateNumber))
-                query.Add($"licensePlateNumber={Uri.EscapeDataString(search.LicensePlateNumber)}");
+            if (!string.IsNullOrWhiteSpace(search.LicensePlate))
+                query.Add($"licensePlate={Uri.EscapeDataString(search.LicensePlate)}");
             
             if (!string.IsNullOrWhiteSpace(search.ClientName))
                 query.Add($"clientName={Uri.EscapeDataString(search.ClientName)}");
+                
+            if (search.InspectionExpiryDateFrom.HasValue)
+                query.Add($"inspectionExpiryDateFrom={search.InspectionExpiryDateFrom.Value:yyyy-MM-dd}");
+                
+            if (search.InspectionExpiryDateTo.HasValue)
+                query.Add($"inspectionExpiryDateTo={search.InspectionExpiryDateTo.Value:yyyy-MM-dd}");
 
             var queryString = query.Any() ? "?" + string.Join("&", query) : "";
             var response = await Http.GetAsync($"api/vehicles/search{queryString}");
@@ -93,9 +99,11 @@ namespace AutoDealerSphere.Client.Pages
 
         public class VehicleSearchModel
         {
-            public string? VehicleName { get; set; }
-            public string? LicensePlateNumber { get; set; }
+            public string? VehicleNameOrModel { get; set; }
+            public string? LicensePlate { get; set; }
             public string? ClientName { get; set; }
+            public DateTime? InspectionExpiryDateFrom { get; set; }
+            public DateTime? InspectionExpiryDateTo { get; set; }
         }
     }
 }

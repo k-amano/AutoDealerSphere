@@ -22,9 +22,10 @@
 <div>
     <SfDataForm ID="ClientSearchForm" Width="50%" Model="@Search">
         <FormItems>
-            <FormItem Field="@nameof(Search.Id)"></FormItem>
-            <FormItem Field="@nameof(Search.Name)"></FormItem>
-            <FormItem Field="@nameof(Search.Email)"></FormItem>
+            <FormItem Field="@nameof(Search.NameOrKana)" LabelText="名前・カナ"></FormItem>
+            <FormItem Field="@nameof(Search.Email)" LabelText="メールアドレス"></FormItem>
+            <FormItem Field="@nameof(Search.Phone)" LabelText="電話番号"></FormItem>
+            <FormItem Field="@nameof(Search.Address)" LabelText="住所"></FormItem>
         </FormItems>
         <FormButtons>
             <SfButton @onclick="() => OnSearch(Search)">検索</SfButton>

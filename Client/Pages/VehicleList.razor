@@ -6,6 +6,7 @@
 @using Syncfusion.Blazor.Navigations
 @using Syncfusion.Blazor.DataForm
 @using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars
 @using Newtonsoft.Json
 @using AutoDealerSphere.Shared.Models
 
@@ -22,9 +23,11 @@
 <div>
     <SfDataForm ID="VehicleSearchForm" Width="50%" Model="@Search">
         <FormItems>
-            <FormItem Field="@nameof(Search.VehicleName)"></FormItem>
-            <FormItem Field="@nameof(Search.LicensePlateNumber)"></FormItem>
-            <FormItem Field="@nameof(Search.ClientName)"></FormItem>
+            <FormItem Field="@nameof(Search.VehicleNameOrModel)" LabelText="車名・型式"></FormItem>
+            <FormItem Field="@nameof(Search.LicensePlate)" LabelText="ナンバー"></FormItem>
+            <FormItem Field="@nameof(Search.ClientName)" LabelText="所有者"></FormItem>
+            <FormItem Field="@nameof(Search.InspectionExpiryDateFrom)" EditorType="FormEditorType.DatePicker" LabelText="車検満了日(開始)"></FormItem>
+            <FormItem Field="@nameof(Search.InspectionExpiryDateTo)" EditorType="FormEditorType.DatePicker" LabelText="車検満了日(終了)"></FormItem>
         </FormItems>
         <FormButtons>
             <SfButton @onclick="() => OnSearch(Search)">検索</SfButton>
