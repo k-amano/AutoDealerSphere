@@ -41,20 +41,35 @@ namespace AutoDealerSphere.Server.Controllers
             var clients = await _clientService.GetAllAsync();
             var filteredClients = clients.AsQueryable();
 
-            if (search.Id > 0)
+            // 名前またはカナの部分一致
+            if (!string.IsNullOrEmpty(search.NameOrKana))
             {
-                filteredClients = filteredClients.Where(c => c.Id == search.Id);
+                filteredClients = filteredClients.Where(c => 
+                    c.Name.Contains(search.NameOrKana) || 
+                    (c.Kana != null && c.Kana.Contains(search.NameOrKana))
+                );
             }
-            else
+            
+            // メールアドレスの部分一致
+            if (!string.IsNullOrEmpty(search.Email))
             {
-                if (!string.IsNullOrEmpty(search.Name))
-                {
-                    filteredClients = filteredClients.Where(c => c.Name.Contains(search.Name));
-                }
-                if (!string.IsNullOrEmpty(search.Email))
-                {
-                    filteredClients = filteredClients.Where(c => c.Email.Contains(search.Email));
-                }
+                filteredClients = filteredClients.Where(c => c.Email.Contains(search.Email));
+            }
+            
+            // 電話番号の部分一致
+            if (!string.IsNullOrEmpty(search.Phone))
+            {
+                filteredClients = filteredClients.Where(c => c.Phone != null && c.Phone.Contains(search.Phone));
+            }
+            
+            // 住所の部分一致（郵便番号、都道府県、住所）
+            if (!string.IsNullOrEmpty(search.Address))
+            {
+                filteredClients = filteredClients.Where(c => 
+                    c.Zip.Contains(search.Address) ||
+                    Prefecture.GetName(c.Prefecture).Contains(search.Address) ||
+                    c.Address.Contains(search.Address)
+                );
             }
 
             return Ok(filteredClients.ToList());

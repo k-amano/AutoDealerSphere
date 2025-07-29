@@ -45,27 +45,49 @@ namespace AutoDealerSphere.Server.Controllers
         // GET: api/vehicles/search
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Vehicle>>> SearchVehicles(
-            [FromQuery] string? vehicleName,
-            [FromQuery] string? licensePlateNumber,
-            [FromQuery] string? clientName)
+            [FromQuery] string? vehicleNameOrModel,
+            [FromQuery] string? licensePlate,
+            [FromQuery] string? clientName,
+            [FromQuery] DateTime? inspectionExpiryDateFrom,
+            [FromQuery] DateTime? inspectionExpiryDateTo)
         {
             var query = _context.Vehicles
                 .Include(v => v.Client)
                 .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(vehicleName))
+            // 車名または型式の部分一致
+            if (!string.IsNullOrWhiteSpace(vehicleNameOrModel))
             {
-                query = query.Where(v => v.VehicleName != null && v.VehicleName.Contains(vehicleName));
+                query = query.Where(v => 
+                    (v.VehicleName != null && v.VehicleName.Contains(vehicleNameOrModel)) ||
+                    (v.VehicleModel != null && v.VehicleModel.Contains(vehicleNameOrModel)));
             }
 
-            if (!string.IsNullOrWhiteSpace(licensePlateNumber))
+            // ナンバープレート情報の部分一致
+            if (!string.IsNullOrWhiteSpace(licensePlate))
             {
-                query = query.Where(v => v.LicensePlateNumber != null && v.LicensePlateNumber.Contains(licensePlateNumber));
+                query = query.Where(v => 
+                    (v.LicensePlateLocation != null && v.LicensePlateLocation.Contains(licensePlate)) ||
+                    (v.LicensePlateClassification != null && v.LicensePlateClassification.Contains(licensePlate)) ||
+                    (v.LicensePlateHiragana != null && v.LicensePlateHiragana.Contains(licensePlate)) ||
+                    (v.LicensePlateNumber != null && v.LicensePlateNumber.Contains(licensePlate)));
             }
 
+            // 所有者名の部分一致
             if (!string.IsNullOrWhiteSpace(clientName))
             {
                 query = query.Where(v => v.Client != null && v.Client.Name.Contains(clientName));
+            }
+
+            // 車検満了日の範囲指定
+            if (inspectionExpiryDateFrom.HasValue)
+            {
+                query = query.Where(v => v.InspectionExpiryDate >= inspectionExpiryDateFrom.Value);
+            }
+
+            if (inspectionExpiryDateTo.HasValue)
+            {
+                query = query.Where(v => v.InspectionExpiryDate <= inspectionExpiryDateTo.Value);
             }
 
             return await query.OrderBy(v => v.Id).ToListAsync();
