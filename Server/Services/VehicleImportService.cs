@@ -90,13 +90,45 @@ namespace AutoDealerSphere.Server.Services
                                 Email = "", // 必須フィールドのため空文字列
                                 Zip = !string.IsNullOrWhiteSpace(zip) ? zip.Replace("-", "") : "",
                                 Address = !string.IsNullOrWhiteSpace(address) ? address : "",
-                                Prefecture = 0 // 必須フィールドのため0
+                                Prefecture = Prefecture.GetCodeFromAddress(address) // 住所から都道府県コードを判定
                             };
                             
                             // 顧客を追加して保存
                             context.Clients.Add(client);
                             await context.SaveChangesAsync(); // 新規顧客を保存してIDを確定
                             clientsImported++;
+                        }
+                        else
+                        {
+                            // 既存顧客の情報を更新
+                            bool updated = false;
+                            
+                            // 郵便番号が空で、インポートデータに郵便番号がある場合は更新
+                            if (string.IsNullOrWhiteSpace(client.Zip) && !string.IsNullOrWhiteSpace(zip))
+                            {
+                                client.Zip = zip.Replace("-", "");
+                                updated = true;
+                            }
+                            
+                            // 住所が空で、インポートデータに住所がある場合は更新
+                            if (string.IsNullOrWhiteSpace(client.Address) && !string.IsNullOrWhiteSpace(address))
+                            {
+                                client.Address = address;
+                                client.Prefecture = Prefecture.GetCodeFromAddress(address);
+                                updated = true;
+                            }
+                            
+                            // 都道府県が未設定（0）で、住所がある場合は更新
+                            if (client.Prefecture == 0 && !string.IsNullOrWhiteSpace(address))
+                            {
+                                client.Prefecture = Prefecture.GetCodeFromAddress(address);
+                                updated = true;
+                            }
+                            
+                            if (updated)
+                            {
+                                await context.SaveChangesAsync();
+                            }
                         }
 
                         // 車両情報を作成
