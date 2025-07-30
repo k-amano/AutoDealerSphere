@@ -1,30 +1,11 @@
-.vehicle-form {
+/* フォーム共通スタイル */
+
+/* フォームコンテナ */
+.form {
     padding: 20px;
 }
 
-h4 {
-    font-size: 16px;
-    font-weight: normal;
-    padding: 0 10px 0 15px;
-    margin-bottom: 1em;
-    margin-top: 1.5em;
-    border-bottom: 1px solid #d7d7d7;
-    color: #666;
-    position: relative;
-}
-
-h4::before {
-    content: "■";
-    color: #00A99D;
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-.form-section {
-    padding: 10px 0;
-}
-
+/* フォーム行 */
 .form-row {
     display: flex;
     flex-wrap: wrap;
@@ -33,34 +14,41 @@ h4::before {
     gap: 4px;
 }
 
+/* フォームラベル */
 .form-row label {
     width: 150px;
     margin-right: 10px;
     color: #333;
 }
 
-/* Syncfusionのinput-groupコンテナのスタイル */
+/* フォームボタン */
+.form-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+/* Syncfusionコンポーネント共通 */
 ::deep .e-input-group {
     flex: 1;
     max-width: 400px;
 }
 
-/* Syncfusionのドロップダウンのスタイル */
 ::deep .e-ddl {
     max-width: 400px;
 }
 
-/* SfDatePickerのスタイル */
 ::deep .e-date-wrapper {
+    flex: 1;
     max-width: 400px;
 }
 
-/* SfNumericTextBoxのスタイル */
 ::deep .e-numerictextbox {
     max-width: 400px;
 }
 
-/* ValidationMessageのスタイル */
+/* バリデーション */
 ::deep .validation-message {
     flex-basis: 100%;
     color: #dc3545;
@@ -69,20 +57,13 @@ h4::before {
     margin-left: 160px;
 }
 
-/* Syncfusionのエラースタイル */
 ::deep .e-error {
     color: #dc3545;
     font-size: 0.9em;
     margin-top: 4px;
 }
 
-.form-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 30px;
-}
-
+/* 必須項目 */
 .required::after {
     content: "必須";
     color: #ffffff;
@@ -91,4 +72,16 @@ h4::before {
     padding: 0.3em;
     border-radius: 0.5em;
     margin-left: 0.3em;
+}
+
+/* ツールバー */
+.toolbar {
+    margin-bottom: 10px;
+}
+
+/* エラーメッセージ */
+.error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin: 20px 0;
 }
