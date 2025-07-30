@@ -39,42 +39,6 @@ h4::before {
     color: #333;
 }
 
-/* Syncfusionのinput-groupコンテナのスタイル */
-::deep .e-input-group {
-    flex: 1;
-    max-width: 400px;
-}
-
-/* Syncfusionのドロップダウンのスタイル */
-::deep .e-ddl {
-    max-width: 400px;
-}
-
-/* SfDatePickerのスタイル */
-::deep .e-date-wrapper {
-    max-width: 400px;
-}
-
-/* SfNumericTextBoxのスタイル */
-::deep .e-numerictextbox {
-    max-width: 400px;
-}
-
-/* ValidationMessageのスタイル */
-::deep .validation-message {
-    flex-basis: 100%;
-    color: #dc3545;
-    font-size: 0.9em;
-    margin-top: 4px;
-    margin-left: 160px;
-}
-
-/* Syncfusionのエラースタイル */
-::deep .e-error {
-    color: #dc3545;
-    font-size: 0.9em;
-    margin-top: 4px;
-}
 
 
 .required::after {
