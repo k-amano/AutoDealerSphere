@@ -1,0 +1,87 @@
+/* フォーム共通スタイル */
+
+/* フォームコンテナ */
+.form {
+    padding: 20px;
+}
+
+/* フォーム行 */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 4px;
+}
+
+/* フォームラベル */
+.form-row label {
+    width: 150px;
+    margin-right: 10px;
+    color: #333;
+}
+
+/* フォームボタン */
+.form-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+/* Syncfusionコンポーネント共通 */
+::deep .e-input-group {
+    flex: 1;
+    max-width: 400px;
+}
+
+::deep .e-ddl {
+    max-width: 400px;
+}
+
+::deep .e-date-wrapper {
+    flex: 1;
+    max-width: 400px;
+}
+
+::deep .e-numerictextbox {
+    max-width: 400px;
+}
+
+/* バリデーション */
+::deep .validation-message {
+    flex-basis: 100%;
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 4px;
+    margin-left: 160px;
+}
+
+::deep .e-error {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+/* 必須項目 */
+.required::after {
+    content: "必須";
+    color: #ffffff;
+    background: #cc0000;
+    font-size: 0.8em;
+    padding: 0.3em;
+    border-radius: 0.5em;
+    margin-left: 0.3em;
+}
+
+/* ツールバー */
+.toolbar {
+    margin-bottom: 10px;
+}
+
+/* エラーメッセージ */
+.error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin: 20px 0;
+}
