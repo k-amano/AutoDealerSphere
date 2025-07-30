@@ -7,6 +7,7 @@
 @using Syncfusion.Blazor.DataForm
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Inputs
 @using Newtonsoft.Json
 @using AutoDealerSphere.Shared.Models
 
@@ -20,19 +21,37 @@
 <h2>車両管理</h2>
 <h3>車両一覧</h3>
 
-<div>
-    <SfDataForm ID="VehicleSearchForm" Width="50%" Model="@Search">
-        <FormItems>
-            <FormItem Field="@nameof(Search.VehicleNameOrModel)" LabelText="車名・型式"></FormItem>
-            <FormItem Field="@nameof(Search.LicensePlate)" LabelText="ナンバー"></FormItem>
-            <FormItem Field="@nameof(Search.ClientName)" LabelText="所有者"></FormItem>
-            <FormItem Field="@nameof(Search.InspectionExpiryDateFrom)" EditorType="FormEditorType.DatePicker" LabelText="車検満了日(開始)"></FormItem>
-            <FormItem Field="@nameof(Search.InspectionExpiryDateTo)" EditorType="FormEditorType.DatePicker" LabelText="車検満了日(終了)"></FormItem>
-        </FormItems>
-        <FormButtons>
-            <SfButton @onclick="() => OnSearch(Search)">検索</SfButton>
-        </FormButtons>
-    </SfDataForm>
+<div class="search-form">
+    <EditForm Model="@Search" OnValidSubmit="() => OnSearch(Search)">
+        <DataAnnotationsValidator />
+        <div class="form">
+            <div class="form-row">
+                <label>車名・型式</label>
+                <SfTextBox @bind-Value="Search.VehicleNameOrModel" Placeholder="車名または型式"></SfTextBox>
+            </div>
+            <div class="form-row">
+                <label>ナンバー</label>
+                <SfTextBox @bind-Value="Search.LicensePlate" Placeholder="ナンバープレート"></SfTextBox>
+            </div>
+            <div class="form-row">
+                <label>所有者</label>
+                <SfTextBox @bind-Value="Search.ClientName" Placeholder="所有者名"></SfTextBox>
+            </div>
+            <div class="form-row">
+                <label>車検満了日</label>
+                <div class="date-range">
+                    <SfDatePicker TValue="DateTime?" @bind-Value="Search.InspectionExpiryDateFrom" 
+                        Placeholder="開始日" Format="yyyy/MM/dd"></SfDatePicker>
+                    <span class="date-separator">～</span>
+                    <SfDatePicker TValue="DateTime?" @bind-Value="Search.InspectionExpiryDateTo" 
+                        Placeholder="終了日" Format="yyyy/MM/dd"></SfDatePicker>
+                </div>
+            </div>
+            <div class="form-buttons">
+                <SfButton Type="ButtonType.Submit">検索</SfButton>
+            </div>
+        </div>
+    </EditForm>
 </div>
 <br />
 

@@ -10,13 +10,6 @@
 	<EditForm Model="@Item" OnValidSubmit="OnValidated" OnInvalidSubmit="OnUnvalidated">
 		<DataAnnotationsValidator />
 		<div class="form">
-			@if (this.OnClickDelete.HasDelegate)
-			{
-				<div class="form-row">
-					<label>ID</label>
-					<SfTextBox Value="@Item.Id.ToString()" Enabled="false"></SfTextBox>
-				</div>
-			}
 			<div class="form-row">
 				<label class="required">名前</label>
 				<SfTextBox @bind-Value="Item.Name" Placeholder="名前"></SfTextBox>
@@ -28,7 +21,7 @@
 				<ValidationMessage For="@(() => Item.Kana)" />
 			</div>
 			<div class="form-row">
-				<label class="required">メールアドレス</label>
+				<label>メールアドレス</label>
 				<SfTextBox @bind-Value="Item.Email" Placeholder="メールアドレス"></SfTextBox>
 				<ValidationMessage For="@(() => Item.Email)" />
 			</div>

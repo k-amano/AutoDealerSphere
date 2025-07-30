@@ -16,9 +16,8 @@ namespace AutoDealerSphere.Shared.Models
         [StringLength(40, ErrorMessage = "カナは40文字までです。")]
         public string? Kana { get; set; }
         
-        [Required(ErrorMessage = "メールアドレスを入力してください。")]
         [StringLength(50, ErrorMessage = "メールアドレスは50文字までです。")]
-        public string Email { get; set; } = "";
+        public string? Email { get; set; }
         
         [Required(ErrorMessage = "郵便番号を入力してください。")]
         [StringLength(8, ErrorMessage = "郵便番号は8文字までです。")]
