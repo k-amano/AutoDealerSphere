@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:blazor.syncfusion.com)",
+      "Bash(ls:*)",
+      "Bash(cp:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": false
+}
