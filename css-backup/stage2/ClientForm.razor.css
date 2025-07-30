@@ -1,28 +1,9 @@
-.vehicle-form {
+.client-form {
     padding: 20px;
 }
 
-h4 {
-    font-size: 16px;
-    font-weight: normal;
-    padding: 0 10px 0 15px;
-    margin-bottom: 1em;
-    margin-top: 1.5em;
-    border-bottom: 1px solid #d7d7d7;
-    color: #666;
-    position: relative;
-}
-
-h4::before {
-    content: "■";
-    color: #00A99D;
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-.form-section {
-    padding: 10px 0;
+.form {
+    padding: 20px;
 }
 
 .form-row {
@@ -50,16 +31,6 @@ h4::before {
     max-width: 400px;
 }
 
-/* SfDatePickerのスタイル */
-::deep .e-date-wrapper {
-    max-width: 400px;
-}
-
-/* SfNumericTextBoxのスタイル */
-::deep .e-numerictextbox {
-    max-width: 400px;
-}
-
 /* ValidationMessageのスタイル */
 ::deep .validation-message {
     flex-basis: 100%;
@@ -74,6 +45,13 @@ h4::before {
     color: #dc3545;
     font-size: 0.9em;
     margin-top: 4px;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
 }
 
 
