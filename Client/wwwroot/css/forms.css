@@ -175,18 +175,18 @@
     margin-right: 12px;
 }
 
-.vehicle-name {
+.vehicle-plate {
     font-weight: 500;
+    margin-right: 10px;
+}
+
+.vehicle-name {
+    color: #333;
     margin-right: 10px;
 }
 
 .vehicle-model {
     color: #666;
-    margin-right: 10px;
-}
-
-.vehicle-plate {
-    color: #333;
     margin-right: auto;
 }
 

@@ -71,13 +71,13 @@
                         <div class="vehicle-row">
                             <div class="row-line1">
                                 <span class="vehicle-id">@vehicle.Id</span>
-                                <span class="vehicle-name">
+                                <span class="vehicle-plate">
                                     <span @onclick="() => EditVehicleFromContext(context)" class="grid-link">
-                                        @vehicle.VehicleName
+                                        @GetLicensePlateFromContext(context)
                                     </span>
                                 </span>
+                                <span class="vehicle-name">@vehicle.VehicleName</span>
                                 <span class="vehicle-model">@vehicle.VehicleModel</span>
-                                <span class="vehicle-plate">@GetLicensePlateFromContext(context)</span>
                                 <span class="vehicle-client">@GetClientNameFromContext(context)</span>
                             </div>
                             <div class="row-line2">
