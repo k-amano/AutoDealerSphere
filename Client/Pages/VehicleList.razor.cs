@@ -97,6 +97,14 @@ namespace AutoDealerSphere.Client.Pages
             return "";
         }
 
+        private void EditClientFromVehicle(Vehicle vehicle)
+        {
+            if (vehicle.ClientId > 0)
+            {
+                NavigationManager.NavigateTo($"/client/{vehicle.ClientId}");
+            }
+        }
+
         public class VehicleSearchModel
         {
             public string? VehicleNameOrModel { get; set; }
