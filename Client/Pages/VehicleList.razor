@@ -78,7 +78,18 @@
                                 </span>
                                 <span class="vehicle-name">@vehicle.VehicleName</span>
                                 <span class="vehicle-model">@vehicle.VehicleModel</span>
-                                <span class="vehicle-client">@GetClientNameFromContext(context)</span>
+                                <span class="vehicle-client">
+                                    @if (vehicle.ClientId > 0)
+                                    {
+                                        <span @onclick="() => EditClientFromVehicle(vehicle)" class="grid-link">
+                                            @GetClientNameFromContext(context)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @GetClientNameFromContext(context)
+                                    }
+                                </span>
                             </div>
                             <div class="row-line2">
                                 <span class="vehicle-dates">
