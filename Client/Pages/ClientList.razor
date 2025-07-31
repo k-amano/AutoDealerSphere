@@ -55,31 +55,57 @@
 
 @if (Clients.Any())
 {
-    <SfGrid DataSource="@Clients" AllowPaging="true" AllowSorting="true" AllowResizing="true">
+    <SfGrid DataSource="@Clients" AllowPaging="true" AllowSorting="true" AllowMultiSorting="true">
+        <GridTemplates>
+            <RowTemplate>
+                @{
+                    var client = context as AutoDealerSphere.Shared.Models.Client;
+                    <td colspan="9">
+                        <div class="client-row">
+                            <div class="row-line1">
+                                <span class="client-id">@client.Id</span>
+                                <span class="client-name">
+                                    <span @onclick="() => EditClientFromContext(context)" class="grid-link">
+                                        @client.Name
+                                    </span>
+                                </span>
+                                @if (!string.IsNullOrWhiteSpace(client.Kana))
+                                {
+                                    <span class="client-kana">@client.Kana</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(client.Phone))
+                                {
+                                    <span class="client-phone">📞 @client.Phone</span>
+                                }
+                            </div>
+                            <div class="row-line2">
+                                <span class="client-address">
+                                    〒@client.Zip @GetPrefectureName(client.Prefecture)@client.Address
+                                    @if (!string.IsNullOrWhiteSpace(client.Building))
+                                    {
+                                        <span> @client.Building</span>
+                                    }
+                                </span>
+                                @if (!string.IsNullOrWhiteSpace(client.Email))
+                                {
+                                    <span class="client-email">✉ @client.Email</span>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                }
+            </RowTemplate>
+        </GridTemplates>
         <GridColumns>
-            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Id)" HeaderText="ID" Width="60"></GridColumn>
-            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Name)" HeaderText="名前" Width="120">
-                <Template>
-                    @{
-                        var client = context as AutoDealerSphere.Shared.Models.Client;
-                        <span @onclick="() => EditClientFromContext(context)" 
-                              class="grid-link">
-                            @client.Name
-                        </span>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Kana)" HeaderText="カナ" Width="120"></GridColumn>
-            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Email)" HeaderText="メールアドレス" Width="180"></GridColumn>
-            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Zip)" HeaderText="郵便番号" Width="100"></GridColumn>
-            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Prefecture)" HeaderText="都道府県" Width="100">
-                <Template>
-                    @GetPrefectureNameFromContext(context)
-                </Template>
-            </GridColumn>
-            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Address)" HeaderText="住所" Width="200"></GridColumn>
-            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Building)" HeaderText="建物名" Width="150"></GridColumn>
-            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Phone)" HeaderText="電話番号" Width="120"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Id)" HeaderText="ID"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Name)" HeaderText="名前"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Kana)" HeaderText="カナ"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Phone)" HeaderText="電話番号"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Zip)" HeaderText="郵便番号"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Prefecture)" HeaderText="都道府県"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Address)" HeaderText="住所"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Building)" HeaderText="建物名"></GridColumn>
+            <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.Client.Email)" HeaderText="メール"></GridColumn>
         </GridColumns>
     </SfGrid>
 }
