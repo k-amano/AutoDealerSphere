@@ -62,39 +62,48 @@
 
 @if (Vehicles.Any())
 {
-    <SfGrid DataSource="@Vehicles" AllowPaging="true" AllowSorting="true" AllowResizing="true">
+    <SfGrid DataSource="@Vehicles" AllowPaging="true" AllowSorting="true" AllowMultiSorting="true" CssClass="two-line-grid">
+        <GridTemplates>
+            <RowTemplate>
+                @{
+                    var vehicle = context as Vehicle;
+                    <td colspan="8">
+                        <div class="vehicle-row">
+                            <div class="row-line1">
+                                <span class="vehicle-id">@vehicle.Id</span>
+                                <span class="vehicle-name">
+                                    <span @onclick="() => EditVehicleFromContext(context)" class="grid-link">
+                                        @vehicle.VehicleName
+                                    </span>
+                                </span>
+                                <span class="vehicle-model">@vehicle.VehicleModel</span>
+                                <span class="vehicle-plate">@GetLicensePlateFromContext(context)</span>
+                                <span class="vehicle-client">@GetClientNameFromContext(context)</span>
+                            </div>
+                            <div class="row-line2">
+                                <span class="vehicle-dates">
+                                    初度登録: @vehicle.FirstRegistrationDate?.ToString("yyyy/MM/dd")
+                                    車検満了: @vehicle.InspectionExpiryDate?.ToString("yyyy/MM/dd")
+                                </span>
+                                @if (vehicle.Mileage != null)
+                                {
+                                    <span class="vehicle-mileage">走行距離: @($"{vehicle.Mileage:N0} km")</span>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                }
+            </RowTemplate>
+        </GridTemplates>
         <GridColumns>
-            <GridColumn Field="@nameof(Vehicle.Id)" HeaderText="ID" Width="60"></GridColumn>
-            <GridColumn Field="@nameof(Vehicle.VehicleName)" HeaderText="車名" Width="120"></GridColumn>
-            <GridColumn Field="@nameof(Vehicle.VehicleModel)" HeaderText="型式" Width="100"></GridColumn>
-            <GridColumn HeaderText="ナンバー" Width="120">
-                <Template>
-                    @GetLicensePlateFromContext(context)
-                </Template>
-            </GridColumn>
-            <GridColumn HeaderText="所有者" Width="120">
-                <Template>
-                    @GetClientNameFromContext(context)
-                </Template>
-            </GridColumn>
-            <GridColumn Field="@nameof(Vehicle.FirstRegistrationDate)" HeaderText="初度登録" Format="d" Width="100"></GridColumn>
-            <GridColumn Field="@nameof(Vehicle.InspectionExpiryDate)" HeaderText="車検満了日" Format="d" Width="100"></GridColumn>
-            <GridColumn Field="@nameof(Vehicle.Mileage)" HeaderText="走行距離" Width="100" Format="N0">
-                <Template>
-                    @{
-                        var vehicle = context as Vehicle;
-                        if (vehicle?.Mileage != null)
-                        {
-                            <span>@($"{vehicle.Mileage:N0} km")</span>
-                        }
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn HeaderText="操作" Width="80" IsPrimaryKey="false">
-                <Template>
-                    <SfButton OnClick="@(() => EditVehicleFromContext(context))" CssClass="e-small">編集</SfButton>
-                </Template>
-            </GridColumn>
+            <GridColumn Field="@nameof(Vehicle.Id)" HeaderText="ID"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.VehicleName)" HeaderText="車名"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.VehicleModel)" HeaderText="型式"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.LicensePlateNumber)" HeaderText="ナンバー"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.ClientId)" HeaderText="所有者"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.FirstRegistrationDate)" HeaderText="初度登録"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.InspectionExpiryDate)" HeaderText="車検満了日"></GridColumn>
+            <GridColumn Field="@nameof(Vehicle.Mileage)" HeaderText="走行距離"></GridColumn>
         </GridColumns>
     </SfGrid>
 }

@@ -161,3 +161,59 @@
 .two-line-grid .e-rowcell {
     padding: 0;
 }
+
+/* 車両リストの2段表示スタイル */
+.vehicle-row {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.vehicle-id {
+    color: #999;
+    margin-right: 12px;
+}
+
+.vehicle-name {
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+.vehicle-model {
+    color: #666;
+    margin-right: 10px;
+}
+
+.vehicle-plate {
+    color: #333;
+    margin-right: auto;
+}
+
+.vehicle-client {
+    color: #333;
+    margin-left: 10px;
+}
+
+.vehicle-dates {
+    color: #666;
+    margin-right: 10px;
+}
+
+.vehicle-mileage {
+    color: #666;
+    margin-left: auto;
+}
+
+/* 日付範囲のスタイル */
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.date-separator {
+    color: #333;
+    white-space: nowrap;
+}
