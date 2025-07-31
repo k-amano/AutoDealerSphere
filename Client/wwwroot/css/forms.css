@@ -93,3 +93,14 @@
     font-size: 14px;
     margin: 20px 0;
 }
+
+/* グリッドのリンク */
+.grid-link {
+    cursor: pointer;
+    color: #0066cc;
+    text-decoration: none;
+}
+
+.grid-link:hover {
+    color: #0052a3;
+}
