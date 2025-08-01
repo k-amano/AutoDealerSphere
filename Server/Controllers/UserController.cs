@@ -53,6 +53,24 @@ namespace AutoDealerSphere.Server.Controllers
 			return user;
 		}
 
+		[Route("login")]
+		[HttpPost]
+		public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
+		{
+			if (_context == null)
+			{
+				return new LoginResponse { Success = false, ErrorMessage = "データベース接続エラー" };
+			}
+
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+			if (user == null || !PasswordHashService.VerifyPassword(request.Password, user.Password))
+			{
+				return new LoginResponse { Success = false, ErrorMessage = "メールアドレスまたはパスワードが正しくありません。" };
+			}
+
+			return new LoginResponse { Success = true, User = user };
+		}
+
 		[Route("add")]
 		[HttpPost]
 		public async Task<IActionResult> SaveUser(User user)
@@ -63,6 +81,8 @@ namespace AutoDealerSphere.Server.Controllers
 			}
 			if (user != null)
 			{
+				// パスワードをハッシュ化
+				user.Password = PasswordHashService.HashPassword(user.Password);
 				_context.Add(user);
 				await _context.SaveChangesAsync();
 				return Ok("Saved Successfully!!");
@@ -75,7 +95,20 @@ namespace AutoDealerSphere.Server.Controllers
 		public async Task<IActionResult> UpdateUser(User user)
 		{
 			if (null == _context) return NotFound();
+			
+			// 既存のユーザー情報を取得
+			var existingUser = await _context.Users.FindAsync(user.Id);
+			if (existingUser == null) return NotFound();
+			
+			// パスワードが変更された場合のみハッシュ化
+			if (user.Password != existingUser.Password)
+			{
+				user.Password = PasswordHashService.HashPassword(user.Password);
+			}
+			
+			_context.Entry(existingUser).State = EntityState.Detached;
 			_context.Entry(user).State = EntityState.Modified;
+			
 			try
 			{
 				await _context.SaveChangesAsync();

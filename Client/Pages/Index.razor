@@ -11,27 +11,28 @@
     <div class="login-box">
         <h2 class="login-title">ログイン</h2>
         
-        <SfDataForm ID="LoginForm" Model="@loginModel" ColumnCount="1">
-            <FormItems>
-                <FormItem Field="@nameof(loginModel.Email)" LabelText="メールアドレス">
-                    <Template>
-                        <SfTextBox @bind-Value="@loginModel.Email" Placeholder="メールアドレスを入力"></SfTextBox>
-                    </Template>
-                </FormItem>
-                <FormItem Field="@nameof(loginModel.Password)" LabelText="パスワード">
-                    <Template>
-                        <SfTextBox @bind-Value="@loginModel.Password" Type="InputType.Password" Placeholder="パスワードを入力"></SfTextBox>
-                    </Template>
-                </FormItem>
-            </FormItems>
-        </SfDataForm>
+        <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <div class="form">
+                <div class="form-row">
+                    <label>メールアドレス</label>
+                    <SfTextBox @bind-Value="@loginModel.Email" Placeholder="メールアドレスを入力"></SfTextBox>
+                    <ValidationMessage For="@(() => loginModel.Email)" />
+                </div>
+                <div class="form-row">
+                    <label>パスワード</label>
+                    <SfTextBox @bind-Value="@loginModel.Password" Type="InputType.Password" Placeholder="パスワードを入力"></SfTextBox>
+                    <ValidationMessage For="@(() => loginModel.Password)" />
+                </div>
+            </div>
+        </EditForm>
         
         @if (!string.IsNullOrEmpty(errorMessage))
         {
             <div class="error-message">@errorMessage</div>
         }
         
-        <div class="login-button-container">
+        <div class="form-buttons">
             <SfButton CssClass="e-primary" OnClick="HandleLogin">ログイン</SfButton>
         </div>
     </div>
@@ -46,7 +47,7 @@
     }
     
     .login-box {
-        width: 400px;
+        width: 500px;
         padding: 40px;
         background: #fff;
         border-radius: 8px;
@@ -59,14 +60,48 @@
         color: #333;
     }
     
-    .login-button-container {
-        margin-top: 20px;
-        text-align: center;
+    .login-box .form {
+        padding: 0;
     }
     
-    .login-button-container .e-btn {
-        width: 100%;
-        padding: 10px;
+    .login-box .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        gap: 4px;
+    }
+    
+    .login-box .form-row label {
+        width: 150px;
+        margin-right: 10px;
+        color: #333;
+        line-height: 36px;
+    }
+    
+    .login-box .form-row .e-input-group {
+        flex: 1;
+        max-width: 280px;
+    }
+    
+    .login-box .form-row .validation-message {
+        flex-basis: 100%;
+        color: #dc3545;
+        font-size: 0.9em;
+        margin-top: 4px;
+        margin-left: 160px;
+    }
+    
+    .login-box .form-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    
+    .login-box .form-buttons .e-btn {
+        width: auto;
+        min-width: 120px;
     }
     
     .error-message {
@@ -74,10 +109,6 @@
         text-align: center;
         margin-top: 10px;
         font-size: 14px;
-    }
-    
-    .e-dataform .e-form-fields {
-        margin-bottom: 20px;
     }
 </style>
 
@@ -100,18 +131,23 @@
         {
             errorMessage = "";
             
-            // TODO: 実際の認証処理を実装
-            // 現在は仮実装として、サンプルユーザーでのみログイン可能
-            if ((loginModel.Email == "admin@example.com" && loginModel.Password == "admin123") ||
-                (loginModel.Email == "user@example.com" && loginModel.Password == "user123") ||
-                (loginModel.Email == "yamada@example.com" && loginModel.Password == "yamada123"))
+            var loginRequest = new LoginRequest 
+            { 
+                Email = loginModel.Email, 
+                Password = loginModel.Password 
+            };
+            
+            var response = await Http.PostAsJsonAsync<LoginRequest>("/api/User/login", loginRequest);
+            var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+            
+            if (loginResponse != null && loginResponse.Success)
             {
                 // ログイン成功 - 顧客一覧へ遷移
                 NavigationManager.NavigateTo("/clientlist");
             }
             else
             {
-                errorMessage = "メールアドレスまたはパスワードが正しくありません。";
+                errorMessage = loginResponse?.ErrorMessage ?? "ログインに失敗しました。";
             }
         }
         catch (Exception ex)

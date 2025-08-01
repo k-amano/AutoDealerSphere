@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 @using Syncfusion.Blazor.Navigations
 @using AutoDealerSphere.Client.Shared
 
@@ -7,18 +8,27 @@
         <h1 class="heading10" data-en="AutoDealerSphere"><span>自動車販売管理システム</span></h1>
     </div>
     <div class="main-container">
-        <div class="sidebar">
-            <SfMenu Items="MenuItems" Orientation="Orientation.Vertical">
-                <MenuFieldSettings Text="Text" Url="Url" IconCss="IconCss"></MenuFieldSettings>
-            </SfMenu>
-        </div>
-        <div class="main-content">
+        @if (!IsLoginPage())
+        {
+            <div class="sidebar">
+                <SfMenu Items="MenuItems" Orientation="Orientation.Vertical">
+                    <MenuFieldSettings Text="Text" Url="Url" IconCss="IconCss"></MenuFieldSettings>
+                </SfMenu>
+            </div>
+        }
+        <div class="main-content @(IsLoginPage() ? "full-width" : "")">
             @Body
         </div>
     </div>
 </div>
 
 @code {
+    private bool IsLoginPage()
+    {
+        var uri = NavigationManager.Uri;
+        return uri.EndsWith("/") || uri.EndsWith("/index");
+    }
+
     private List<AutoDealerSphere.Client.Shared.MenuItems> MenuItems = new()
     {
         new AutoDealerSphere.Client.Shared.MenuItems()
@@ -85,6 +95,10 @@
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+}
+
+.main-content.full-width {
+    max-width: 100%;
 }
 
 .heading10 {

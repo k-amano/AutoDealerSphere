@@ -167,7 +167,7 @@ namespace AutoDealerSphere.Server.Services
                     {
                         Name = "管理者",
                         Email = "admin@example.com",
-                        Password = "admin123", // 実際の実装ではハッシュ化が必要
+                        Password = PasswordHashService.HashPassword("admin123"),
                         Role = 2 // 管理者
                     };
 

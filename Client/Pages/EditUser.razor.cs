@@ -20,7 +20,9 @@ namespace AutoDealerSphere.Client.Pages
 				{
 					Id = user.Id,
 					Name = user.Name,
-					Email = user.Email
+					Email = user.Email,
+					Password = user.Password,
+					Role = user.Role
 				};
 			}
 			_initialized = true;
@@ -31,7 +33,7 @@ namespace AutoDealerSphere.Client.Pages
 			var result = await Http.PostAsJsonAsync("/api/User/update", item);
 			if (result?.StatusCode == System.Net.HttpStatusCode.OK)
 			{
-				this.NavigationManager.NavigateTo("./");
+				this.NavigationManager.NavigateTo("/userlist");
 			}
 		}
 
@@ -40,7 +42,7 @@ namespace AutoDealerSphere.Client.Pages
 			var result = await Http.DeleteAsync($"/api/User/{this.UserId}");
 			if (result?.StatusCode == System.Net.HttpStatusCode.NoContent)
 			{
-				this.NavigationManager.NavigateTo("./");
+				this.NavigationManager.NavigateTo("/userlist");
 			}
 		}
 	}
