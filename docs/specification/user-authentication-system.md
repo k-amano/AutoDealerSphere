@@ -13,7 +13,7 @@ AutoDealerSphereにユーザー認証機能を追加し、ユーザー管理と�
 
 | フィールド名 | 型 | 必須 | デフォルト値 | 説明 |
 |------------|---|-----|------------|------|
-| Password | string | ○ | "" | ユーザーのパスワード（現在は平文、将来的にハッシュ化予定） |
+| Password | string | ○ | "" | ユーザーのパスワード（BCryptでハッシュ化） |
 | Role | int | ○ | 1 | ユーザーの権限レベル |
 
 ### 1.2 権限レベル
@@ -75,23 +75,21 @@ AutoDealerSphereにユーザー認証機能を追加し、ユーザー管理と�
 
 | 名前 | メールアドレス | パスワード | 権限 |
 |-----|--------------|-----------|------|
-| 管理者 | admin@example.com | admin123 | 管理者 |
-| 一般ユーザー | user@example.com | user123 | 一般ユーザー |
-| 山田太郎 | yamada@example.com | yamada123 | 一般ユーザー |
+| 管理者 | admin@example.com | admin123（ハッシュ化して保存） | 管理者 |
 
 ## 5. データベース更新
 
-### 5.1 マイグレーション
-既存のUsersテーブルに新しいカラムを追加するため、以下の処理を実装：
+### 5.1 データベース初期化
+`DatabaseInitializeService`クラスでデータベース初期化時に以下を実行：
+- Clientsテーブルの作成
+- Vehiclesテーブルの作成
+- Usersテーブルの作成
+- 管理者ユーザーの自動登録（パスワードはハッシュ化）
 
-1. Usersテーブルの存在確認
-2. テーブルが存在しない場合は新規作成
-3. 既存テーブルの場合はPasswordとRoleカラムの追加
-
-### 5.2 データベース初期化
-`Server/Program.cs`でデータベース初期化時に以下を実行：
-- Usersテーブルの作成または更新
-- サンプルユーザーの登録
+### 5.2 パスワードハッシュ化
+`PasswordHashService`クラスで以下の機能を提供：
+- パスワードのハッシュ化（BCrypt.Net-Next使用）
+- パスワードの検証
 
 ## 6. 今後の実装予定
 
@@ -106,9 +104,9 @@ AutoDealerSphereにユーザー認証機能を追加し、ユーザー管理と�
 - API呼び出しの権限確認
 
 ### 6.3 セキュリティ強化
-- パスワードのハッシュ化（BCrypt等）
 - パスワードポリシーの実装
 - ログイン試行回数制限
+- セッションタイムアウト
 
 ## 7. 技術仕様
 
@@ -125,24 +123,30 @@ Client/
 ├── Pages/
 │   ├── Index.razor          # ログイン画面
 │   ├── UserList.razor       # ユーザー一覧
-│   └── UserList.razor.cs    # ユーザー一覧のコードビハインド
+│   ├── UserList.razor.cs    # ユーザー一覧のコードビハインド
+│   ├── EditUser.razor       # ユーザー編集
+│   └── EditUser.razor.cs    # ユーザー編集のコードビハインド
 ├── Shared/
 │   └── UserForm.razor       # ユーザーフォーム
 └── Layout/
-    └── MainLayout.razor     # メニュー定義
+    └── MainLayout.razor     # メニュー定義（ログイン画面でメニュー非表示）
 
 Server/
-├── Program.cs               # データベース初期化
+├── Program.cs               # アプリケーション起動
+├── Controllers/
+│   └── UserController.cs    # ユーザーAPI（ログイン機能含む）
 └── Services/
-    └── DbInitializer.cs     # サンプルデータ登録
+    ├── DatabaseInitializeService.cs  # データベース初期化
+    └── PasswordHashService.cs        # パスワードハッシュ化
 
 Shared/
 └── Models/
-    └── User.cs              # ユーザーモデル
+    ├── User.cs              # ユーザーモデル
+    └── LoginRequest.cs      # ログイン関連モデル
 ```
 
 ## 8. 注意事項
 
-1. **パスワード管理**: 現在はパスワードを平文で保存しているため、本番環境では必ずハッシュ化を実装すること
+1. **パスワード管理**: BCrypt.Net-Nextを使用してパスワードをハッシュ化して保存
 2. **データベース更新**: 既存データベースがある場合は、`Server/Data/crm01.db`を削除して再起動するか、手動でマイグレーションを実行する必要がある
 3. **権限制御**: メニューとAPIの権限制御は未実装のため、今後の実装が必要
