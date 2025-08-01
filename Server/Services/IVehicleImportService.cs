@@ -5,6 +5,6 @@ namespace AutoDealerSphere.Server.Services
 {
     public interface IVehicleImportService
     {
-        Task<(int clientsImported, int vehiclesImported, List<string> errors)> ImportFromCsvAsync(string filePath);
+        Task<(int clientsImported, int vehiclesImported, List<string> errors)> ImportFromCsvAsync(string filePath, bool replaceExisting = false);
     }
 }
