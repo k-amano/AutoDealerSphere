@@ -14,5 +14,11 @@ namespace AutoDealerSphere.Shared.Models
 		[Required(ErrorMessage = "メールアドレスを入力してください。")]
 		[StringLength(50, ErrorMessage = "メールアドレスは50文字までです。")]
 		public string Email { get; set; } = "";
+		[Required(ErrorMessage = "パスワードを入力してください。")]
+		[StringLength(100, ErrorMessage = "パスワードは100文字までです。")]
+		public string Password { get; set; } = "";
+		[Required(ErrorMessage = "権限を選択してください。")]
+		[Range(1, 2, ErrorMessage = "権限は1（一般）または2（管理者）を選択してください。")]
+		public int Role { get; set; } = 1;
 	}
 }

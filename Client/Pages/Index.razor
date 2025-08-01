@@ -1,63 +1,122 @@
-﻿@page "/"
+@page "/"
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.DataForm
-@using Newtonsoft.Json
-@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+@using AutoDealerSphere.Shared.Models
+@using System.ComponentModel.DataAnnotations
 
-<SfBreadcrumb>
-    <BreadcrumbItems>
-        <BreadcrumbItem IconCss="e-icons e-home" Url="/"/>
-        <BreadcrumbItem Text="ユーザ管理" Url="/"/>
-    </BreadcrumbItems>
-</SfBreadcrumb>
-
-<h2>ユーザ管理</h2>
-<h3>UserList</h3>
-
-<div>
-	<SfDataForm ID="MyForm" Width="50%" Model="@Item">
-		<FormItems>
-			<FormItem Field="@nameof(@Item.Id)"></FormItem>
-			<FormItem Field="@nameof(@Item.Name)"></FormItem>
-			<FormItem Field="@nameof(@Item.Email)"></FormItem>
-		</FormItems>
-		<FormButtons>
-			<SfButton @onclick="() => this.OnClickSearch(Item)">Search</SfButton>
-		</FormButtons>
-	</SfDataForm>
+<div class="login-container">
+    <div class="login-box">
+        <h2 class="login-title">ログイン</h2>
+        
+        <SfDataForm ID="LoginForm" Model="@loginModel" ColumnCount="1">
+            <FormItems>
+                <FormItem Field="@nameof(loginModel.Email)" LabelText="メールアドレス">
+                    <Template>
+                        <SfTextBox @bind-Value="@loginModel.Email" Placeholder="メールアドレスを入力"></SfTextBox>
+                    </Template>
+                </FormItem>
+                <FormItem Field="@nameof(loginModel.Password)" LabelText="パスワード">
+                    <Template>
+                        <SfTextBox @bind-Value="@loginModel.Password" Type="InputType.Password" Placeholder="パスワードを入力"></SfTextBox>
+                    </Template>
+                </FormItem>
+            </FormItems>
+        </SfDataForm>
+        
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="error-message">@errorMessage</div>
+        }
+        
+        <div class="login-button-container">
+            <SfButton CssClass="e-primary" OnClick="HandleLogin">ログイン</SfButton>
+        </div>
+    </div>
 </div>
-<br />
-@if (_initialized)
-{
-	@if (0 < _users.Count())
-	{
-		<SfGrid DataSource="@_users">
-			<GridColumns>
-				<GridColumn Field=@nameof(User.Id) HeaderText="ID" TextAlign="TextAlign.Right" Width="20"></GridColumn>
-				<GridColumn Field=@nameof(User.Name) HeaderText="Name" Width="100"></GridColumn>
-				<GridColumn Field=@nameof(User.Email) HeaderText="Email" Width="130"></GridColumn>
-				<GridColumn HeaderText="Actions" TextAlign="TextAlign.Center" Width="120">
-					<Template>
-						@{
-							User? user = (context as User);
-							if (null != user)
-							{
-								<button @onclick="() => this.OnClickEdit(user)">Edit</button>
-							}
-						}
-					</Template>
-				</GridColumn>
-			</GridColumns>
-		</SfGrid>
-	}
-	else
-	{
-		<p class="error-message">ユーザ情報が見つかりません。</p>
-	}
+
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+    
+    .login-box {
+        width: 400px;
+        padding: 40px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .login-title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+    }
+    
+    .login-button-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .login-button-container .e-btn {
+        width: 100%;
+        padding: 10px;
+    }
+    
+    .error-message {
+        color: #d32f2f;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+    
+    .e-dataform .e-form-fields {
+        margin-bottom: 20px;
+    }
+</style>
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+    private string errorMessage = "";
+
+    private class LoginModel
+    {
+        [Required(ErrorMessage = "メールアドレスを入力してください。")]
+        public string Email { get; set; } = "";
+        
+        [Required(ErrorMessage = "パスワードを入力してください。")]
+        public string Password { get; set; } = "";
+    }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            errorMessage = "";
+            
+            // TODO: 実際の認証処理を実装
+            // 現在は仮実装として、サンプルユーザーでのみログイン可能
+            if ((loginModel.Email == "admin@example.com" && loginModel.Password == "admin123") ||
+                (loginModel.Email == "user@example.com" && loginModel.Password == "user123") ||
+                (loginModel.Email == "yamada@example.com" && loginModel.Password == "yamada123"))
+            {
+                // ログイン成功 - 顧客一覧へ遷移
+                NavigationManager.NavigateTo("/clientlist");
+            }
+            else
+            {
+                errorMessage = "メールアドレスまたはパスワードが正しくありません。";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "ログイン処理中にエラーが発生しました。";
+        }
+    }
 }
-<br />
-<div>
-	<SfButton OnClick="AddUserHandler">ユーザの追加</SfButton>
-</div>

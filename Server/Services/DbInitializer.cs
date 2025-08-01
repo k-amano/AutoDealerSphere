@@ -52,6 +52,20 @@ namespace AutoDealerSphere.Server.Services
             {
                 AddSampleData(context);
             }
+            
+            // ユーザーテーブルが空の場合のみサンプルユーザーを追加
+            try
+            {
+                if (!context.Users.Any())
+                {
+                    AddSampleUsers(context);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Usersテーブルの構造が異なる場合はスキップ
+                Console.WriteLine($"Warning: Could not add sample users: {ex.Message}");
+            }
         }
         
         private static void AddSampleData(SQLDBContext context)
@@ -94,6 +108,37 @@ namespace AutoDealerSphere.Server.Services
             };
 
             context.Clients.AddRange(clients);
+            context.SaveChanges();
+        }
+        
+        private static void AddSampleUsers(SQLDBContext context)
+        {
+            var users = new[]
+            {
+                new User
+                {
+                    Name = "管理者",
+                    Email = "admin@example.com",
+                    Password = "admin123", // 実際の実装ではハッシュ化が必要
+                    Role = 2 // 管理者
+                },
+                new User
+                {
+                    Name = "一般ユーザー",
+                    Email = "user@example.com",
+                    Password = "user123", // 実際の実装ではハッシュ化が必要
+                    Role = 1 // 一般ユーザー
+                },
+                new User
+                {
+                    Name = "山田太郎",
+                    Email = "yamada@example.com",
+                    Password = "yamada123", // 実際の実装ではハッシュ化が必要
+                    Role = 1 // 一般ユーザー
+                }
+            };
+
+            context.Users.AddRange(users);
             context.SaveChanges();
         }
     }
