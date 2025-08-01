@@ -76,10 +76,77 @@ using (var scope = app.Services.CreateScope())
             ");
         }
         
-        // 初回起動時のみサンプルデータを初期化（Usersテーブルにデータがない場合）
-        if (!dbContext.Users.Any())
+        // Usersテーブルが存在するかチェック
+        try
         {
-            DbInitializer.InitializeSampleData(dbContext);
+            var usersTableExists = dbContext.Database.ExecuteSqlRaw(
+                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='Users'") > 0;
+            
+            if (!usersTableExists)
+            {
+                // Usersテーブルを作成
+                dbContext.Database.ExecuteSqlRaw(@"
+                    CREATE TABLE IF NOT EXISTS Users (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Name TEXT NOT NULL,
+                        Email TEXT NOT NULL,
+                        Password TEXT NOT NULL,
+                        Role INTEGER NOT NULL DEFAULT 1
+                    )
+                ");
+            }
+            else
+            {
+                // Usersテーブルのカラムをチェックして必要に応じて追加
+                try
+                {
+                    // Passwordカラムが存在するかチェック
+                    var hasPasswordColumn = dbContext.Database.ExecuteSqlRaw(
+                        "SELECT COUNT(*) FROM pragma_table_info('Users') WHERE name = 'Password'") > 0;
+                    
+                    if (!hasPasswordColumn)
+                    {
+                        // Password と Role カラムを追加
+                        dbContext.Database.ExecuteSqlRaw(@"
+                            ALTER TABLE Users ADD COLUMN Password TEXT NOT NULL DEFAULT '';
+                        ");
+                        dbContext.Database.ExecuteSqlRaw(@"
+                            ALTER TABLE Users ADD COLUMN Role INTEGER NOT NULL DEFAULT 1;
+                        ");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Warning: Could not update Users table structure: {ex.Message}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Warning: Could not check/create Users table: {ex.Message}");
+        }
+        
+        // 初回起動時のみサンプルデータを初期化（Usersテーブルにデータがない場合）
+        try
+        {
+            if (!dbContext.Users.Any())
+            {
+                DbInitializer.InitializeSampleData(dbContext);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Usersテーブルがまだ存在しない場合は、初期化をスキップ
+            Console.WriteLine($"Warning: Could not check Users table: {ex.Message}");
+            // EnsureCreatedでテーブルが作成された後、再度試行
+            try
+            {
+                DbInitializer.InitializeSampleData(dbContext);
+            }
+            catch
+            {
+                // それでも失敗した場合はスキップ
+            }
         }
     }
     catch (Exception ex)

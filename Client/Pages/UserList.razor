@@ -1,0 +1,129 @@
+@page "/userlist"
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using Newtonsoft.Json
+@using AutoDealerSphere.Shared.Models
+
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/" />
+        <BreadcrumbItem Text="ユーザー管理" Url="/" />
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>ユーザー管理</h2>
+<h3>ユーザー一覧</h3>
+
+<div class="search-form">
+    <EditForm Model="@Search" OnValidSubmit="() => OnSearch(Search)">
+        <DataAnnotationsValidator />
+        <div class="form">
+            <div class="form-row">
+                <label>名前</label>
+                <SfTextBox @bind-Value="Search.Name" Placeholder="名前"></SfTextBox>
+            </div>
+            <div class="form-row">
+                <label>メールアドレス</label>
+                <SfTextBox @bind-Value="Search.Email" Placeholder="メールアドレス"></SfTextBox>
+            </div>
+            <div class="form-buttons">
+                <SfButton Type="ButtonType.Submit">検索</SfButton>
+            </div>
+        </div>
+    </EditForm>
+</div>
+<br />
+
+<div class="toolbar">
+    <SfButton OnClick="AddUser" CssClass="e-primary">新規追加</SfButton>
+</div>
+<br />
+
+@if (Users.Any())
+{
+    <SfGrid DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowMultiSorting="true" CssClass="two-line-grid">
+        <GridTemplates>
+            <RowTemplate>
+                @{
+                    var user = context as User;
+                    <td colspan="5">
+                        <div class="user-row">
+                            <div class="row-line1">
+                                <span class="user-id">@user.Id</span>
+                                <span class="user-name">
+                                    <span @onclick="() => EditUserFromContext(context)" class="grid-link">
+                                        @user.Name
+                                    </span>
+                                </span>
+                                <span class="user-role">
+                                    @(user.Role == 2 ? "管理者" : "一般ユーザー")
+                                </span>
+                            </div>
+                            <div class="row-line2">
+                                <span class="user-email">✉ @user.Email</span>
+                            </div>
+                        </div>
+                    </td>
+                }
+            </RowTemplate>
+        </GridTemplates>
+        <GridColumns>
+            <GridColumn Field="@nameof(User.Id)" HeaderText="ID"></GridColumn>
+            <GridColumn Field="@nameof(User.Name)" HeaderText="名前"></GridColumn>
+            <GridColumn Field="@nameof(User.Email)" HeaderText="メールアドレス"></GridColumn>
+            <GridColumn Field="@nameof(User.Role)" HeaderText="権限"></GridColumn>
+            <GridColumn Field="@nameof(User.Password)" HeaderText="パスワード" Visible="false"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+}
+else
+{
+    <p class="error-message">ユーザー情報が見つかりません。</p>
+}
+
+<style>
+    /* ユーザーリストの2段表示スタイル */
+    .user-row {
+        padding: 8px 12px;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 14px;
+        line-height: 22px;
+    }
+    
+    .user-id {
+        color: #999;
+        margin-right: 12px;
+    }
+    
+    .user-name {
+        margin-right: 10px;
+    }
+    
+    .user-role {
+        color: #666;
+        padding: 2px 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-left: auto;
+    }
+    
+    .user-role:contains("管理者") {
+        background-color: #e3f2fd;
+        border-color: #90caf9;
+        color: #1976d2;
+    }
+    
+    .user-email {
+        color: #666;
+    }
+</style>
+
+@code {
+}

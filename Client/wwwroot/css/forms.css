@@ -33,14 +33,16 @@
 /* Syncfusionコンポーネント共通（スコープ回避版） */
 .search-form .e-input-group,
 .client-form .e-input-group,
-.vehicle-form .e-input-group {
+.vehicle-form .e-input-group,
+.user-form .e-input-group {
     flex: 1;
     max-width: 400px;
 }
 
 .search-form .e-ddl,
 .client-form .e-ddl,
-.vehicle-form .e-ddl {
+.vehicle-form .e-ddl,
+.user-form .e-ddl {
     max-width: 400px;
 }
 
@@ -56,7 +58,8 @@
 
 /* バリデーション */
 .client-form .validation-message,
-.vehicle-form .validation-message {
+.vehicle-form .validation-message,
+.user-form .validation-message {
     flex-basis: 100%;
     color: #dc3545;
     font-size: 0.9em;
@@ -65,7 +68,8 @@
 }
 
 .client-form .e-error,
-.vehicle-form .e-error {
+.vehicle-form .e-error,
+.user-form .e-error {
     color: #dc3545;
     font-size: 0.9em;
     margin-top: 4px;
