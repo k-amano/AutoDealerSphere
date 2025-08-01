@@ -4,28 +4,143 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>AutoDealerSphere</title>
     <base href="/" />
-    <link rel="stylesheet" href="css/blazor-ui.css" />
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/forms.css" />
-    <link rel="stylesheet" href="AutoDealerSphere.Client.styles.css" />
+    <link rel="stylesheet" href="css/blazor-ui.css?v=2025080102" />
+    <link rel="stylesheet" href="css/styles.css?v=2025080102" />
+    <link rel="stylesheet" href="css/forms.css?v=2025080102" />
+    <link rel="stylesheet" href="AutoDealerSphere.Client.styles.css?v=2025080102" />
     <link href="_content/Syncfusion.Blazor.Themes/bootstrap5.css" rel="stylesheet" />
     <script src="_content/Syncfusion.Blazor.Core/scripts/syncfusion-blazor.min.js" type="text/javascript"></script>
+    <style>
+        .loading-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .loading-spinner div {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #666;
+            border-radius: 50%;
+            animation: loading-spinner 1.2s linear infinite;
+        }
+
+        .loading-spinner div:nth-child(1) {
+            animation-delay: 0s;
+            top: 56px;
+            left: 99px;
+        }
+
+        .loading-spinner div:nth-child(2) {
+            animation-delay: -0.1s;
+            top: 33px;
+            left: 93px;
+        }
+
+        .loading-spinner div:nth-child(3) {
+            animation-delay: -0.2s;
+            top: 17px;
+            left: 78px;
+        }
+
+        .loading-spinner div:nth-child(4) {
+            animation-delay: -0.3s;
+            top: 11px;
+            left: 56px;
+        }
+
+        .loading-spinner div:nth-child(5) {
+            animation-delay: -0.4s;
+            top: 17px;
+            left: 33px;
+        }
+
+        .loading-spinner div:nth-child(6) {
+            animation-delay: -0.5s;
+            top: 33px;
+            left: 17px;
+        }
+
+        .loading-spinner div:nth-child(7) {
+            animation-delay: -0.6s;
+            top: 56px;
+            left: 11px;
+        }
+
+        .loading-spinner div:nth-child(8) {
+            animation-delay: -0.7s;
+            top: 78px;
+            left: 17px;
+        }
+
+        @keyframes loading-spinner {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        .loading-progress-text {
+            text-align: center;
+            font-weight: bold;
+            color: #444;
+            margin-top: 2rem;
+        }
+
+        #blazor-error-ui {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #ffffe0;
+            padding: 1rem;
+            z-index: 1000;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="loading-container">
+            <div class="loading-spinner">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div class="loading-progress-text">
+                ページを読み込んでいます...<br>
+                しばらくお待ちください。
+            </div>
+        </div>
     </div>
 
     <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
+        エラーが発生しました。
+        <a href="" class="reload">再読み込み</a>
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>

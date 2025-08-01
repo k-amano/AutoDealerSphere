@@ -22,7 +22,7 @@ namespace AutoDealerSphere.Server.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadAndImport(IFormFile file)
+        public async Task<IActionResult> UploadAndImport(IFormFile file, [FromForm] bool replaceExisting = false)
         {
             if (file == null || file.Length == 0)
             {
@@ -45,7 +45,7 @@ namespace AutoDealerSphere.Server.Controllers
                 }
 
                 // インポート実行
-                var result = await _importService.ImportFromCsvAsync(tempPath);
+                var result = await _importService.ImportFromCsvAsync(tempPath, replaceExisting);
 
                 // 一時ファイルを削除
                 if (System.IO.File.Exists(tempPath))

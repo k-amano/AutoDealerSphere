@@ -22,11 +22,12 @@ namespace AutoDealerSphere.Server.Services
             _logger = logger;
         }
 
-        public async Task<(int clientsImported, int vehiclesImported, List<string> errors)> ImportFromCsvAsync(string filePath)
+        public async Task<(int clientsImported, int vehiclesImported, List<string> errors)> ImportFromCsvAsync(string filePath, bool replaceExisting = false)
         {
             var errors = new List<string>();
             int clientsImported = 0;
             int vehiclesImported = 0;
+            var processedClientNames = new HashSet<string>(); // 処理された顧客名を追跡
 
             try
             {
@@ -45,6 +46,35 @@ namespace AutoDealerSphere.Server.Services
                 var columnIndexes = GetColumnIndexes(headers);
 
                 using var context = await _contextFactory.CreateDbContextAsync();
+
+                // 既存データを置き換える場合
+                if (replaceExisting)
+                {
+                    try
+                    {
+                        // 既存の車両データをすべて削除
+                        var existingVehicles = await context.Vehicles.ToListAsync();
+                        context.Vehicles.RemoveRange(existingVehicles);
+                        await context.SaveChangesAsync();
+
+                        // 車両の連番をリセット（SQLiteの場合）
+                        await context.Database.ExecuteSqlRawAsync("DELETE FROM sqlite_sequence WHERE name='Vehicles'");
+
+                        // 既存の顧客データをすべて削除
+                        var existingClients = await context.Clients.ToListAsync();
+                        context.Clients.RemoveRange(existingClients);
+                        await context.SaveChangesAsync();
+                        
+                        // 顧客の連番もリセット
+                        await context.Database.ExecuteSqlRawAsync("DELETE FROM sqlite_sequence WHERE name='Clients'");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "既存データの削除中にエラーが発生しました。");
+                        errors.Add($"既存データの削除に失敗しました: {ex.Message}");
+                        return (0, 0, errors);
+                    }
+                }
 
                 // データ行を処理
                 for (int i = 1; i < lines.Length; i++)
