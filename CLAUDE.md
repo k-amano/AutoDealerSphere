@@ -42,9 +42,10 @@ dotnet run
    - Shared contains domain models used by both layers
 
 2. **Database Initialization**:
-   - On startup, the application recreates the database with sample data (see Server/Program.cs:22-27)
+   - On startup, the application ensures database tables are created (see Server/Program.cs:17-31)
    - Database context is configured with SQLite connection string from appsettings.json
-   - Sample data initialization is handled by DbInitializer service
+   - Database initialization is handled by DatabaseInitializeService
+   - Initial admin user is created automatically (admin@example.com / admin123)
 
 3. **Service Pattern**:
    - Services are registered in DI container (e.g., IClientService)
@@ -59,6 +60,7 @@ dotnet run
 ## Important Notes
 
 - The application uses Syncfusion components which require a license key (configured in Client/Program.cs)
-- Database is recreated on every startup - this behavior may need modification for production
-- The application supports both User and Client management with full CRUD operations
+- Database tables are created if they don't exist on startup, preserving existing data
+- The application supports User, Client, and Vehicle management with full CRUD operations
 - Japanese language is used throughout the UI (labels, error messages, etc.)
+- Initial admin user is created automatically for system access
