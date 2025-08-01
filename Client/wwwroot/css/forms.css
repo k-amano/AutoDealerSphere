@@ -221,3 +221,58 @@
     color: #333;
     white-space: nowrap;
 }
+
+/* ユーザーリストのスタイル */
+.user-row {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    line-height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+.user-id {
+    color: #999;
+    margin-right: 20px;
+    width: 50px;
+    flex-shrink: 0;
+}
+
+.user-name {
+    margin-right: 20px;
+    width: 140px;
+    flex-shrink: 0;
+}
+
+.user-email {
+    color: #666;
+    margin-right: auto;
+}
+
+.user-role {
+    color: #666;
+    padding: 4px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-left: 10px;
+    width: 100px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.user-role.admin {
+    background-color: #e3f2fd;
+    border-color: #90caf9;
+    color: #1976d2;
+}
+
+/* ユーザーグリッドのスタイル */
+.user-grid .e-row {
+    height: auto;
+}
+
+.user-grid .e-rowcell {
+    padding: 0;
+}
