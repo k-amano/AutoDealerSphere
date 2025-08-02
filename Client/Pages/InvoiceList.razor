@@ -52,7 +52,15 @@
 <br />
 
 <div class="register-form">
-    <SfButton @onclick="OnCreateClick">新規作成</SfButton>
+    @if (HasClients)
+    {
+        <SfButton @onclick="OnCreateClick">新規作成</SfButton>
+    }
+    else
+    {
+        <SfButton Disabled="true" title="顧客データがないため新規作成できません">新規作成</SfButton>
+        <span class="text-warning ms-2">※ 先に顧客情報を登録してください</span>
+    }
 </div>
 <br />
 
@@ -114,10 +122,18 @@ else
 @code {
     private Invoice[]? Invoices;
     private InvoiceSearchModel Search = new InvoiceSearchModel();
+    private bool HasClients = false;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadInvoices();
+        await CheckClients();
+    }
+    
+    private async Task CheckClients()
+    {
+        var clients = await Http.GetFromJsonAsync<AutoDealerSphere.Shared.Models.Client[]>("api/Client");
+        HasClients = clients != null && clients.Any();
     }
 
     private async Task LoadInvoices()

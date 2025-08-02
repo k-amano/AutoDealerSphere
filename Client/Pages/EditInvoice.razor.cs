@@ -37,10 +37,10 @@ namespace AutoDealerSphere.Client.Pages
                 };
                 
                 // 請求書番号を取得
-                var response = await Http.GetFromJsonAsync<dynamic>("api/Invoices/new-number");
+                var response = await Http.GetFromJsonAsync<InvoiceNumberResponse>("api/Invoices/new-number");
                 if (response != null)
                 {
-                    _invoice.InvoiceNumber = response.invoiceNumber;
+                    _invoice.InvoiceNumber = response.InvoiceNumber;
                 }
             }
             else
@@ -148,6 +148,11 @@ namespace AutoDealerSphere.Client.Pages
         private void OnCancelClick()
         {
             NavigationManager.NavigateTo("/invoicelist");
+        }
+        
+        private class InvoiceNumberResponse
+        {
+            public string InvoiceNumber { get; set; } = string.Empty;
         }
     }
 }

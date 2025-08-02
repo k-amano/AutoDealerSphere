@@ -24,7 +24,15 @@
 
 @if (_initialized)
 {
-    @if (_invoice != null)
+    @if (_clients == null || !_clients.Any())
+    {
+        <div class="alert alert-warning">
+            <h4>請求書を作成できません</h4>
+            <p>顧客データが登録されていません。先に顧客情報を登録してください。</p>
+            <SfButton @onclick="@(() => NavigationManager.NavigateTo("/clientlist"))" IsPrimary="true">顧客管理へ</SfButton>
+        </div>
+    }
+    else if (_invoice != null)
     {
         <EditForm Model="@_invoice" OnValidSubmit="OnValidSubmit">
             <DataAnnotationsValidator />
