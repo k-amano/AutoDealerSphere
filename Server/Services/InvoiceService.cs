@@ -120,8 +120,9 @@ namespace AutoDealerSphere.Server.Services
 
         public async Task<byte[]> ExportToExcelAsync(int invoiceId)
         {
-            // Excel出力機能は後で実装
-            throw new NotImplementedException();
+            // ExcelExportServiceに委譲
+            var excelExportService = new ExcelExportService(this);
+            return await excelExportService.ExportInvoiceToExcelAsync(invoiceId);
         }
 
         private void CalculateInvoiceTotals(Invoice invoice)

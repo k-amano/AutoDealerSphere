@@ -92,12 +92,16 @@ namespace AutoDealerSphere.Server.Controllers
         {
             try
             {
+                var invoice = await _invoiceService.GetInvoiceByIdAsync(id);
+                if (invoice == null)
+                {
+                    return NotFound($"Invoice with ID {id} not found");
+                }
+
                 var excelData = await _invoiceService.ExportToExcelAsync(id);
-                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"invoice_{id}.xlsx");
-            }
-            catch (NotImplementedException)
-            {
-                return StatusCode(501, "Excel export is not implemented yet");
+                var fileName = $"請求書_{invoice.InvoiceNumber}_{DateTime.Now:yyyyMMdd}.xlsx";
+                
+                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
             catch (Exception ex)
             {
