@@ -45,31 +45,37 @@
 </div>
 <br />
 
-<SfGrid DataSource="@Parts" AllowSorting="true" AllowPaging="true" AllowFiltering="false" AllowTextWrap="true">
-    <GridPageSettings PageSize="20"></GridPageSettings>
-    <GridColumns>
-        <GridColumn Field="@nameof(Part.Id)" HeaderText="ID" Width="70"></GridColumn>
-        <GridColumn Field="@nameof(Part.PartName)" HeaderText="部品名" Width="200">
-            <Template>
-                @{
-                    var part = (context as Part);
-                    <a href="@($"/part/{part.Id}")" class="grid-link">@part.PartName</a>
-                }
-            </Template>
-        </GridColumn>
-        <GridColumn Field="@nameof(Part.Type)" HeaderText="タイプ" Width="150"></GridColumn>
-        <GridColumn Field="@nameof(Part.UnitPrice)" HeaderText="単価" Width="120" Format="C0" TextAlign="TextAlign.Right"></GridColumn>
-        <GridColumn Field="@nameof(Part.IsActive)" HeaderText="有効" Width="80">
-            <Template>
-                @{
-                    var part = (context as Part);
-                    <span>@(part.IsActive ? "○" : "×")</span>
-                }
-            </Template>
-        </GridColumn>
-        <GridColumn Field="@nameof(Part.UpdatedAt)" HeaderText="更新日時" Width="150" Format="yyyy/MM/dd HH:mm"></GridColumn>
-    </GridColumns>
-</SfGrid>
+@if (Parts != null && Parts.Any())
+{
+    <SfGrid DataSource="@Parts" AllowSorting="true" AllowPaging="true" AllowFiltering="false" AllowTextWrap="true">
+        <GridPageSettings PageSize="20"></GridPageSettings>
+        <GridColumns>
+            <GridColumn Field="@nameof(Part.Id)" HeaderText="ID" Width="70"></GridColumn>
+            <GridColumn Field="@nameof(Part.PartName)" HeaderText="部品名" Width="200">
+                <Template>
+                    @{
+                        var part = (context as Part);
+                        <a href="@($"/part/{part.Id}")" class="grid-link">@part.PartName</a>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(Part.Type)" HeaderText="タイプ" Width="150"></GridColumn>
+            <GridColumn Field="@nameof(Part.UnitPrice)" HeaderText="単価" Width="120" TextAlign="TextAlign.Right">
+                <Template>
+                    @{
+                        var part = (context as Part);
+                        <span>¥@($"{part.UnitPrice:N0}")</span>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(Part.UpdatedAt)" HeaderText="更新日時" Width="150" Format="yyyy/MM/dd HH:mm"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+}
+else
+{
+    <p class="error-message">部品情報が見つかりません。</p>
+}
 
 @code {
     private Part[]? Parts;

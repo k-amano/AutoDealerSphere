@@ -126,7 +126,7 @@
                                 <EditTemplate Context="editContext">
                                     @{
                                         var detail = (editContext as InvoiceDetail);
-                                        <SfNumericTextBox @bind-Value="detail.UnitPrice" Format="C0" Min="0m"></SfNumericTextBox>
+                                        <SfNumericTextBox @bind-Value="detail.UnitPrice" Format="¥#,##0" Min="0m"></SfNumericTextBox>
                                     }
                                 </EditTemplate>
                             </GridColumn>
@@ -134,7 +134,7 @@
                                 <EditTemplate Context="editContext">
                                     @{
                                         var detail = (editContext as InvoiceDetail);
-                                        <SfNumericTextBox @bind-Value="detail.LaborCost" Format="C0" Min="0m"></SfNumericTextBox>
+                                        <SfNumericTextBox @bind-Value="detail.LaborCost" Format="¥#,##0" Min="0m"></SfNumericTextBox>
                                     }
                                 </EditTemplate>
                             </GridColumn>
@@ -146,11 +146,11 @@
                                     }
                                 </Template>
                             </GridColumn>
-                            <GridColumn Field="@nameof(InvoiceDetail.SubTotal)" HeaderText="小計" Width="100" Format="C0">
+                            <GridColumn Field="@nameof(InvoiceDetail.SubTotal)" HeaderText="小計" Width="100">
                                 <Template Context="templateContext">
                                     @{
                                         var detail = (templateContext as InvoiceDetail);
-                                        <span>@detail.SubTotal.ToString("C0")</span>
+                                        <span>¥@($"{detail.SubTotal:N0}")</span>
                                     }
                                 </Template>
                             </GridColumn>
@@ -169,19 +169,19 @@
                 <h4>合計</h4>
                 <div class="form-row">
                     <label>課税対象小計</label>
-                    <span class="total-amount">@_invoice.TaxableSubTotal.ToString("C0")</span>
+                    <span class="total-amount">¥@($"{_invoice.TaxableSubTotal:N0}")</span>
                 </div>
                 <div class="form-row">
                     <label>非課税小計</label>
-                    <span class="total-amount">@_invoice.NonTaxableSubTotal.ToString("C0")</span>
+                    <span class="total-amount">¥@($"{_invoice.NonTaxableSubTotal:N0}")</span>
                 </div>
                 <div class="form-row">
                     <label>消費税（@(_invoice.TaxRate)%）</label>
-                    <span class="total-amount">@_invoice.Tax.ToString("C0")</span>
+                    <span class="total-amount">¥@($"{_invoice.Tax:N0}")</span>
                 </div>
                 <div class="form-row">
                     <label><strong>合計金額</strong></label>
-                    <span class="total-amount"><strong>@_invoice.Total.ToString("C0")</strong></span>
+                    <span class="total-amount"><strong>¥@($"{_invoice.Total:N0}")</strong></span>
                 </div>
                 
                 <div class="form-row">

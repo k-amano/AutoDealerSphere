@@ -41,6 +41,7 @@ namespace AutoDealerSphere.Server.Services
                 CreateInitialAdminUser();
                 CreateInitialVehicleCategories();
                 CreateInitialStatutoryFees();
+                CreateInitialParts();
             }
             catch (Exception ex)
             {
@@ -185,8 +186,7 @@ namespace AutoDealerSphere.Server.Services
                             Id INTEGER PRIMARY KEY AUTOINCREMENT,
                             CategoryName TEXT NOT NULL,
                             Description TEXT,
-                            DisplayOrder INTEGER NOT NULL DEFAULT 0,
-                            IsActive INTEGER NOT NULL DEFAULT 1
+                            DisplayOrder INTEGER NOT NULL DEFAULT 0
                         )
                     ");
             }
@@ -206,7 +206,6 @@ namespace AutoDealerSphere.Server.Services
                             PartName TEXT NOT NULL,
                             Type TEXT,
                             UnitPrice DECIMAL(10,2) NOT NULL DEFAULT 0,
-                            IsActive INTEGER NOT NULL DEFAULT 1,
                             CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
                             UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))
                         )
@@ -231,7 +230,6 @@ namespace AutoDealerSphere.Server.Services
                             IsTaxable INTEGER NOT NULL DEFAULT 0,
                             EffectiveFrom TEXT NOT NULL,
                             EffectiveTo TEXT,
-                            IsActive INTEGER NOT NULL DEFAULT 1,
                             CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
                             UpdatedAt TEXT NOT NULL DEFAULT (datetime('now')),
                             FOREIGN KEY (VehicleCategoryId) REFERENCES VehicleCategories(Id)
@@ -310,12 +308,6 @@ namespace AutoDealerSphere.Server.Services
         {
             try
             {
-                // テーブルが存在するか確認
-                var tableExists = _context.Database.ExecuteSqlRaw(
-                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='VehicleCategories'") > 0;
-                
-                if (!tableExists) return;
-
                 var categoriesExist = _context.VehicleCategories.Any();
                 
                 if (!categoriesExist)
@@ -343,12 +335,6 @@ namespace AutoDealerSphere.Server.Services
         {
             try
             {
-                // テーブルが存在するか確認
-                var tableExists = _context.Database.ExecuteSqlRaw(
-                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='StatutoryFees'") > 0;
-                
-                if (!tableExists) return;
-
                 var feesExist = _context.StatutoryFees.Any();
                 
                 if (!feesExist)
@@ -359,7 +345,7 @@ namespace AutoDealerSphere.Server.Services
                     // 軽自動車
                     fees.Add(new StatutoryFee { VehicleCategoryId = 1, FeeType = "自賠責保険（24ヶ月）", Amount = 17540, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 1, FeeType = "自賠責保険（25ヶ月）", Amount = 18040, EffectiveFrom = effectiveDate });
-                    fees.Add(new StatutoryFee { VehicleCategoryId = 1, FeeType = "重量税", Amount = 6600, EffectiveFrom = effectiveDate });
+                    fees.Add(new StatutoryFee { VehicleCategoryId = 1, FeeType = "重量税", Amount = 8200, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 1, FeeType = "印紙代", Amount = 1800, EffectiveFrom = effectiveDate });
 
                     // 小型車
@@ -369,10 +355,10 @@ namespace AutoDealerSphere.Server.Services
                     fees.Add(new StatutoryFee { VehicleCategoryId = 2, FeeType = "印紙代", Amount = 1800, EffectiveFrom = effectiveDate });
 
                     // 普通車
-                    fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "自賠責保険（24ヶ月）", Amount = 17650, EffectiveFrom = effectiveDate });
-                    fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "自賠責保険（25ヶ月）", Amount = 18160, EffectiveFrom = effectiveDate });
-                    fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "重量税", Amount = 24600, EffectiveFrom = effectiveDate });
-                    fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "印紙代", Amount = 1800, EffectiveFrom = effectiveDate });
+                    fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "自賠責保険（24ヶ月）", Amount = 20010, EffectiveFrom = effectiveDate });
+                    fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "自賠責保険（25ヶ月）", Amount = 20610, EffectiveFrom = effectiveDate });
+                    fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "重量税", Amount = 34200, EffectiveFrom = effectiveDate });
+                    fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "印紙代", Amount = 1700, EffectiveFrom = effectiveDate });
 
                     _context.StatutoryFees.AddRange(fees);
                     _context.SaveChanges();
@@ -381,6 +367,112 @@ namespace AutoDealerSphere.Server.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Warning: Could not create initial statutory fees: {ex.Message}");
+            }
+        }
+
+        private void CreateInitialParts()
+        {
+            try
+            {
+                var partsExist = _context.Parts.Any();
+                
+                if (!partsExist)
+                {
+                    var parts = new List<Part>
+                    {
+                        // オイル関連
+                        new Part { PartName = "エンジンオイル（4L）", Type = "オイル", UnitPrice = 3500 },
+                        new Part { PartName = "エンジンオイル（3L）", Type = "オイル", UnitPrice = 2700 },
+                        new Part { PartName = "オイルフィルター", Type = "フィルター", UnitPrice = 1500 },
+                        new Part { PartName = "ATFオイル", Type = "オイル", UnitPrice = 2000 },
+                        new Part { PartName = "ブレーキオイル", Type = "オイル", UnitPrice = 1500 },
+                        
+                        // フィルター類
+                        new Part { PartName = "エアフィルター", Type = "フィルター", UnitPrice = 2500 },
+                        new Part { PartName = "エアコンフィルター", Type = "フィルター", UnitPrice = 2000 },
+                        
+                        // タイヤ関連
+                        new Part { PartName = "タイヤ（155/65R14）", Type = "タイヤ", UnitPrice = 6000 },
+                        new Part { PartName = "タイヤ（175/65R14）", Type = "タイヤ", UnitPrice = 7000 },
+                        new Part { PartName = "タイヤ（195/65R15）", Type = "タイヤ", UnitPrice = 8500 },
+                        new Part { PartName = "タイヤ（205/60R16）", Type = "タイヤ", UnitPrice = 10000 },
+                        
+                        // ブレーキ関連
+                        new Part { PartName = "ブレーキパッド（フロント）", Type = "ブレーキ", UnitPrice = 8000 },
+                        new Part { PartName = "ブレーキパッド（リア）", Type = "ブレーキ", UnitPrice = 6000 },
+                        new Part { PartName = "ブレーキディスク（フロント）", Type = "ブレーキ", UnitPrice = 12000 },
+                        new Part { PartName = "ブレーキディスク（リア）", Type = "ブレーキ", UnitPrice = 10000 },
+                        
+                        // バッテリー
+                        new Part { PartName = "バッテリー（40B19L）", Type = "バッテリー", UnitPrice = 8000 },
+                        new Part { PartName = "バッテリー（60B24L）", Type = "バッテリー", UnitPrice = 12000 },
+                        new Part { PartName = "バッテリー（80D23L）", Type = "バッテリー", UnitPrice = 15000 },
+                        
+                        // ワイパー
+                        new Part { PartName = "ワイパーブレード（運転席）", Type = "ワイパー", UnitPrice = 1500 },
+                        new Part { PartName = "ワイパーブレード（助手席）", Type = "ワイパー", UnitPrice = 1200 },
+                        new Part { PartName = "ワイパーブレード（リア）", Type = "ワイパー", UnitPrice = 1000 },
+                        
+                        // ランプ類
+                        new Part { PartName = "ヘッドライトバルブ（H4）", Type = "ランプ", UnitPrice = 1500 },
+                        new Part { PartName = "ヘッドライトバルブ（HID）", Type = "ランプ", UnitPrice = 8000 },
+                        new Part { PartName = "ブレーキランプバルブ", Type = "ランプ", UnitPrice = 500 },
+                        new Part { PartName = "ウインカーバルブ", Type = "ランプ", UnitPrice = 500 },
+                        
+                        // その他消耗品
+                        new Part { PartName = "スパークプラグ", Type = "点火系", UnitPrice = 800 },
+                        new Part { PartName = "クーラント", Type = "冷却系", UnitPrice = 1500 },
+                        new Part { PartName = "ウォッシャー液", Type = "その他", UnitPrice = 500 },
+                        
+                        // 工賃項目（部品ではないが、請求書で使用）
+                        new Part { PartName = "一般整備工賃", Type = "工賃", UnitPrice = 0 },
+                        
+                        // 車検関連（軽自動車）
+                        new Part { PartName = "車検整備費用（軽）", Type = "車検", UnitPrice = 16000 },
+                        new Part { PartName = "24か月点検（軽）", Type = "点検", UnitPrice = 4700 },
+                        new Part { PartName = "下廻り（スチーム洗車）", Type = "車検", UnitPrice = 2000 },
+                        new Part { PartName = "下廻り（錆止め塗装）（軽）", Type = "車検", UnitPrice = 3000 },
+                        new Part { PartName = "車検ライン通し（軽）", Type = "車検", UnitPrice = 5000 },
+                        new Part { PartName = "車検代行料（軽）", Type = "車検", UnitPrice = 8500 },
+                        new Part { PartName = "スーパークーラント交換 5L", Type = "冷却系", UnitPrice = 4000 },
+                        new Part { PartName = "ブレーキフルード交換 1L", Type = "ブレーキ", UnitPrice = 2000 },
+                        new Part { PartName = "フロント・リアブレーキ O/H サービス", Type = "ブレーキ", UnitPrice = 0 },
+                        
+                        // 車検関連（普通車）
+                        new Part { PartName = "車検整備費用（普通車）", Type = "車検", UnitPrice = 20000 },
+                        new Part { PartName = "24か月点検（普通車）", Type = "点検", UnitPrice = 6000 },
+                        new Part { PartName = "下廻り（錆止め塗装）（普通車）", Type = "車検", UnitPrice = 4000 },
+                        new Part { PartName = "車検ライン通し（普通車）", Type = "車検", UnitPrice = 5000 },
+                        new Part { PartName = "車検代行料（普通車）", Type = "車検", UnitPrice = 8500 },
+                        new Part { PartName = "スーパークーラント交換 6L", Type = "冷却系", UnitPrice = 4800 },
+                        
+                        // タイヤ（詳細）
+                        new Part { PartName = "タイヤ 155/65R14 ネクストリー", Type = "タイヤ", UnitPrice = 8500 },
+                        new Part { PartName = "タイヤ 155/65R14 エコピア NH200", Type = "タイヤ", UnitPrice = 11400 },
+                        new Part { PartName = "タイヤ 145/80R12 貨物 K370", Type = "タイヤ", UnitPrice = 6000 },
+                        new Part { PartName = "タイヤ入替・バランス", Type = "工賃", UnitPrice = 1500 },
+                        new Part { PartName = "エアーバルブ", Type = "タイヤ", UnitPrice = 500 },
+                        new Part { PartName = "廃タイヤ処分", Type = "その他", UnitPrice = 500 },
+                        
+                        // 足回り工賃（軽自動車）
+                        new Part { PartName = "タイロッド工賃（軽）", Type = "工賃", UnitPrice = 3000 },
+                        new Part { PartName = "ロアーム工賃（軽）", Type = "工賃", UnitPrice = 3000 },
+                        
+                        // 足回り工賃（普通車）
+                        new Part { PartName = "タイロッド工賃（普通車）", Type = "工賃", UnitPrice = 4000 },
+                        new Part { PartName = "ロアーム工賃（普通車）", Type = "工賃", UnitPrice = 4000 },
+                        
+                        // 管理費
+                        new Part { PartName = "証紙管理費", Type = "手数料", UnitPrice = 400 }
+                    };
+
+                    _context.Parts.AddRange(parts);
+                    _context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Could not create initial parts: {ex.Message}");
             }
         }
     }
