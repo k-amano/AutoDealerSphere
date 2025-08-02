@@ -137,7 +137,7 @@
                 Password = loginModel.Password 
             };
             
-            var response = await Http.PostAsJsonAsync<LoginRequest>("/api/User/login", loginRequest);
+            var response = await Http.PostAsJsonAsync<LoginRequest>("api/User/login", loginRequest);
             var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
             
             if (loginResponse != null && loginResponse.Success)

@@ -1,0 +1,101 @@
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using System.ComponentModel.DataAnnotations
+
+<div class="part-form">
+	<EditForm Model="@Item" OnValidSubmit="OnValidated" OnInvalidSubmit="OnUnvalidated">
+		<DataAnnotationsValidator />
+		<div class="form">
+			<div class="form-row">
+				<label class="required">部品名</label>
+				<SfTextBox @bind-Value="Item.PartName" Placeholder="部品名"></SfTextBox>
+				<ValidationMessage For="@(() => Item.PartName)" />
+			</div>
+			<div class="form-row">
+				<label>タイプ</label>
+				<SfTextBox @bind-Value="Item.Type" Placeholder="タイプ"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Type)" />
+			</div>
+			<div class="form-row">
+				<label class="required">単価</label>
+				<SfNumericTextBox @bind-Value="Item.UnitPrice" Placeholder="単価" Format="C0" Min="0m" Max="99999999.99m"></SfNumericTextBox>
+				<ValidationMessage For="@(() => Item.UnitPrice)" />
+			</div>
+			<div class="form-row">
+				<label>有効</label>
+				<SfCheckBox @bind-Checked="Item.IsActive"></SfCheckBox>
+			</div>
+			<div class="form-buttons">
+				<SfButton OnClick="OnRegister" IsPrimary="true">登録</SfButton>
+				@if (Item.Id > 0 && this.OnClickDelete.HasDelegate)
+				{
+					<SfButton OnClick="OnOpenDialogue" CssClass="e-danger">削除</SfButton>
+				}
+				<SfButton OnClick="OnCancel">キャンセル</SfButton>
+			</div>
+		</div>
+	</EditForm>
+	<SfDialog Width="250px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@IsVisible">
+		<DialogTemplates>
+			<Header> 確認 </Header>
+			<Content> 削除してもよろしいですか? </Content>
+		</DialogTemplates>
+		<DialogButtons>
+			<DialogButton Content="OK" IsPrimary="true" OnClick="@OnDelete" />
+			<DialogButton Content="Cancel" OnClick="@OnCloseDialogue" />
+		</DialogButtons>
+	</SfDialog>
+</div>
+
+@code {
+	[Parameter]
+	public Part Item { get; set; } = new Part();
+
+	[Parameter]
+	public EventCallback<Part> OnClickOK { get; set; }
+
+	[Parameter]
+	public EventCallback OnClickDelete { get; set; }
+
+	private bool IsVisible { get; set; } = false;
+
+	private async Task OnValidated()
+	{
+		await OnClickOK.InvokeAsync(Item);
+	}
+
+	private void OnUnvalidated()
+	{
+		// 検証エラー時の処理
+	}
+
+	private void OnRegister()
+	{
+		// フォーム送信をトリガー
+	}
+
+	private void OnCancel()
+	{
+		NavigationManager.NavigateTo("/partlist");
+	}
+
+	private void OnOpenDialogue()
+	{
+		this.IsVisible = true;
+	}
+
+	private async Task OnDelete()
+	{
+		this.IsVisible = false;
+		await OnClickDelete.InvokeAsync();
+	}
+
+	private void OnCloseDialogue()
+	{
+		this.IsVisible = false;
+	}
+}

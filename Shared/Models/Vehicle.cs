@@ -107,5 +107,11 @@ namespace AutoDealerSphere.Shared.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public DateTime? UpdatedAt { get; set; }
+
+        // 請求書システム用に追加
+        public int? VehicleCategoryId { get; set; }
+
+        [ForeignKey("VehicleCategoryId")]
+        public VehicleCategory? VehicleCategory { get; set; }
     }
 }
