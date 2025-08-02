@@ -1,6 +1,7 @@
 @page "/invoicelist"
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 @using Syncfusion.Blazor.Data
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Navigations
@@ -169,14 +170,27 @@ else
 
     private async Task OnExportClick(int invoiceId)
     {
-        var response = await Http.GetAsync($"api/Invoices/{invoiceId}/export");
-        if (response.IsSuccessStatusCode)
+        try
         {
-            var bytes = await response.Content.ReadAsByteArrayAsync();
-            var fileName = $"invoice_{invoiceId}_{DateTime.Now:yyyyMMdd}.xlsx";
-            
-            // ファイルダウンロード処理（JavaScript経由）
-            await Http.PostAsJsonAsync("api/download", new { FileName = fileName, Content = bytes });
+            var response = await Http.GetAsync($"api/Invoices/{invoiceId}/export");
+            if (response.IsSuccessStatusCode)
+            {
+                var bytes = await response.Content.ReadAsByteArrayAsync();
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                var fileName = contentDisposition?.FileName?.Trim('"') ?? $"invoice_{invoiceId}_{DateTime.Now:yyyyMMdd}.xlsx";
+                
+                // JavaScript経由でファイルをダウンロード
+                await JSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, bytes);
+            }
+            else
+            {
+                // エラーメッセージを表示（実際のアプリケーションでは適切なエラーハンドリングを実装）
+                Console.WriteLine($"Excel export failed: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Excel export error: {ex.Message}");
         }
     }
 
