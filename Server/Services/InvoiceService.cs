@@ -19,7 +19,7 @@ namespace AutoDealerSphere.Server.Services
                 .Include(i => i.Client)
                 .Include(i => i.Vehicle)
                 .Include(i => i.InvoiceDetails)
-                .OrderByDescending(i => i.InvoiceDate)
+                .OrderBy(i => i.Id)
                 .ToListAsync();
         }
 

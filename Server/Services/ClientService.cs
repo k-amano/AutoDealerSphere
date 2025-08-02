@@ -18,7 +18,7 @@ namespace AutoDealerSphere.Server.Services
 
         public async Task<IEnumerable<AutoDealerSphere.Shared.Models.Client>> GetAllAsync()
         {
-            return await _context.Clients.ToListAsync();
+            return await _context.Clients.OrderBy(c => c.Id).ToListAsync();
         }
 
         public async Task<AutoDealerSphere.Shared.Models.Client?> GetByIdAsync(int id)

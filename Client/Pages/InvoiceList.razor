@@ -56,46 +56,60 @@
 </div>
 <br />
 
-<SfGrid DataSource="@Invoices" AllowSorting="true" AllowPaging="true" AllowFiltering="false" AllowTextWrap="true">
-    <GridPageSettings PageSize="20"></GridPageSettings>
-    <GridColumns>
-        <GridColumn Field="@nameof(Invoice.Id)" HeaderText="ID" Width="70"></GridColumn>
-        <GridColumn Field="@nameof(Invoice.InvoiceNumber)" HeaderText="請求書番号" Width="120">
-            <Template>
-                @{
-                    var invoice = (context as Invoice);
-                    <a href="@($"/invoice/{invoice.Id}")" class="grid-link">@invoice.InvoiceNumber</a>
-                }
-            </Template>
-        </GridColumn>
-        <GridColumn HeaderText="顧客名" Width="200">
-            <Template>
-                @{
-                    var invoice = (context as Invoice);
-                    <span>@(invoice?.Client?.Name ?? "-")</span>
-                }
-            </Template>
-        </GridColumn>
-        <GridColumn HeaderText="車名" Width="150">
-            <Template>
-                @{
-                    var invoice = (context as Invoice);
-                    <span>@(invoice?.Vehicle?.VehicleName ?? "-")</span>
-                }
-            </Template>
-        </GridColumn>
-        <GridColumn Field="@nameof(Invoice.InvoiceDate)" HeaderText="請求日" Width="100" Format="yyyy/MM/dd"></GridColumn>
-        <GridColumn Field="@nameof(Invoice.Total)" HeaderText="合計金額" Width="120" Format="C0" TextAlign="TextAlign.Right"></GridColumn>
-        <GridColumn HeaderText="操作" Width="100" TextAlign="TextAlign.Center">
-            <Template>
-                @{
-                    var invoice = (context as Invoice);
-                    <SfButton CssClass="e-btn e-btn-sm" @onclick="() => OnExportClick(invoice.Id)">Excel出力</SfButton>
-                }
-            </Template>
-        </GridColumn>
-    </GridColumns>
-</SfGrid>
+@if (Invoices != null && Invoices.Any())
+{
+    <SfGrid DataSource="@Invoices" AllowSorting="true" AllowPaging="true" AllowFiltering="false" AllowTextWrap="true">
+        <GridPageSettings PageSize="20"></GridPageSettings>
+        <GridColumns>
+            <GridColumn Field="@nameof(Invoice.Id)" HeaderText="ID" Width="70"></GridColumn>
+            <GridColumn Field="@nameof(Invoice.InvoiceNumber)" HeaderText="請求書番号" Width="120">
+                <Template>
+                    @{
+                        var invoice = (context as Invoice);
+                        <a href="@($"/invoice/{invoice.Id}")" class="grid-link">@invoice.InvoiceNumber</a>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn HeaderText="顧客名" Width="200">
+                <Template>
+                    @{
+                        var invoice = (context as Invoice);
+                        <span>@(invoice?.Client?.Name ?? "-")</span>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn HeaderText="車名" Width="150">
+                <Template>
+                    @{
+                        var invoice = (context as Invoice);
+                        <span>@(invoice?.Vehicle?.VehicleName ?? "-")</span>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(Invoice.InvoiceDate)" HeaderText="請求日" Width="100" Format="yyyy/MM/dd"></GridColumn>
+            <GridColumn Field="@nameof(Invoice.Total)" HeaderText="合計金額" Width="120" TextAlign="TextAlign.Right">
+                <Template>
+                    @{
+                        var invoice = (context as Invoice);
+                        <span>¥@($"{invoice.Total:N0}")</span>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn HeaderText="操作" Width="100" TextAlign="TextAlign.Center">
+                <Template>
+                    @{
+                        var invoice = (context as Invoice);
+                        <SfButton CssClass="e-btn e-btn-sm" @onclick="() => OnExportClick(invoice.Id)">Excel出力</SfButton>
+                    }
+                </Template>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
+}
+else
+{
+    <p class="error-message">請求書情報が見つかりません。</p>
+}
 
 @code {
     private Invoice[]? Invoices;

@@ -22,12 +22,8 @@
 			</div>
 			<div class="form-row">
 				<label class="required">単価</label>
-				<SfNumericTextBox @bind-Value="Item.UnitPrice" Placeholder="単価" Format="C0" Min="0m" Max="99999999.99m"></SfNumericTextBox>
+				<SfNumericTextBox @bind-Value="Item.UnitPrice" Placeholder="単価" Format="¥#,##0" Min="0m" Max="99999999.99m"></SfNumericTextBox>
 				<ValidationMessage For="@(() => Item.UnitPrice)" />
-			</div>
-			<div class="form-row">
-				<label>有効</label>
-				<SfCheckBox @bind-Checked="Item.IsActive"></SfCheckBox>
 			</div>
 			<div class="form-buttons">
 				<SfButton OnClick="OnRegister" IsPrimary="true">登録</SfButton>

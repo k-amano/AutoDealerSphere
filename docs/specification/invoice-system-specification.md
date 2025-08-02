@@ -22,7 +22,6 @@ AutoDealerSphereシステムに、車検・修理作業の請求書を作成し�
 | CategoryName | TEXT | NOT NULL | 区分名（軽自動車、小型車等） |
 | Description | TEXT | | 説明 |
 | DisplayOrder | INTEGER | NOT NULL DEFAULT 0 | 表示順 |
-| IsActive | BOOLEAN | NOT NULL DEFAULT 1 | 有効フラグ |
 
 #### 2.1.2 部品マスタ（Parts）
 | カラム名 | データ型 | 制約 | 説明 |
@@ -31,7 +30,6 @@ AutoDealerSphereシステムに、車検・修理作業の請求書を作成し�
 | PartName | TEXT | NOT NULL | 部品名 |
 | Type | TEXT | | 型式 |
 | UnitPrice | DECIMAL(10,2) | NOT NULL DEFAULT 0 | 標準単価 |
-| IsActive | BOOLEAN | NOT NULL DEFAULT 1 | 有効フラグ |
 | CreatedAt | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP | 作成日時 |
 | UpdatedAt | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP | 更新日時 |
 
@@ -45,7 +43,6 @@ AutoDealerSphereシステムに、車検・修理作業の請求書を作成し�
 | IsTaxable | BOOLEAN | NOT NULL DEFAULT 0 | 課税フラグ |
 | EffectiveFrom | DATETIME | NOT NULL | 適用開始日 |
 | EffectiveTo | DATETIME | | 適用終了日（NULL=現在有効） |
-| IsActive | BOOLEAN | NOT NULL DEFAULT 1 | 有効フラグ |
 | CreatedAt | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP | 作成日時 |
 | UpdatedAt | DATETIME | NOT NULL DEFAULT CURRENT_TIMESTAMP | 更新日時 |
 
@@ -121,11 +118,14 @@ CREATE TABLE Vehicles (
 #### 3.1.1 部品一覧画面
 - **パス**: `/partlist`
 - **機能**:
-  - 部品の一覧表示（部品名、型式、単価）
-  - 一覧画面上部の検索エリアで絞り込み（部品名、型式）
-  - 「新規作成」ボタン
-  - 各行に「編集」「削除」ボタン
+  - 部品の一覧表示（ID、部品名、タイプ、単価、更新日時）
+  - ID順でソート表示
+  - 一覧画面上部の検索エリアで絞り込み（部品名、タイプ）
+  - 「新規登録」ボタン
+  - 部品名をクリックして編集画面へ遷移
   - ページング（SfGridの標準機能）
+  - データがない場合は「部品情報が見つかりません。」を表示
+  - 価格は「¥」記号付きで表示（文字化け対策済み）
 
 #### 3.1.2 部品登録・編集画面
 - **新規登録パス**: `/part/0`
@@ -133,9 +133,9 @@ CREATE TABLE Vehicles (
 - **コンポーネント**: `EditPart.razor`（新規・編集共通）
 - **入力項目**:
   - 部品名（必須、最大100文字）
-  - 型式（任意、最大50文字）
-  - 単価（必須、0以上）
-  - 有効フラグ
+  - タイプ（任意、最大50文字）
+  - 単価（必須、0以上、¥記号付きで表示）
+- **削除機能**: 物理削除（論理削除ではない）
 
 ### 3.2 法定費用管理機能
 
@@ -160,10 +160,14 @@ CREATE TABLE Vehicles (
 #### 3.3.1 請求書一覧画面
 - **パス**: `/invoicelist`
 - **機能**:
-  - 請求書の一覧表示
+  - 請求書の一覧表示（ID、請求書番号、顧客名、車名、請求日、合計金額）
+  - ID順でソート表示
   - 一覧画面上部の検索エリアで絞り込み（請求書番号、顧客名、期間）
   - 「新規作成」ボタン
-  - 各行に「編集」「削除」「複製」「Excel出力」ボタン
+  - 請求書番号をクリックして編集画面へ遷移
+  - 各行に「Excel出力」ボタン
+  - データがない場合は「請求書情報が見つかりません。」を表示
+  - 金額は「¥」記号付きで表示
 
 #### 3.3.2 請求書作成・編集画面
 - **新規作成パス**: `/invoice/0`
@@ -233,6 +237,7 @@ graph TD
 
 ### 5.1 部品登録
 - 部品名: 必須、最大100文字
+- タイプ: 任意、最大50文字
 - 単価: 必須、0以上の数値
 
 ### 5.2 請求書作成
@@ -270,14 +275,32 @@ INSERT INTO StatutoryFees (VehicleCategoryId, FeeType, Amount, IsTaxable, Effect
 
 - 請求書の作成・編集・削除は認証されたユーザーのみ可能
 - 管理者権限を持つユーザーのみ法定費用の変更が可能
+- パスワードはBCryptでハッシュ化して保存
+- ロール管理（Role=1: 一般ユーザー、Role=2: 管理者）
 
 ## 8. パフォーマンス要件
 
 - 請求書一覧画面: 1000件表示で3秒以内
 - Excel出力: 明細100行で5秒以内
 
-## 9. 今後の拡張予定
+## 9. 削除方式
 
+全てのエンティティで物理削除を採用（IsActiveフラグによる論理削除は使用しない）
+
+## 10. 共通仕様
+
+### 10.1 一覧画面
+- 全ての一覧画面はID順（昇順）でソート
+- データがない場合は統一されたメッセージ形式で表示
+- 通貨表示は「¥」記号を使用（Format="C0"ではなくカスタムフォーマット）
+
+### 10.2 フォーム
+- 新規登録と編集は同一のフォームコンポーネントを使用
+- 削除確認ダイアログを表示
+
+## 11. 今後の拡張予定
+
+- Excel出力機能の実装
 - PDF出力機能
 - 請求書のメール送信機能
 - 売上集計レポート機能

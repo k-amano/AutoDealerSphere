@@ -16,8 +16,7 @@ namespace AutoDealerSphere.Server.Services
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Parts
-                .Where(p => p.IsActive)
-                .OrderBy(p => p.PartName)
+                .OrderBy(p => p.Id)
                 .ToListAsync();
         }
 
@@ -61,9 +60,8 @@ namespace AutoDealerSphere.Server.Services
                 return false;
             }
 
-            // 論理削除
-            part.IsActive = false;
-            part.UpdatedAt = DateTime.Now;
+            // 物理削除
+            context.Parts.Remove(part);
             await context.SaveChangesAsync();
             return true;
         }

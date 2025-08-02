@@ -22,7 +22,7 @@ namespace AutoDealerSphere.Server.Controllers
 			List<User> users = new List<User>();
 			if (_context != null)
 			{
-				users = await _context.Users.ToListAsync();
+				users = await _context.Users.OrderBy(u => u.Id).ToListAsync();
 			}
 			return users;
 		}
@@ -37,7 +37,7 @@ namespace AutoDealerSphere.Server.Controllers
 				if (0 < item.Id) sql = sql.Where(a => a.Id == item.Id);
 				if (!string.IsNullOrEmpty(item.Name)) sql = sql.Where(a => a.Name.Contains(item.Name));
 				if (!string.IsNullOrEmpty(item.Email)) sql = sql.Where(a => a.Email.Contains(item.Email));
-				users = await sql.ToListAsync();
+				users = await sql.OrderBy(u => u.Id).ToListAsync();
 			}
 			return users;
 		}
