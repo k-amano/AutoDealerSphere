@@ -1,0 +1,160 @@
+@page "/invoicelist"
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Calendars
+@using Newtonsoft.Json
+@using AutoDealerSphere.Shared.Models
+
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/" />
+        <BreadcrumbItem Text="請求書管理" Url="/invoicelist" />
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>請求書管理</h2>
+<h3>請求書一覧</h3>
+
+<div class="search-form">
+    <EditForm Model="@Search" OnValidSubmit="() => OnSearch(Search)">
+        <DataAnnotationsValidator />
+        <div class="form">
+            <div class="form-row">
+                <label>請求書番号</label>
+                <SfTextBox @bind-Value="Search.InvoiceNumber" Placeholder="請求書番号"></SfTextBox>
+            </div>
+            <div class="form-row">
+                <label>顧客名</label>
+                <SfTextBox @bind-Value="Search.ClientName" Placeholder="顧客名"></SfTextBox>
+            </div>
+            <div class="form-row">
+                <label>請求日（開始）</label>
+                <SfDatePicker TValue="DateTime?" @bind-Value="Search.StartDate" 
+                    Placeholder="開始日" Format="yyyy/MM/dd"></SfDatePicker>
+            </div>
+            <div class="form-row">
+                <label>請求日（終了）</label>
+                <SfDatePicker TValue="DateTime?" @bind-Value="Search.EndDate" 
+                    Placeholder="終了日" Format="yyyy/MM/dd"></SfDatePicker>
+            </div>
+            <div class="form-buttons">
+                <SfButton Type="ButtonType.Submit">検索</SfButton>
+            </div>
+        </div>
+    </EditForm>
+</div>
+<br />
+
+<div class="register-form">
+    <SfButton @onclick="OnCreateClick">新規作成</SfButton>
+</div>
+<br />
+
+<SfGrid DataSource="@Invoices" AllowSorting="true" AllowPaging="true" AllowFiltering="false" AllowTextWrap="true">
+    <GridPageSettings PageSize="20"></GridPageSettings>
+    <GridColumns>
+        <GridColumn Field="@nameof(Invoice.Id)" HeaderText="ID" Width="70"></GridColumn>
+        <GridColumn Field="@nameof(Invoice.InvoiceNumber)" HeaderText="請求書番号" Width="120">
+            <Template>
+                @{
+                    var invoice = (context as Invoice);
+                    <a href="@($"/invoice/{invoice.Id}")" class="grid-link">@invoice.InvoiceNumber</a>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn HeaderText="顧客名" Width="200">
+            <Template>
+                @{
+                    var invoice = (context as Invoice);
+                    <span>@(invoice?.Client?.Name ?? "-")</span>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn HeaderText="車名" Width="150">
+            <Template>
+                @{
+                    var invoice = (context as Invoice);
+                    <span>@(invoice?.Vehicle?.VehicleName ?? "-")</span>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(Invoice.InvoiceDate)" HeaderText="請求日" Width="100" Format="yyyy/MM/dd"></GridColumn>
+        <GridColumn Field="@nameof(Invoice.Total)" HeaderText="合計金額" Width="120" Format="C0" TextAlign="TextAlign.Right"></GridColumn>
+        <GridColumn HeaderText="操作" Width="100" TextAlign="TextAlign.Center">
+            <Template>
+                @{
+                    var invoice = (context as Invoice);
+                    <SfButton CssClass="e-btn e-btn-sm" @onclick="() => OnExportClick(invoice.Id)">Excel出力</SfButton>
+                }
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code {
+    private Invoice[]? Invoices;
+    private InvoiceSearchModel Search = new InvoiceSearchModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInvoices();
+    }
+
+    private async Task LoadInvoices()
+    {
+        Invoices = await Http.GetFromJsonAsync<Invoice[]>("api/Invoices");
+    }
+
+    private async Task OnSearch(InvoiceSearchModel search)
+    {
+        if (string.IsNullOrWhiteSpace(search.InvoiceNumber) && 
+            string.IsNullOrWhiteSpace(search.ClientName) &&
+            !search.StartDate.HasValue &&
+            !search.EndDate.HasValue)
+        {
+            await LoadInvoices();
+        }
+        else
+        {
+            var filteredInvoices = Invoices?.Where(i =>
+                (string.IsNullOrWhiteSpace(search.InvoiceNumber) || i.InvoiceNumber.Contains(search.InvoiceNumber)) &&
+                (string.IsNullOrWhiteSpace(search.ClientName) || (i.Client != null && i.Client.Name.Contains(search.ClientName))) &&
+                (!search.StartDate.HasValue || i.InvoiceDate >= search.StartDate.Value) &&
+                (!search.EndDate.HasValue || i.InvoiceDate <= search.EndDate.Value)
+            ).ToArray();
+            Invoices = filteredInvoices;
+        }
+    }
+
+    private void OnCreateClick()
+    {
+        NavigationManager.NavigateTo("/invoice/0");
+    }
+
+    private async Task OnExportClick(int invoiceId)
+    {
+        var response = await Http.GetAsync($"api/Invoices/{invoiceId}/export");
+        if (response.IsSuccessStatusCode)
+        {
+            var bytes = await response.Content.ReadAsByteArrayAsync();
+            var fileName = $"invoice_{invoiceId}_{DateTime.Now:yyyyMMdd}.xlsx";
+            
+            // ファイルダウンロード処理（JavaScript経由）
+            await Http.PostAsJsonAsync("api/download", new { FileName = fileName, Content = bytes });
+        }
+    }
+
+    public class InvoiceSearchModel
+    {
+        public string? InvoiceNumber { get; set; }
+        public string? ClientName { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+    }
+}

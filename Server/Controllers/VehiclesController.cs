@@ -42,6 +42,16 @@ namespace AutoDealerSphere.Server.Controllers
             return vehicle;
         }
 
+        // GET: api/vehicles/byClient/5
+        [HttpGet("byClient/{clientId}")]
+        public async Task<ActionResult<IEnumerable<Vehicle>>> GetVehiclesByClient(int clientId)
+        {
+            return await _context.Vehicles
+                .Where(v => v.ClientId == clientId)
+                .OrderBy(v => v.VehicleName)
+                .ToListAsync();
+        }
+
         // GET: api/vehicles/search
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Vehicle>>> SearchVehicles(

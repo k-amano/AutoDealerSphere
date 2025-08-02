@@ -1,0 +1,115 @@
+@page "/partlist"
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using Newtonsoft.Json
+@using AutoDealerSphere.Shared.Models
+
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/" />
+        <BreadcrumbItem Text="部品管理" Url="/partlist" />
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>部品管理</h2>
+<h3>部品一覧</h3>
+
+<div class="search-form">
+    <EditForm Model="@Search" OnValidSubmit="() => OnSearch(Search)">
+        <DataAnnotationsValidator />
+        <div class="form">
+            <div class="form-row">
+                <label>部品名</label>
+                <SfTextBox @bind-Value="Search.PartName" Placeholder="部品名"></SfTextBox>
+            </div>
+            <div class="form-row">
+                <label>タイプ</label>
+                <SfTextBox @bind-Value="Search.Type" Placeholder="タイプ"></SfTextBox>
+            </div>
+            <div class="form-buttons">
+                <SfButton Type="ButtonType.Submit">検索</SfButton>
+            </div>
+        </div>
+    </EditForm>
+</div>
+<br />
+
+<div class="register-form">
+    <SfButton @onclick="OnCreateClick">新規登録</SfButton>
+</div>
+<br />
+
+<SfGrid DataSource="@Parts" AllowSorting="true" AllowPaging="true" AllowFiltering="false" AllowTextWrap="true">
+    <GridPageSettings PageSize="20"></GridPageSettings>
+    <GridColumns>
+        <GridColumn Field="@nameof(Part.Id)" HeaderText="ID" Width="70"></GridColumn>
+        <GridColumn Field="@nameof(Part.PartName)" HeaderText="部品名" Width="200">
+            <Template>
+                @{
+                    var part = (context as Part);
+                    <a href="@($"/part/{part.Id}")" class="grid-link">@part.PartName</a>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(Part.Type)" HeaderText="タイプ" Width="150"></GridColumn>
+        <GridColumn Field="@nameof(Part.UnitPrice)" HeaderText="単価" Width="120" Format="C0" TextAlign="TextAlign.Right"></GridColumn>
+        <GridColumn Field="@nameof(Part.IsActive)" HeaderText="有効" Width="80">
+            <Template>
+                @{
+                    var part = (context as Part);
+                    <span>@(part.IsActive ? "○" : "×")</span>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(Part.UpdatedAt)" HeaderText="更新日時" Width="150" Format="yyyy/MM/dd HH:mm"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code {
+    private Part[]? Parts;
+
+    private PartSearchModel Search = new PartSearchModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadParts();
+    }
+
+    private async Task LoadParts()
+    {
+        Parts = await Http.GetFromJsonAsync<Part[]>("api/Parts");
+    }
+
+    private async Task OnSearch(PartSearchModel search)
+    {
+        if (string.IsNullOrWhiteSpace(search.PartName) && string.IsNullOrWhiteSpace(search.Type))
+        {
+            await LoadParts();
+        }
+        else
+        {
+            var filteredParts = Parts?.Where(p =>
+                (string.IsNullOrWhiteSpace(search.PartName) || p.PartName.Contains(search.PartName)) &&
+                (string.IsNullOrWhiteSpace(search.Type) || (p.Type != null && p.Type.Contains(search.Type)))
+            ).ToArray();
+            Parts = filteredParts;
+        }
+    }
+
+    private void OnCreateClick()
+    {
+        NavigationManager.NavigateTo("/part/0");
+    }
+
+    public class PartSearchModel
+    {
+        public string? PartName { get; set; }
+        public string? Type { get; set; }
+    }
+}

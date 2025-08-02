@@ -6,11 +6,17 @@ var connectionString = builder.Configuration.GetConnectionString("crm01");
 
 // Add services to the container.
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddRazorPages();
 builder.Services.AddDbContextFactory<SQLDBContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IVehicleImportService, VehicleImportService>();
+builder.Services.AddScoped<IPartService, PartService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
 var app = builder.Build();
 
