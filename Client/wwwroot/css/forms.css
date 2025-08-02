@@ -276,3 +276,30 @@
 .user-grid .e-rowcell {
     padding: 0;
 }
+
+/* 警告メッセージ */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert-warning h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.text-warning {
+    color: #856404 !important;
+}
+
+.ms-2 {
+    margin-left: 0.5rem;
+}
