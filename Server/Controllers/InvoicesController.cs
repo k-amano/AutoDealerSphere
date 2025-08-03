@@ -108,5 +108,42 @@ namespace AutoDealerSphere.Server.Controllers
                 return StatusCode(500, $"Error exporting invoice: {ex.Message}");
             }
         }
+
+        // 明細エンドポイント
+        [HttpPost("{invoiceId}/details")]
+        public async Task<ActionResult<InvoiceDetail>> CreateInvoiceDetail(int invoiceId, InvoiceDetail detail)
+        {
+            var created = await _invoiceService.CreateInvoiceDetailAsync(invoiceId, detail);
+            return CreatedAtAction(nameof(GetInvoice), new { id = invoiceId }, created);
+        }
+
+        [HttpPut("{invoiceId}/details/{detailId}")]
+        public async Task<IActionResult> UpdateInvoiceDetail(int invoiceId, int detailId, InvoiceDetail detail)
+        {
+            if (detailId != detail.Id)
+            {
+                return BadRequest("Detail ID mismatch");
+            }
+
+            var updated = await _invoiceService.UpdateInvoiceDetailAsync(invoiceId, detailId, detail);
+            if (updated == null)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{invoiceId}/details/{detailId}")]
+        public async Task<IActionResult> DeleteInvoiceDetail(int invoiceId, int detailId)
+        {
+            var deleted = await _invoiceService.DeleteInvoiceDetailAsync(invoiceId, detailId);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
     }
 }

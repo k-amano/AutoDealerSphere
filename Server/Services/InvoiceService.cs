@@ -148,5 +148,80 @@ namespace AutoDealerSphere.Server.Services
             invoice.Tax = Math.Floor(taxableSubTotal * invoice.TaxRate / 100);
             invoice.Total = taxableSubTotal + nonTaxableSubTotal + invoice.Tax;
         }
+
+        // 明細CRUD操作
+        public async Task<InvoiceDetail> CreateInvoiceDetailAsync(int invoiceId, InvoiceDetail detail)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            detail.InvoiceId = invoiceId;
+            detail.CreatedAt = DateTime.Now;
+            
+            context.InvoiceDetails.Add(detail);
+            await context.SaveChangesAsync();
+            
+            // 請求書の合計を再計算
+            await RecalculateInvoiceTotalsAsync(invoiceId);
+            
+            return detail;
+        }
+
+        public async Task<InvoiceDetail?> UpdateInvoiceDetailAsync(int invoiceId, int detailId, InvoiceDetail detail)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var existingDetail = await context.InvoiceDetails
+                .FirstOrDefaultAsync(d => d.Id == detailId && d.InvoiceId == invoiceId);
+            
+            if (existingDetail == null)
+                return null;
+            
+            existingDetail.ItemName = detail.ItemName;
+            existingDetail.Type = detail.Type;
+            existingDetail.RepairMethod = detail.RepairMethod;
+            existingDetail.Quantity = detail.Quantity;
+            existingDetail.UnitPrice = detail.UnitPrice;
+            existingDetail.LaborCost = detail.LaborCost;
+            existingDetail.IsTaxable = detail.IsTaxable;
+            existingDetail.PartId = detail.PartId;
+            
+            await context.SaveChangesAsync();
+            
+            // 請求書の合計を再計算
+            await RecalculateInvoiceTotalsAsync(invoiceId);
+            
+            return existingDetail;
+        }
+
+        public async Task<bool> DeleteInvoiceDetailAsync(int invoiceId, int detailId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var detail = await context.InvoiceDetails
+                .FirstOrDefaultAsync(d => d.Id == detailId && d.InvoiceId == invoiceId);
+            
+            if (detail == null)
+                return false;
+            
+            context.InvoiceDetails.Remove(detail);
+            await context.SaveChangesAsync();
+            
+            // 請求書の合計を再計算
+            await RecalculateInvoiceTotalsAsync(invoiceId);
+            
+            return true;
+        }
+
+        private async Task RecalculateInvoiceTotalsAsync(int invoiceId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var invoice = await context.Invoices
+                .Include(i => i.InvoiceDetails)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId);
+            
+            if (invoice != null)
+            {
+                CalculateInvoiceTotals(invoice);
+                invoice.UpdatedAt = DateTime.Now;
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }

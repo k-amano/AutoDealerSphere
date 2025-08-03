@@ -1,0 +1,196 @@
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Buttons
+@using AutoDealerSphere.Shared.Models
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+
+<SfDialog @ref="_dialog" Width="600px" IsModal="true" ShowCloseIcon="true" @bind-Visible="_isVisible">
+    <DialogTemplates>
+        <Header>
+            <span>@(_isNew ? "請求書基本情報入力" : "請求書基本情報編集")</span>
+        </Header>
+        <Content>
+            @if (_model != null)
+            {
+                <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    
+                    <div class="form-row">
+                        <label>請求書番号</label>
+                        <SfTextBox @bind-Value="_model.InvoiceNumber" Readonly="true"></SfTextBox>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="required">顧客</label>
+                        <SfDropDownList TValue="int" TItem="AutoDealerSphere.Shared.Models.Client" 
+                            @bind-Value="@_model.ClientId" 
+                            DataSource="@_clients"
+                            Placeholder="顧客を選択"
+                            AllowFiltering="true">
+                            <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                            <DropDownListEvents TValue="int" TItem="AutoDealerSphere.Shared.Models.Client" ValueChange="OnClientChanged"></DropDownListEvents>
+                        </SfDropDownList>
+                        <ValidationMessage For="@(() => _model.ClientId)" />
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="required">車両</label>
+                        <SfDropDownList TValue="int" TItem="Vehicle" 
+                            @bind-Value="@_model.VehicleId" 
+                            DataSource="@_vehicles"
+                            Placeholder="車両を選択"
+                            Enabled="@(_vehicles != null && _vehicles.Any())">
+                            <DropDownListFieldSettings Value="Id" Text="VehicleName"></DropDownListFieldSettings>
+                        </SfDropDownList>
+                        <ValidationMessage For="@(() => _model.VehicleId)" />
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="required">請求日</label>
+                        <SfDatePicker @bind-Value="_model.InvoiceDate" Format="yyyy/MM/dd"></SfDatePicker>
+                        <ValidationMessage For="@(() => _model.InvoiceDate)" />
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="required">作業完了日</label>
+                        <SfDatePicker @bind-Value="_model.WorkCompletedDate" Format="yyyy/MM/dd"></SfDatePicker>
+                        <ValidationMessage For="@(() => _model.WorkCompletedDate)" />
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>次回車検日</label>
+                        <SfDatePicker @bind-Value="_model.NextInspectionDate" Format="yyyy/MM/dd"></SfDatePicker>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>走行距離</label>
+                        <SfNumericTextBox @bind-Value="_model.Mileage" Placeholder="走行距離" Format="N0"></SfNumericTextBox>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>備考</label>
+                        <SfTextBox @bind-Value="_model.Notes" Multiline="true" Placeholder="備考"></SfTextBox>
+                    </div>
+                    
+                    <div class="dialog-buttons">
+                        <SfButton Type="ButtonType.Submit" IsPrimary="true">保存</SfButton>
+                        <SfButton @onclick="Cancel">キャンセル</SfButton>
+                    </div>
+                </EditForm>
+            }
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+<style>
+    .form-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 10px;
+    }
+    
+    .form-row label {
+        width: 120px;
+        color: #333;
+    }
+    
+    .form-row .e-input-group,
+    .form-row .e-ddl,
+    .form-row .e-date-wrapper {
+        flex: 1;
+    }
+    
+    .dialog-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .required::after {
+        content: "必須";
+        color: #ffffff;
+        background: #cc0000;
+        font-size: 0.8em;
+        padding: 0.3em;
+        border-radius: 0.5em;
+        margin-left: 0.3em;
+    }
+</style>
+
+@code {
+    [Parameter] public EventCallback<Invoice> OnSave { get; set; }
+
+    private SfDialog? _dialog;
+    private bool _isVisible = false;
+    private bool _isNew = false;
+    private Invoice? _model;
+    private List<AutoDealerSphere.Shared.Models.Client> _clients = new();
+    private List<Vehicle> _vehicles = new();
+
+    public async Task Open(Invoice invoice)
+    {
+        _isNew = invoice.Id == 0;
+        _model = new Invoice
+        {
+            Id = invoice.Id,
+            InvoiceNumber = invoice.InvoiceNumber,
+            ClientId = invoice.ClientId,
+            VehicleId = invoice.VehicleId,
+            InvoiceDate = invoice.InvoiceDate,
+            WorkCompletedDate = invoice.WorkCompletedDate,
+            NextInspectionDate = invoice.NextInspectionDate,
+            Mileage = invoice.Mileage,
+            Notes = invoice.Notes,
+            TaxRate = invoice.TaxRate,
+            InvoiceDetails = invoice.InvoiceDetails
+        };
+
+        // 顧客リストを取得
+        var clients = await Http.GetFromJsonAsync<AutoDealerSphere.Shared.Models.Client[]>("api/Client");
+        _clients = clients?.ToList() ?? new List<AutoDealerSphere.Shared.Models.Client>();
+
+        // 既存データの場合、車両リストも取得
+        if (_model.ClientId > 0)
+        {
+            await LoadVehicles(_model.ClientId);
+        }
+
+        _isVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task OnClientChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<int, AutoDealerSphere.Shared.Models.Client> args)
+    {
+        if (args.Value > 0)
+        {
+            await LoadVehicles(args.Value);
+            _model!.VehicleId = 0;
+        }
+    }
+
+    private async Task LoadVehicles(int clientId)
+    {
+        var vehicles = await Http.GetFromJsonAsync<Vehicle[]>($"api/Vehicles/byClient/{clientId}");
+        _vehicles = vehicles?.ToList() ?? new List<Vehicle>();
+    }
+
+    private async Task OnValidSubmit()
+    {
+        if (_model != null)
+        {
+            await OnSave.InvokeAsync(_model);
+            _isVisible = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        _isVisible = false;
+    }
+}

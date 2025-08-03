@@ -1,0 +1,168 @@
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using AutoDealerSphere.Shared.Models
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+
+<SfDialog @ref="_dialog" Width="500px" IsModal="true" ShowCloseIcon="true" @bind-Visible="_isVisible">
+    <DialogTemplates>
+        <Header>
+            <span>@(_isEdit ? "明細編集" : "明細追加")</span>
+        </Header>
+        <Content>
+            @if (_model != null)
+            {
+                <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    
+                    <div class="form-row">
+                        <label class="required">項目名</label>
+                        <SfTextBox @bind-Value="_model.ItemName" Placeholder="項目名を入力"></SfTextBox>
+                        <ValidationMessage For="@(() => _model.ItemName)" />
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>タイプ</label>
+                        <SfTextBox @bind-Value="_model.Type" Placeholder="タイプを入力"></SfTextBox>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>修理方法</label>
+                        <SfTextBox @bind-Value="_model.RepairMethod" Placeholder="修理方法を入力"></SfTextBox>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="required">数量</label>
+                        <SfNumericTextBox @bind-Value="_model.Quantity" Format="N2" Min="0.01m" Max="9999.99m" @onchange="CalculateSubTotal"></SfNumericTextBox>
+                        <ValidationMessage For="@(() => _model.Quantity)" />
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="required">単価</label>
+                        <SfNumericTextBox @bind-Value="_model.UnitPrice" Format="¥#,##0" Min="0m" @onchange="CalculateSubTotal"></SfNumericTextBox>
+                        <ValidationMessage For="@(() => _model.UnitPrice)" />
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>工賃</label>
+                        <SfNumericTextBox @bind-Value="_model.LaborCost" Format="¥#,##0" Min="0m" @onchange="CalculateSubTotal"></SfNumericTextBox>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>課税</label>
+                        <SfCheckBox @bind-Checked="_model.IsTaxable"></SfCheckBox>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>小計</label>
+                        <span class="subtotal">¥@($"{_subTotal:N0}")</span>
+                    </div>
+                    
+                    <div class="dialog-buttons">
+                        <SfButton Type="ButtonType.Submit" IsPrimary="true">保存</SfButton>
+                        <SfButton @onclick="Cancel">キャンセル</SfButton>
+                    </div>
+                </EditForm>
+            }
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+<style>
+    .form-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 10px;
+    }
+    
+    .form-row label {
+        width: 100px;
+        color: #333;
+    }
+    
+    .form-row .e-input-group,
+    .form-row .e-numerictextbox {
+        flex: 1;
+    }
+    
+    .subtotal {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .dialog-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .required::after {
+        content: "必須";
+        color: #ffffff;
+        background: #cc0000;
+        font-size: 0.8em;
+        padding: 0.3em;
+        border-radius: 0.5em;
+        margin-left: 0.3em;
+    }
+</style>
+
+@code {
+    [Parameter] public EventCallback<InvoiceDetail> OnSave { get; set; }
+
+    private SfDialog? _dialog;
+    private bool _isVisible = false;
+    private bool _isEdit = false;
+    private InvoiceDetail? _model;
+    private decimal _subTotal = 0;
+
+    public async Task Open(InvoiceDetail detail, bool isEdit)
+    {
+        _isEdit = isEdit;
+        _model = new InvoiceDetail
+        {
+            Id = detail.Id,
+            InvoiceId = detail.InvoiceId,
+            PartId = detail.PartId,
+            ItemName = detail.ItemName ?? string.Empty,
+            Type = detail.Type,
+            RepairMethod = detail.RepairMethod,
+            Quantity = detail.Quantity,
+            UnitPrice = detail.UnitPrice,
+            LaborCost = detail.LaborCost,
+            IsTaxable = detail.IsTaxable,
+            DisplayOrder = detail.DisplayOrder
+        };
+
+        CalculateSubTotal();
+        _isVisible = true;
+        StateHasChanged();
+    }
+
+    private void CalculateSubTotal()
+    {
+        if (_model != null)
+        {
+            _subTotal = (_model.UnitPrice * _model.Quantity) + _model.LaborCost;
+        }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        if (_model != null)
+        {
+            await OnSave.InvokeAsync(_model);
+            _isVisible = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        _isVisible = false;
+    }
+}
