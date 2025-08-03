@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AutoDealerSphere.Shared.Validators;
 
 namespace AutoDealerSphere.Shared.Models
 {
@@ -16,12 +17,14 @@ namespace AutoDealerSphere.Shared.Models
         public string InvoiceNumber { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "顧客は必須です。")]
+        [Range(1, int.MaxValue, ErrorMessage = "顧客を選択してください。")]
         public int ClientId { get; set; }
 
         [ForeignKey("ClientId")]
         public Client? Client { get; set; }
 
         [Required(ErrorMessage = "車両は必須です。")]
+        [Range(1, int.MaxValue, ErrorMessage = "車両を選択してください。")]
         public int VehicleId { get; set; }
 
         [ForeignKey("VehicleId")]
@@ -54,6 +57,7 @@ namespace AutoDealerSphere.Shared.Models
 
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
+        [MinimumItems(1, ErrorMessage = "明細は最低1件必要です。")]
         public List<InvoiceDetail> InvoiceDetails { get; set; } = new List<InvoiceDetail>();
     }
 }

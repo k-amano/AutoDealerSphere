@@ -303,3 +303,47 @@
 .ms-2 {
     margin-left: 0.5rem;
 }
+
+/* 請求書詳細画面のスタイル */
+.detail-header {
+    margin-bottom: 20px;
+}
+
+.invoice-info,
+.invoice-details,
+.invoice-summary,
+.invoice-notes {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 5px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 10px;
+}
+
+.summary-row {
+    display: contents;
+}
+
+.summary-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.summary-value {
+    color: #333;
+}
+
+.summary-row.total {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #000;
+}
+
+.hidden {
+    display: none !important;
+}

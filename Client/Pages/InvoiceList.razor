@@ -55,7 +55,7 @@
 <div class="register-form">
     @if (HasClients)
     {
-        <SfButton @onclick="OnCreateClick">新規作成</SfButton>
+        <SfButton @onclick="@(() => NavigationManager.NavigateTo("/invoice/detail/0"))">新規作成</SfButton>
     }
     else
     {
@@ -75,7 +75,7 @@
                 <Template>
                     @{
                         var invoice = (context as Invoice);
-                        <a href="@($"/invoice/{invoice.Id}")" class="grid-link">@invoice.InvoiceNumber</a>
+                        <a href="@($"/invoice/detail/{invoice.Id}")" class="grid-link">@invoice.InvoiceNumber</a>
                     }
                 </Template>
             </GridColumn>
@@ -163,10 +163,6 @@ else
         }
     }
 
-    private void OnCreateClick()
-    {
-        NavigationManager.NavigateTo("/invoice/0");
-    }
 
     private async Task OnExportClick(int invoiceId)
     {

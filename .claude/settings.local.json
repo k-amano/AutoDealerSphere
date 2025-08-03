@@ -10,7 +10,8 @@
       "Bash(cp:*)",
       "Bash(mv:*)",
       "Bash(find:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(grep:*)"
     ]
   },
   "enableAllProjectMcpServers": false
