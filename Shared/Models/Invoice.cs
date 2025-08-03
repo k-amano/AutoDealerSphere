@@ -57,7 +57,6 @@ namespace AutoDealerSphere.Shared.Models
 
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
-        [MinimumItems(1, ErrorMessage = "明細は最低1件必要です。")]
         public List<InvoiceDetail> InvoiceDetails { get; set; } = new List<InvoiceDetail>();
     }
 }

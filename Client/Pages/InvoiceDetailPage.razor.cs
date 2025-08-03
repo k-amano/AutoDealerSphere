@@ -183,8 +183,10 @@ namespace AutoDealerSphere.Client.Pages
                 var contentDisposition = response.Content.Headers.ContentDisposition;
                 var fileName = contentDisposition?.FileName?.Trim('"') ?? $"invoice_{InvoiceId}_{DateTime.Now:yyyyMMdd}.xlsx";
                 
-                // JavaScript経由でファイルをダウンロード
-                await JSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, bytes);
+                // JavaScript経由でファイルをダウンロード (MemoryStreamを使用)
+                using var stream = new System.IO.MemoryStream(bytes);
+                using var streamRef = new Microsoft.JSInterop.DotNetStreamReference(stream: stream);
+                await JSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
             }
         }
 
