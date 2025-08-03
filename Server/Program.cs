@@ -1,6 +1,9 @@
 using AutoDealerSphere.Server.Services;
 using Microsoft.EntityFrameworkCore;
 
+// Syncfusionライセンスキーを設定
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JEaF5cWWJCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXdec3VUR2ddV0V+WkpWYEk=");
+
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("crm01");
 

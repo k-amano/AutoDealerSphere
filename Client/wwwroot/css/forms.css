@@ -347,3 +347,45 @@
 .hidden {
     display: none !important;
 }
+
+/* アラートボックス */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+.alert-info h4 {
+    margin-top: 0;
+    color: inherit;
+}
+
+.alert-info ol {
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+/* 詳細画面のボタン配置 */
+.detail-header .button-group {
+    margin-bottom: 20px;
+}
+
+.detail-header .button-group button {
+    margin-right: 10px;
+}
+
+.detail-header p {
+    margin-bottom: 10px;
+    color: #666;
+}

@@ -55,11 +55,15 @@
 <div class="register-form">
     @if (HasClients)
     {
-        <SfButton @onclick="@(() => NavigationManager.NavigateTo("/invoice/detail/0"))">新規作成</SfButton>
+        <SfButton @onclick="@(() => NavigationManager.NavigateTo("/invoice/detail/0"))" CssClass="e-primary">
+            新規追加
+        </SfButton>
     }
     else
     {
-        <SfButton Disabled="true" title="顧客データがないため新規作成できません">新規作成</SfButton>
+        <SfButton Disabled="true" title="顧客データがないため新規作成できません">
+            新規追加
+        </SfButton>
         <span class="text-warning ms-2">※ 先に顧客情報を登録してください</span>
     }
 </div>
@@ -175,8 +179,10 @@ else
                 var contentDisposition = response.Content.Headers.ContentDisposition;
                 var fileName = contentDisposition?.FileName?.Trim('"') ?? $"invoice_{invoiceId}_{DateTime.Now:yyyyMMdd}.xlsx";
                 
-                // JavaScript経由でファイルをダウンロード
-                await JSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, bytes);
+                // JavaScript経由でファイルをダウンロード (MemoryStreamを使用)
+                using var stream = new System.IO.MemoryStream(bytes);
+                using var streamRef = new Microsoft.JSInterop.DotNetStreamReference(stream: stream);
+                await JSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
             }
             else
             {
