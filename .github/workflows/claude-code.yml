@@ -43,5 +43,6 @@ jobs:
           max_iterations: 10
           model: claude-opus-4-20250514
           plan: max
+          allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,BatchTool,Write"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
