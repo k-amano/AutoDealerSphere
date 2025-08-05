@@ -20,6 +20,7 @@
             <div class="@ExistingInvoiceButtonClass">
                 <SfButton @onclick="OpenBasicInfoDialog" CssClass="e-primary">基本編集</SfButton>
                 <SfButton @onclick="OpenDetailDialog" CssClass="e-success">明細追加</SfButton>
+                <SfButton @onclick="OpenStatutoryFeeDialog" CssClass="e-info">法定費用</SfButton>
                 <SfButton @onclick="ExportExcel">Excel出力</SfButton>
                 <SfButton @onclick="DeleteInvoice" CssClass="e-danger">削除実行</SfButton>
             </div>
@@ -159,3 +160,6 @@
 
 <!-- 明細編集ダイアログ -->
 <AutoDealerSphere.Client.Components.InvoiceDetailDialog @ref="_detailDialog" OnSave="OnDetailSaved" />
+
+<!-- 法定費用選択ダイアログ -->
+<AutoDealerSphere.Client.Components.StatutoryFeeDialog @ref="_statutoryFeeDialog" OnSave="OnStatutoryFeeSaved" />
