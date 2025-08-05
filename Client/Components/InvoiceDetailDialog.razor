@@ -19,13 +19,15 @@
                     <div class="search-section">
                         <div class="form-row">
                             <label>部品名で検索</label>
-                            <SfTextBox @bind-Value="_partSearchText" Placeholder="部品名を入力" @oninput="@(async () => await SearchParts())"></SfTextBox>
+                            <SfTextBox @bind-Value="_partSearchText" Placeholder="部品名を入力"></SfTextBox>
                         </div>
                         <div class="form-row">
                             <label>タイプで絞込</label>
                             <SfDropDownList TValue="string" TItem="string" DataSource="@_partTypes" @bind-Value="_selectedType" Placeholder="すべて">
-                                <DropDownListEvents TValue="string" TItem="string" ValueChange="@(async (e) => await FilterPartsByType())"></DropDownListEvents>
                             </SfDropDownList>
+                        </div>
+                        <div class="form-row">
+                            <SfButton @onclick="SearchParts" IsPrimary="true">検索</SfButton>
                         </div>
                     </div>
                     
@@ -141,6 +143,11 @@
         padding: 15px;
         background: #f5f5f5;
         border-radius: 5px;
+    }
+    
+    .search-section .form-row:last-child {
+        justify-content: flex-end;
+        margin-bottom: 0;
     }
     
     .parts-grid {
