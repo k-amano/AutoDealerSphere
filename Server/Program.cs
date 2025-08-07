@@ -21,6 +21,7 @@ builder.Services.AddScoped<IVehicleImportService, VehicleImportService>();
 builder.Services.AddScoped<IPartService, PartService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IExcelExportService, ExcelExportService>();
+builder.Services.AddScoped<IStatutoryFeeService, StatutoryFeeService>();
 
 var app = builder.Build();
 

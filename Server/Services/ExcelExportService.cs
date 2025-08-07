@@ -151,51 +151,102 @@ namespace AutoDealerSphere.Server.Services
 
                 row += 2;
 
+                // 非課税項目（法定費用）の表示
+                int nonTaxableStartRow = row;
+                var nonTaxableItems = invoice.InvoiceDetails
+                    .Where(d => !d.IsTaxable && d.Type == "法定費用")
+                    .OrderBy(d => d.DisplayOrder)
+                    .ToList();
+
+                if (nonTaxableItems.Any())
+                {
+                    // 非課税項目ヘッダー
+                    worksheet.Range[$"B{row}"].Text = "非課税項目";
+                    worksheet.Range[$"B{row}"].CellStyle.Font.Bold = true;
+                    worksheet.Range[$"B{row}"].CellStyle.Color = Color.FromArgb(217, 217, 217);
+                    worksheet.Range[$"B{row}:D{row}"].Merge();
+                    worksheet.Range[$"B{row}:D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
+                    worksheet.Range[$"B{row}:D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
+                    
+                    row++;
+
+                    // 非課税項目の明細
+                    foreach (var item in nonTaxableItems)
+                    {
+                        worksheet.Range[$"B{row}"].Text = item.ItemName;
+                        worksheet.Range[$"C{row}"].Number = (double)item.UnitPrice;
+                        worksheet.Range[$"C{row}"].NumberFormat = "¥#,##0";
+                        worksheet.Range[$"C{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                        row++;
+                    }
+
+                    // 非課税項目の罫線
+                    if (row > nonTaxableStartRow + 1)
+                    {
+                        var nonTaxableRange = worksheet.Range[$"B{nonTaxableStartRow}:D{row - 1}"];
+                        nonTaxableRange.BorderAround(ExcelLineStyle.Thin);
+                        nonTaxableRange.BorderInside(ExcelLineStyle.Thin, ExcelKnownColors.Black);
+                    }
+
+                    // 非課税項目計
+                    worksheet.Range[$"B{row}"].Text = "非課税項目計";
+                    worksheet.Range[$"B{row}"].CellStyle.Font.Bold = true;
+                    worksheet.Range[$"C{row}"].Number = (double)invoice.NonTaxableSubTotal;
+                    worksheet.Range[$"C{row}"].NumberFormat = "¥#,##0";
+                    worksheet.Range[$"C{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                    worksheet.Range[$"C{row}"].CellStyle.Font.Bold = true;
+                    worksheet.Range[$"B{row}:D{row}"].BorderAround(ExcelLineStyle.Medium);
+                }
+
+                // 小計・消費税・合計は元の位置（右側）のまま
+                int summaryRow = nonTaxableStartRow; // 非課税項目と同じ高さから開始
+                
                 // 小計・消費税・合計
                 int summaryStartCol = 6; // F列
                 
                 // 課税対象小計
-                worksheet.Range[$"F{row}"].Text = "課税対象小計：";
-                worksheet.Range[$"F{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                worksheet.Range[$"G{row}"].Number = (double)invoice.TaxableSubTotal;
-                worksheet.Range[$"G{row}"].NumberFormat = "¥#,##0";
-                worksheet.Range[$"G{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range[$"F{summaryRow}"].Text = "課税対象小計：";
+                worksheet.Range[$"F{summaryRow}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range[$"G{summaryRow}"].Number = (double)invoice.TaxableSubTotal;
+                worksheet.Range[$"G{summaryRow}"].NumberFormat = "¥#,##0";
+                worksheet.Range[$"G{summaryRow}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
 
-                row++;
+                summaryRow++;
 
                 // 非課税小計
-                worksheet.Range[$"F{row}"].Text = "非課税小計：";
-                worksheet.Range[$"F{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                worksheet.Range[$"G{row}"].Number = (double)invoice.NonTaxableSubTotal;
-                worksheet.Range[$"G{row}"].NumberFormat = "¥#,##0";
-                worksheet.Range[$"G{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range[$"F{summaryRow}"].Text = "非課税小計：";
+                worksheet.Range[$"F{summaryRow}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range[$"G{summaryRow}"].Number = (double)invoice.NonTaxableSubTotal;
+                worksheet.Range[$"G{summaryRow}"].NumberFormat = "¥#,##0";
+                worksheet.Range[$"G{summaryRow}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
 
-                row++;
+                summaryRow++;
 
                 // 消費税
-                worksheet.Range[$"F{row}"].Text = $"消費税（{invoice.TaxRate}%）：";
-                worksheet.Range[$"F{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                worksheet.Range[$"G{row}"].Number = (double)invoice.Tax;
-                worksheet.Range[$"G{row}"].NumberFormat = "¥#,##0";
-                worksheet.Range[$"G{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range[$"F{summaryRow}"].Text = $"消費税（{invoice.TaxRate}%）：";
+                worksheet.Range[$"F{summaryRow}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range[$"G{summaryRow}"].Number = (double)invoice.Tax;
+                worksheet.Range[$"G{summaryRow}"].NumberFormat = "¥#,##0";
+                worksheet.Range[$"G{summaryRow}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
 
-                row++;
+                summaryRow++;
 
                 // 合計（太字・大きめのフォント）
-                worksheet.Range[$"F{row}"].Text = "合計金額：";
-                worksheet.Range[$"F{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                worksheet.Range[$"F{row}"].CellStyle.Font.Bold = true;
-                worksheet.Range[$"F{row}"].CellStyle.Font.Size = 12;
-                worksheet.Range[$"G{row}"].Number = (double)invoice.Total;
-                worksheet.Range[$"G{row}"].NumberFormat = "¥#,##0";
-                worksheet.Range[$"G{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                worksheet.Range[$"G{row}"].CellStyle.Font.Bold = true;
-                worksheet.Range[$"G{row}"].CellStyle.Font.Size = 12;
+                worksheet.Range[$"F{summaryRow}"].Text = "合計金額：";
+                worksheet.Range[$"F{summaryRow}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range[$"F{summaryRow}"].CellStyle.Font.Bold = true;
+                worksheet.Range[$"F{summaryRow}"].CellStyle.Font.Size = 12;
+                worksheet.Range[$"G{summaryRow}"].Number = (double)invoice.Total;
+                worksheet.Range[$"G{summaryRow}"].NumberFormat = "¥#,##0";
+                worksheet.Range[$"G{summaryRow}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range[$"G{summaryRow}"].CellStyle.Font.Bold = true;
+                worksheet.Range[$"G{summaryRow}"].CellStyle.Font.Size = 12;
 
                 // 合計に罫線
-                worksheet.Range[$"F{row}:G{row}"].BorderAround(ExcelLineStyle.Medium);
+                worksheet.Range[$"F{summaryRow}:G{summaryRow}"].BorderAround(ExcelLineStyle.Medium);
 
-                row += 3;
+                // 次の内容のために行カウンタを更新
+                row = Math.Max(row, summaryRow) + 3;
 
                 // 次回車検日
                 if (invoice.NextInspectionDate.HasValue)

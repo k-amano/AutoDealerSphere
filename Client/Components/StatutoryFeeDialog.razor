@@ -1,0 +1,127 @@
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Grids
+@using AutoDealerSphere.Shared.Models
+@using System.ComponentModel.DataAnnotations
+
+<SfDialog @ref="_dialog" Width="600px" IsModal="true" ShowCloseIcon="true" @bind-Visible="_isVisible">
+    <DialogTemplates>
+        <Header>
+            <span>法定費用選択</span>
+        </Header>
+        <Content>
+            <div class="statutory-fee-selection">
+                <h4>法定費用を選択してください</h4>
+                
+                @if (_isLoading)
+                {
+                    <div class="loading">読み込み中...</div>
+                }
+                else if (_statutoryFees == null || !_statutoryFees.Any())
+                {
+                    <div class="no-data">
+                        <p>該当する法定費用データがありません。</p>
+                        <p>車両カテゴリが正しく設定されているか確認してください。</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="vehicle-info">
+                        <p><strong>車両情報:</strong> @_vehicleDisplay</p>
+                        <p><strong>車両カテゴリ:</strong> @_vehicleCategoryDisplay</p>
+                    </div>
+                    
+                    <div class="fees-grid">
+                        <SfGrid DataSource="@_statutoryFees" AllowPaging="false" AllowSorting="false">
+                            <GridColumns>
+                                <GridColumn Width="50">
+                                    <Template>
+                                        @{
+                                            var fee = (context as StatutoryFee);
+                                            <SfRadioButton Name="feeSelection" Value="@fee.Id.ToString()" @bind-Checked="_selectedFeeIdString" @onchange="@(() => OnFeeSelected(fee.Id))"></SfRadioButton>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn Field="@nameof(StatutoryFee.FeeType)" HeaderText="費用項目" Width="250"></GridColumn>
+                                <GridColumn Field="@nameof(StatutoryFee.Amount)" HeaderText="金額" Width="120">
+                                    <Template>
+                                        @{
+                                            var fee = (context as StatutoryFee);
+                                            <span>¥@($"{fee?.Amount:N0}")</span>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn Field="@nameof(StatutoryFee.IsTaxable)" HeaderText="課税" Width="80">
+                                    <Template>
+                                        @{
+                                            var fee = (context as StatutoryFee);
+                                            <span>@(fee?.IsTaxable == true ? "課税" : "非課税")</span>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                            </GridColumns>
+                            <GridTemplates>
+                                <EmptyRecordTemplate>
+                                    <div class="empty-record">法定費用データがありません</div>
+                                </EmptyRecordTemplate>
+                            </GridTemplates>
+                        </SfGrid>
+                    </div>
+                }
+                
+                <div class="dialog-buttons">
+                    <SfButton @onclick="SaveSelectedFee" IsPrimary="true" Disabled="@(_selectedFeeId == 0 || _isLoading)">追加</SfButton>
+                    <SfButton @onclick="Cancel">キャンセル</SfButton>
+                </div>
+            </div>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+<style>
+    .statutory-fee-selection {
+        padding: 10px;
+    }
+    
+    .vehicle-info {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f5f5f5;
+        border-radius: 5px;
+    }
+    
+    .vehicle-info p {
+        margin: 5px 0;
+    }
+    
+    .fees-grid {
+        margin-bottom: 20px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .loading, .no-data {
+        padding: 40px;
+        text-align: center;
+        color: #666;
+    }
+    
+    .no-data p {
+        margin: 10px 0;
+    }
+    
+    .dialog-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .empty-record {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+    }
+</style>
