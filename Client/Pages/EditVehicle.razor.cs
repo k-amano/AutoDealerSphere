@@ -68,9 +68,9 @@ namespace AutoDealerSphere.Client.Pages
                             UserNameOrCompany = vehicle.UserNameOrCompany,
                             UserAddress = vehicle.UserAddress,
                             BaseLocation = vehicle.BaseLocation,
+                            VehicleCategoryId = vehicle.VehicleCategoryId,
                             CreatedAt = vehicle.CreatedAt,
-                            UpdatedAt = vehicle.UpdatedAt,
-                            VehicleCategoryId = vehicle.VehicleCategoryId
+                            UpdatedAt = vehicle.UpdatedAt
                         };
                     }
                 }
