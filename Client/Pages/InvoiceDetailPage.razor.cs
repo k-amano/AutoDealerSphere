@@ -23,6 +23,7 @@ namespace AutoDealerSphere.Client.Pages
         private Invoice? _invoice;
         private AutoDealerSphere.Client.Components.InvoiceBasicInfoDialog? _basicInfoDialog;
         private AutoDealerSphere.Client.Components.InvoiceDetailDialog? _detailDialog;
+        private AutoDealerSphere.Client.Components.StatutoryFeeDialog? _statutoryFeeDialog;
 
         // UI表示制御プロパティ
         protected bool IsLoading => _invoice == null;
@@ -97,6 +98,14 @@ namespace AutoDealerSphere.Client.Pages
             }
         }
 
+        protected async Task OpenStatutoryFeeDialog()
+        {
+            if (_statutoryFeeDialog != null && _invoice != null)
+            {
+                await _statutoryFeeDialog.Open(InvoiceId, _invoice.VehicleId);
+            }
+        }
+
         protected async Task EditDetail(AutoDealerSphere.Shared.Models.InvoiceDetail detail)
         {
             if (_detailDialog != null)
@@ -162,6 +171,28 @@ namespace AutoDealerSphere.Client.Pages
                 {
                     await LoadInvoice();
                 }
+            }
+        }
+
+        protected async Task OnStatutoryFeeSaved(AutoDealerSphere.Shared.Models.StatutoryFee statutoryFee)
+        {
+            // 法定費用を請求書明細として追加
+            var detail = new AutoDealerSphere.Shared.Models.InvoiceDetail
+            {
+                InvoiceId = InvoiceId,
+                ItemName = statutoryFee.FeeType,
+                Type = "法定費用",
+                Quantity = 1,
+                UnitPrice = statutoryFee.Amount,
+                LaborCost = 0,
+                IsTaxable = statutoryFee.IsTaxable,
+                DisplayOrder = _invoice?.InvoiceDetails.Count ?? 0
+            };
+
+            var response = await Http.PostAsJsonAsync($"api/Invoices/{InvoiceId}/details", detail);
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadInvoice();
             }
         }
 
