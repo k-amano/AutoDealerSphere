@@ -13,11 +13,13 @@ namespace AutoDealerSphere.Client.Pages
 
         private AutoDealerSphere.Shared.Models.Vehicle? _item;
         private List<AutoDealerSphere.Shared.Models.Client> _clients = new();
+        private List<VehicleCategory> _vehicleCategories = new();
         private bool _initialized = false;
 
         protected override async Task OnInitializedAsync()
         {
             await LoadClients();
+            await LoadVehicleCategories();
             
             if (VehicleId > 0)
             {
@@ -66,6 +68,7 @@ namespace AutoDealerSphere.Client.Pages
                             UserNameOrCompany = vehicle.UserNameOrCompany,
                             UserAddress = vehicle.UserAddress,
                             BaseLocation = vehicle.BaseLocation,
+                            VehicleCategoryId = vehicle.VehicleCategoryId,
                             CreatedAt = vehicle.CreatedAt,
                             UpdatedAt = vehicle.UpdatedAt
                         };
@@ -90,6 +93,15 @@ namespace AutoDealerSphere.Client.Pages
             if (response.IsSuccessStatusCode)
             {
                 _clients = await response.Content.ReadFromJsonAsync<List<AutoDealerSphere.Shared.Models.Client>>() ?? new();
+            }
+        }
+
+        private async Task LoadVehicleCategories()
+        {
+            var response = await Http.GetAsync("api/vehiclecategories");
+            if (response.IsSuccessStatusCode)
+            {
+                _vehicleCategories = await response.Content.ReadFromJsonAsync<List<VehicleCategory>>() ?? new();
             }
         }
 
