@@ -65,6 +65,22 @@
         <h4>車両詳細</h4>
         <div class="form-section">
             <div class="form-row">
+                <label>車種</label>
+                <SfDropDownList TValue="int?" TItem="VehicleCategory" @bind-Value="Item.VehicleCategoryId" 
+                    DataSource="@VehicleCategories" Placeholder="車種を選択">
+                    <DropDownListFieldSettings Text="CategoryName" Value="Id"></DropDownListFieldSettings>
+                </SfDropDownList>
+                <ValidationMessage For="@(() => Item.VehicleCategoryId)" />
+            </div>
+            
+            <div class="form-row">
+                <label>排気量(cc)</label>
+                <SfNumericTextBox TValue="decimal?" @bind-Value="Item.Displacement" 
+                    Placeholder="排気量" Format="N0"></SfNumericTextBox>
+                <ValidationMessage For="@(() => Item.Displacement)" />
+            </div>
+            
+            <div class="form-row">
                 <label>初度登録年月</label>
                 <SfDatePicker TValue="DateTime?" @bind-Value="Item.FirstRegistrationDate" 
                     Placeholder="初度登録年月を選択" Format="yyyy/MM/dd"></SfDatePicker>
@@ -145,6 +161,22 @@
                 <SfTextBox @bind-Value="Item.FuelType" Placeholder="燃料の種類"></SfTextBox>
                 <ValidationMessage For="@(() => Item.FuelType)" />
             </div>
+            
+            <div class="form-row">
+                <label>排気量(cc)</label>
+                <SfNumericTextBox TValue="decimal?" @bind-Value="Item.Displacement" 
+                    Placeholder="排気量" Format="N0"></SfNumericTextBox>
+                <ValidationMessage For="@(() => Item.Displacement)" />
+            </div>
+            
+            <div class="form-row">
+                <label>車種</label>
+                <SfDropDownList TValue="int?" TItem="VehicleCategory" @bind-Value="Item.VehicleCategoryId" 
+                    DataSource="@VehicleCategories" Placeholder="車種を選択">
+                    <DropDownListFieldSettings Text="CategoryName" Value="Id"></DropDownListFieldSettings>
+                </SfDropDownList>
+                <ValidationMessage For="@(() => Item.VehicleCategoryId)" />
+            </div>
         </div>
 
         <div class="form-buttons">
@@ -160,6 +192,7 @@
 @code {
     [Parameter] public Vehicle Item { get; set; } = new();
     [Parameter] public List<Client> Clients { get; set; } = new();
+    [Parameter] public List<VehicleCategory> VehicleCategories { get; set; } = new();
     [Parameter] public EventCallback<Vehicle> OnClickOK { get; set; }
     [Parameter] public EventCallback<Vehicle> OnClickDelete { get; set; }
 
