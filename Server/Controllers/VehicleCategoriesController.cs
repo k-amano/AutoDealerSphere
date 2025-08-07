@@ -9,7 +9,6 @@ namespace AutoDealerSphere.Server.Controllers
     [ApiController]
     public class VehicleCategoriesController : ControllerBase
     {
-<<<<<<< HEAD
         private readonly IDbContextFactory<SQLDBContext> _contextFactory;
 
         public VehicleCategoriesController(IDbContextFactory<SQLDBContext> contextFactory)
@@ -17,6 +16,7 @@ namespace AutoDealerSphere.Server.Controllers
             _contextFactory = contextFactory;
         }
 
+        // GET: api/VehicleCategories
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VehicleCategory>>> GetVehicleCategories()
         {
@@ -25,28 +25,13 @@ namespace AutoDealerSphere.Server.Controllers
                 .OrderBy(vc => vc.DisplayOrder)
                 .ToListAsync();
         }
-=======
-        private readonly SQLDBContext _context;
-
-        public VehicleCategoriesController(SQLDBContext context)
-        {
-            _context = context;
-        }
-
-        // GET: api/VehicleCategories
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<VehicleCategory>>> GetVehicleCategories()
-        {
-            return await _context.VehicleCategories
-                .OrderBy(vc => vc.DisplayOrder)
-                .ToListAsync();
-        }
 
         // GET: api/VehicleCategories/5
         [HttpGet("{id}")]
         public async Task<ActionResult<VehicleCategory>> GetVehicleCategory(int id)
         {
-            var vehicleCategory = await _context.VehicleCategories.FindAsync(id);
+            using var context = await _contextFactory.CreateDbContextAsync();
+            var vehicleCategory = await context.VehicleCategories.FindAsync(id);
 
             if (vehicleCategory == null)
             {
@@ -55,6 +40,5 @@ namespace AutoDealerSphere.Server.Controllers
 
             return vehicleCategory;
         }
->>>>>>> 3ede5e8 (feat: 車両管理編集画面に排気量と車種の入力欄を追加)
     }
 }
