@@ -1,0 +1,85 @@
+/* 明細一覧のGridTemplatesスタイル */
+.invoice-detail-grid .e-row {
+    height: auto;
+}
+
+.invoice-detail-grid .e-rowcell {
+    padding: 0;
+}
+
+.detail-row {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    line-height: 26px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.detail-name {
+    min-width: 200px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.detail-type {
+    min-width: 100px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.detail-repair {
+    min-width: 120px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.detail-quantity {
+    min-width: 100px;
+    color: #333;
+    flex-shrink: 0;
+}
+
+.detail-unitprice {
+    min-width: 120px;
+    color: #333;
+    flex-shrink: 0;
+}
+
+.detail-labor {
+    min-width: 120px;
+    color: #333;
+    flex-shrink: 0;
+}
+
+.detail-subtotal {
+    margin-left: auto;
+    font-weight: 500;
+    color: #333;
+    min-width: 120px;
+    text-align: right;
+}
+
+/* 法定費用一覧のスタイル */
+.statutory-fees {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 5px;
+}
+
+.statutory-fee-grid .e-grid {
+    border: none;
+}
+
+.statutory-fee-grid .e-row:hover {
+    background-color: inherit;
+}
+
+/* 空レコードのスタイル */
+.empty-record {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+}
