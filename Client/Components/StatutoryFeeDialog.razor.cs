@@ -2,6 +2,7 @@ using AutoDealerSphere.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Popups;
 using System.Net.Http.Json;
+using System.Linq;
 
 namespace AutoDealerSphere.Client.Components
 {
@@ -11,7 +12,7 @@ namespace AutoDealerSphere.Client.Components
         private HttpClient Http { get; set; } = default!;
 
         [Parameter]
-        public EventCallback<StatutoryFee> OnSave { get; set; }
+        public EventCallback<List<StatutoryFee>> OnSave { get; set; }
 
         private SfDialog? _dialog;
         private bool _isVisible = false;
@@ -20,8 +21,8 @@ namespace AutoDealerSphere.Client.Components
         private int _vehicleId;
         private Vehicle? _vehicle;
         private List<StatutoryFee> _statutoryFees = new();
-        private int _selectedFeeId = 0;
-        private string _selectedFeeIdString = "";
+        private Dictionary<int, bool> _selectedFees = new();
+        private List<InvoiceDetail> _existingInvoiceDetails = new();
         private string _vehicleDisplay = "";
         private string _vehicleCategoryDisplay = "";
 
@@ -29,13 +30,13 @@ namespace AutoDealerSphere.Client.Components
         {
             _invoiceId = invoiceId;
             _vehicleId = vehicleId;
-            _selectedFeeId = 0;
-            _selectedFeeIdString = "";
+            _selectedFees.Clear();
             _isVisible = true;
             _isLoading = true;
             StateHasChanged();
 
             await LoadVehicleAndFees();
+            await LoadExistingInvoiceDetails();
         }
 
         private async Task LoadVehicleAndFees()
@@ -54,6 +55,12 @@ namespace AutoDealerSphere.Client.Components
                     if (_vehicle.VehicleCategoryId > 0)
                     {
                         _statutoryFees = await Http.GetFromJsonAsync<List<StatutoryFee>>($"api/StatutoryFees/category/{_vehicle.VehicleCategoryId}") ?? new();
+                        
+                        // 各法定費用のチェックボックスを初期化
+                        foreach (var fee in _statutoryFees)
+                        {
+                            _selectedFees[fee.Id] = false;
+                        }
                     }
                 }
             }
@@ -69,23 +76,47 @@ namespace AutoDealerSphere.Client.Components
             }
         }
 
-        private void OnFeeSelected(int feeId)
+        private async Task LoadExistingInvoiceDetails()
         {
-            _selectedFeeId = feeId;
-            _selectedFeeIdString = feeId.ToString();
-        }
-
-        private async Task SaveSelectedFee()
-        {
-            if (_selectedFeeId > 0)
+            try
             {
-                var selectedFee = _statutoryFees.FirstOrDefault(f => f.Id == _selectedFeeId);
-                if (selectedFee != null)
+                if (_invoiceId > 0)
                 {
-                    await OnSave.InvokeAsync(selectedFee);
-                    _isVisible = false;
+                    var invoice = await Http.GetFromJsonAsync<Invoice>($"api/Invoices/{_invoiceId}");
+                    if (invoice != null && invoice.InvoiceDetails != null)
+                    {
+                        _existingInvoiceDetails = invoice.InvoiceDetails.Where(d => d.Type == "法定費用").ToList();
+                        
+                        // 既存の法定費用項目にチェックを入れる
+                        foreach (var detail in _existingInvoiceDetails)
+                        {
+                            var fee = _statutoryFees.FirstOrDefault(f => f.FeeType == detail.ItemName);
+                            if (fee != null && _selectedFees.ContainsKey(fee.Id))
+                            {
+                                _selectedFees[fee.Id] = true;
+                            }
+                        }
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading existing invoice details: {ex.Message}");
+            }
+            finally
+            {
+                StateHasChanged();
+            }
+        }
+
+        private async Task SaveSelectedFees()
+        {
+            var selectedFeesList = _statutoryFees
+                .Where(f => _selectedFees.ContainsKey(f.Id) && _selectedFees[f.Id])
+                .ToList();
+
+            await OnSave.InvokeAsync(selectedFeesList);
+            _isVisible = false;
         }
 
         private void Cancel()

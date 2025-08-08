@@ -32,6 +32,7 @@ namespace AutoDealerSphere.Server.Controllers
         {
             var vehicle = await _context.Vehicles
                 .Include(v => v.Client)
+                .Include(v => v.VehicleCategory)
                 .FirstOrDefaultAsync(v => v.Id == id);
 
             if (vehicle == null)
