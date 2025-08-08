@@ -5,6 +5,7 @@
 @using Syncfusion.Blazor.Grids
 @using AutoDealerSphere.Shared.Models
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components
 
 <SfDialog @ref="_dialog" Width="600px" IsModal="true" ShowCloseIcon="true" @bind-Visible="_isVisible">
     <DialogTemplates>
@@ -40,7 +41,8 @@
                                     <Template>
                                         @{
                                             var fee = (context as StatutoryFee);
-                                            <SfRadioButton Name="feeSelection" Value="@fee.Id.ToString()" @bind-Checked="_selectedFeeIdString" @onchange="@(() => OnFeeSelected(fee.Id))"></SfRadioButton>
+                                            bool isChecked = _selectedFeeIds.Contains(fee.Id);
+                                            <input type="checkbox" checked="@isChecked" @onchange="@(e => OnFeeSelectionChanged(fee.Id, (bool)e.Value))" />
                                         }
                                     </Template>
                                 </GridColumn>
@@ -50,14 +52,6 @@
                                         @{
                                             var fee = (context as StatutoryFee);
                                             <span>¥@($"{fee?.Amount:N0}")</span>
-                                        }
-                                    </Template>
-                                </GridColumn>
-                                <GridColumn Field="@nameof(StatutoryFee.IsTaxable)" HeaderText="課税" Width="80">
-                                    <Template>
-                                        @{
-                                            var fee = (context as StatutoryFee);
-                                            <span>@(fee?.IsTaxable == true ? "課税" : "非課税")</span>
                                         }
                                     </Template>
                                 </GridColumn>
@@ -72,7 +66,7 @@
                 }
                 
                 <div class="dialog-buttons">
-                    <SfButton @onclick="SaveSelectedFee" IsPrimary="true" Disabled="@(_selectedFeeId == 0 || _isLoading)">追加</SfButton>
+                    <SfButton @onclick="SaveSelectedFees" IsPrimary="true" Disabled="@(!_selectedFeeIds.Any() || _isLoading)">保存</SfButton>
                     <SfButton @onclick="Cancel">キャンセル</SfButton>
                 </div>
             </div>
