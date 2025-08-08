@@ -13,6 +13,7 @@ namespace AutoDealerSphere.Client.Components
         private SfDialog? _dialog;
         private bool _isVisible = false;
         private bool _isEdit = false;
+        private bool _isEditMode => _isEdit;
         private InvoiceDetail? _model;
         private decimal _subTotal = 0;
 
@@ -46,6 +47,9 @@ namespace AutoDealerSphere.Client.Components
         public async Task Open(InvoiceDetail detail, bool isEdit)
         {
             _isEdit = isEdit;
+            
+            // Always set IsTaxable to true
+            detail.IsTaxable = true;
             
             // 部品データを読み込み
             await LoadParts();
@@ -154,6 +158,7 @@ namespace AutoDealerSphere.Client.Components
                     _model.ItemName = selectedPart.PartName;
                     _model.Type = selectedPart.Type;
                     _model.UnitPrice = selectedPart.UnitPrice;
+                    _model.IsTaxable = true; // Always set to taxable
                     
                     CalculateSubTotal();
                     _currentStep = DialogStep.EditDetails;
@@ -198,6 +203,19 @@ namespace AutoDealerSphere.Client.Components
             _selectedPartIdString = string.Empty;
             _partSearchText = string.Empty;
             _selectedType = string.Empty;
+        }
+        
+        private async Task DeleteDetail()
+        {
+            if (_model != null && _model.Id > 0)
+            {
+                var response = await Http.DeleteAsync($"api/Invoices/{_model.InvoiceId}/details/{_model.Id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    await OnSave.InvokeAsync(null);
+                    _isVisible = false;
+                }
+            }
         }
 
         private enum DialogStep
