@@ -3,6 +3,7 @@ using AutoDealerSphere.Client.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Net.Http.Json;
+using System.Linq;
 
 namespace AutoDealerSphere.Client.Pages
 {
@@ -174,26 +175,57 @@ namespace AutoDealerSphere.Client.Pages
             }
         }
 
-        protected async Task OnStatutoryFeeSaved(AutoDealerSphere.Shared.Models.StatutoryFee statutoryFee)
+        protected async Task OnStatutoryFeeSaved(List<AutoDealerSphere.Shared.Models.StatutoryFee> statutoryFees)
         {
-            // 法定費用を請求書明細として追加
-            var detail = new AutoDealerSphere.Shared.Models.InvoiceDetail
-            {
-                InvoiceId = InvoiceId,
-                ItemName = statutoryFee.FeeType,
-                Type = "法定費用",
-                Quantity = 1,
-                UnitPrice = statutoryFee.Amount,
-                LaborCost = 0,
-                IsTaxable = statutoryFee.IsTaxable,
-                DisplayOrder = _invoice?.InvoiceDetails.Count ?? 0
-            };
+            // 既存の法定費用明細を取得
+            var existingStatutoryDetails = _invoice?.InvoiceDetails
+                .Where(d => d.Type == "法定費用")
+                .ToList() ?? new List<AutoDealerSphere.Shared.Models.InvoiceDetail>();
 
-            var response = await Http.PostAsJsonAsync($"api/Invoices/{InvoiceId}/details", detail);
-            if (response.IsSuccessStatusCode)
+            // 選択された法定費用のリスト
+            var selectedFeeTypes = statutoryFees.Select(f => f.FeeType).ToList();
+
+            // 削除する明細（選択されていない法定費用）
+            var detailsToDelete = existingStatutoryDetails
+                .Where(d => !selectedFeeTypes.Contains(d.ItemName))
+                .ToList();
+
+            // 追加する法定費用（既存にない新規選択）
+            var existingFeeTypes = existingStatutoryDetails.Select(d => d.ItemName).ToList();
+            var feesToAdd = statutoryFees
+                .Where(f => !existingFeeTypes.Contains(f.FeeType))
+                .ToList();
+
+            // 削除処理
+            foreach (var detail in detailsToDelete)
             {
-                await LoadInvoice();
+                if (detail.Id > 0)
+                {
+                    await Http.DeleteAsync($"api/Invoices/{InvoiceId}/details/{detail.Id}");
+                }
             }
+
+            // 追加処理
+            var displayOrder = _invoice?.InvoiceDetails.Count ?? 0;
+            foreach (var statutoryFee in feesToAdd)
+            {
+                var detail = new AutoDealerSphere.Shared.Models.InvoiceDetail
+                {
+                    InvoiceId = InvoiceId,
+                    ItemName = statutoryFee.FeeType,
+                    Type = "法定費用",
+                    Quantity = 1,
+                    UnitPrice = statutoryFee.Amount,
+                    LaborCost = 0,
+                    IsTaxable = statutoryFee.IsTaxable,
+                    DisplayOrder = displayOrder++
+                };
+
+                await Http.PostAsJsonAsync($"api/Invoices/{InvoiceId}/details", detail);
+            }
+
+            // データを再読み込み
+            await LoadInvoice();
         }
 
         protected async Task DeleteInvoice()

@@ -2,6 +2,7 @@ using AutoDealerSphere.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Popups;
 using System.Net.Http.Json;
+using System.Linq;
 
 namespace AutoDealerSphere.Client.Components
 {
@@ -11,7 +12,7 @@ namespace AutoDealerSphere.Client.Components
         private HttpClient Http { get; set; } = default!;
 
         [Parameter]
-        public EventCallback<StatutoryFee> OnSave { get; set; }
+        public EventCallback<List<StatutoryFee>> OnSave { get; set; }
 
         private SfDialog? _dialog;
         private bool _isVisible = false;
@@ -20,8 +21,8 @@ namespace AutoDealerSphere.Client.Components
         private int _vehicleId;
         private Vehicle? _vehicle;
         private List<StatutoryFee> _statutoryFees = new();
-        private int _selectedFeeId = 0;
-        private string _selectedFeeIdString = "";
+        private List<int> _selectedFeeIds = new();
+        private List<InvoiceDetail> _existingStatutoryFeeDetails = new();
         private string _vehicleDisplay = "";
         private string _vehicleCategoryDisplay = "";
 
@@ -29,13 +30,13 @@ namespace AutoDealerSphere.Client.Components
         {
             _invoiceId = invoiceId;
             _vehicleId = vehicleId;
-            _selectedFeeId = 0;
-            _selectedFeeIdString = "";
+            _selectedFeeIds.Clear();
             _isVisible = true;
             _isLoading = true;
             StateHasChanged();
 
             await LoadVehicleAndFees();
+            await LoadExistingStatutoryFees();
         }
 
         private async Task LoadVehicleAndFees()
@@ -48,6 +49,17 @@ namespace AutoDealerSphere.Client.Components
                 if (_vehicle != null)
                 {
                     _vehicleDisplay = $"{_vehicle.VehicleName} ({_vehicle.LicensePlateNumber})";
+                    
+                    // 車両カテゴリ情報を取得
+                    if (_vehicle.VehicleCategoryId > 0 && _vehicle.VehicleCategory == null)
+                    {
+                        var categoryResponse = await Http.GetFromJsonAsync<VehicleCategory>($"api/VehicleCategories/{_vehicle.VehicleCategoryId}");
+                        if (categoryResponse != null)
+                        {
+                            _vehicle.VehicleCategory = categoryResponse;
+                        }
+                    }
+                    
                     _vehicleCategoryDisplay = _vehicle.VehicleCategory?.CategoryName ?? "未設定";
 
                     // 車両カテゴリに対応する法定費用を取得
@@ -69,23 +81,59 @@ namespace AutoDealerSphere.Client.Components
             }
         }
 
-        private void OnFeeSelected(int feeId)
+        private async Task LoadExistingStatutoryFees()
         {
-            _selectedFeeId = feeId;
-            _selectedFeeIdString = feeId.ToString();
-        }
-
-        private async Task SaveSelectedFee()
-        {
-            if (_selectedFeeId > 0)
+            try
             {
-                var selectedFee = _statutoryFees.FirstOrDefault(f => f.Id == _selectedFeeId);
-                if (selectedFee != null)
+                // 請求書の既存明細を取得
+                var invoice = await Http.GetFromJsonAsync<Invoice>($"api/Invoices/{_invoiceId}");
+                if (invoice?.InvoiceDetails != null)
                 {
-                    await OnSave.InvokeAsync(selectedFee);
-                    _isVisible = false;
+                    // 法定費用タイプの明細を抽出
+                    _existingStatutoryFeeDetails = invoice.InvoiceDetails
+                        .Where(d => d.Type == "法定費用")
+                        .ToList();
+                    
+                    // 既存の法定費用項目名から、選択済みとしてマーク
+                    foreach (var detail in _existingStatutoryFeeDetails)
+                    {
+                        var matchingFee = _statutoryFees.FirstOrDefault(f => f.FeeType == detail.ItemName);
+                        if (matchingFee != null)
+                        {
+                            _selectedFeeIds.Add(matchingFee.Id);
+                        }
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading existing statutory fees: {ex.Message}");
+            }
+        }
+
+        private void OnFeeSelectionChanged(int feeId, bool isChecked)
+        {
+            if (isChecked)
+            {
+                if (!_selectedFeeIds.Contains(feeId))
+                {
+                    _selectedFeeIds.Add(feeId);
+                }
+            }
+            else
+            {
+                _selectedFeeIds.Remove(feeId);
+            }
+        }
+
+        private async Task SaveSelectedFees()
+        {
+            var selectedFees = _statutoryFees
+                .Where(f => _selectedFeeIds.Contains(f.Id))
+                .ToList();
+                
+            await OnSave.InvokeAsync(selectedFees);
+            _isVisible = false;
         }
 
         private void Cancel()
