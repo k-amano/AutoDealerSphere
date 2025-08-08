@@ -272,7 +272,7 @@ namespace AutoDealerSphere.Client.Pages
         protected string MileageDisplay => _invoice?.Mileage?.ToString("N0") ?? string.Empty;
         protected string NotesDisplay => _invoice?.Notes ?? string.Empty;
         
-        protected decimal SubTotal => _invoice?.SubTotal ?? 0;
+        protected decimal SubTotal => (_invoice?.TaxableSubTotal ?? 0) + (_invoice?.NonTaxableSubTotal ?? 0);
         protected decimal TaxRate => _invoice?.TaxRate ?? 10m;
         protected decimal Tax => _invoice?.Tax ?? 0;
         protected decimal Total => _invoice?.Total ?? 0;
