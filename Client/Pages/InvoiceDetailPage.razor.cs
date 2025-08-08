@@ -178,53 +178,50 @@ namespace AutoDealerSphere.Client.Pages
         protected async Task OnStatutoryFeeSaved(List<AutoDealerSphere.Shared.Models.StatutoryFee> statutoryFees)
         {
             // 既存の法定費用明細を取得
-            var existingStatutoryDetails = _invoice?.InvoiceDetails
-                .Where(d => d.Type == "法定費用")
-                .ToList() ?? new List<AutoDealerSphere.Shared.Models.InvoiceDetail>();
+            var existingStatutoryDetails = _invoice?.InvoiceDetails?.Where(d => d.Type == "法定費用").ToList() ?? new List<AutoDealerSphere.Shared.Models.InvoiceDetail>();
 
-            // 選択された法定費用のリスト
-            var selectedFeeTypes = statutoryFees.Select(f => f.FeeType).ToList();
-
-            // 削除する明細（選択されていない法定費用）
-            var detailsToDelete = existingStatutoryDetails
-                .Where(d => !selectedFeeTypes.Contains(d.ItemName))
-                .ToList();
-
-            // 追加する法定費用（既存にない新規選択）
-            var existingFeeTypes = existingStatutoryDetails.Select(d => d.ItemName).ToList();
-            var feesToAdd = statutoryFees
-                .Where(f => !existingFeeTypes.Contains(f.FeeType))
-                .ToList();
-
-            // 削除処理
-            foreach (var detail in detailsToDelete)
+            // 選択された法定費用を追加（重複チェック付き）
+            foreach (var statutoryFee in statutoryFees)
             {
-                if (detail.Id > 0)
+                var existingDetail = existingStatutoryDetails.FirstOrDefault(d => d.ItemName == statutoryFee.FeeType);
+                if (existingDetail == null)
                 {
-                    await Http.DeleteAsync($"api/Invoices/{InvoiceId}/details/{detail.Id}");
+                    // 新規追加
+                    var detail = new AutoDealerSphere.Shared.Models.InvoiceDetail
+                    {
+                        InvoiceId = InvoiceId,
+                        ItemName = statutoryFee.FeeType,
+                        Type = "法定費用",
+                        Quantity = 1,
+                        UnitPrice = statutoryFee.Amount,
+                        LaborCost = 0,
+                        IsTaxable = statutoryFee.IsTaxable,
+                        DisplayOrder = _invoice?.InvoiceDetails.Count ?? 0
+                    };
+
+                    var response = await Http.PostAsJsonAsync($"api/Invoices/{InvoiceId}/details", detail);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"Failed to add statutory fee: {statutoryFee.FeeType}");
+                    }
                 }
             }
 
-            // 追加処理
-            var displayOrder = _invoice?.InvoiceDetails.Count ?? 0;
-            foreach (var statutoryFee in feesToAdd)
+            // 選択されていない法定費用を削除
+            foreach (var existingDetail in existingStatutoryDetails)
             {
-                var detail = new AutoDealerSphere.Shared.Models.InvoiceDetail
+                var isSelected = statutoryFees.Any(f => f.FeeType == existingDetail.ItemName);
+                if (!isSelected)
                 {
-                    InvoiceId = InvoiceId,
-                    ItemName = statutoryFee.FeeType,
-                    Type = "法定費用",
-                    Quantity = 1,
-                    UnitPrice = statutoryFee.Amount,
-                    LaborCost = 0,
-                    IsTaxable = statutoryFee.IsTaxable,
-                    DisplayOrder = displayOrder++
-                };
-
-                await Http.PostAsJsonAsync($"api/Invoices/{InvoiceId}/details", detail);
+                    var response = await Http.DeleteAsync($"api/Invoices/{InvoiceId}/details/{existingDetail.Id}");
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"Failed to delete statutory fee: {existingDetail.ItemName}");
+                    }
+                }
             }
 
-            // データを再読み込み
+            // 明細を再読み込み
             await LoadInvoice();
         }
 

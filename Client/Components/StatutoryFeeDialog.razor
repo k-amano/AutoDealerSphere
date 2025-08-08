@@ -41,8 +41,7 @@
                                     <Template>
                                         @{
                                             var fee = (context as StatutoryFee);
-                                            bool isChecked = _selectedFeeIds.Contains(fee.Id);
-                                            <input type="checkbox" checked="@isChecked" @onchange="@(e => OnFeeSelectionChanged(fee.Id, (bool)e.Value))" />
+                                            <SfCheckBox @bind-Checked="@_selectedFees[fee.Id]"></SfCheckBox>
                                         }
                                     </Template>
                                 </GridColumn>
@@ -66,7 +65,7 @@
                 }
                 
                 <div class="dialog-buttons">
-                    <SfButton @onclick="SaveSelectedFees" IsPrimary="true" Disabled="@(!_selectedFeeIds.Any() || _isLoading)">保存</SfButton>
+                    <SfButton @onclick="SaveSelectedFees" IsPrimary="true" Disabled="@(_isLoading)">保存</SfButton>
                     <SfButton @onclick="Cancel">キャンセル</SfButton>
                 </div>
             </div>
