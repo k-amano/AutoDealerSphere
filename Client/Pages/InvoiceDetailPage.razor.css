@@ -14,50 +14,53 @@
     line-height: 26px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
+    overflow: hidden;
 }
 
 .detail-name {
-    min-width: 200px;
+    flex: 0 0 25%;
     font-weight: 500;
-    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .detail-type {
-    min-width: 100px;
+    flex: 0 0 10%;
     color: #666;
-    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .detail-repair {
-    min-width: 120px;
+    flex: 0 0 15%;
     color: #666;
-    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .detail-quantity {
-    min-width: 100px;
+    flex: 0 0 10%;
     color: #333;
-    flex-shrink: 0;
 }
 
 .detail-unitprice {
-    min-width: 120px;
+    flex: 0 0 12%;
     color: #333;
-    flex-shrink: 0;
 }
 
 .detail-labor {
-    min-width: 120px;
+    flex: 0 0 12%;
     color: #333;
-    flex-shrink: 0;
 }
 
 .detail-subtotal {
-    margin-left: auto;
+    flex: 0 0 13%;
     font-weight: 500;
     color: #333;
-    min-width: 120px;
     text-align: right;
 }
 
