@@ -43,6 +43,11 @@ namespace AutoDealerSphere.Client.Pages
         protected string InvoiceNotesClass => HasNotes ? "" : "hidden";
         protected string NextInspectionRowClass => !string.IsNullOrEmpty(NextInspectionDateDisplay) ? "info-row" : "info-row hidden";
         protected string MileageRowClass => !string.IsNullOrEmpty(MileageDisplay) ? "info-row" : "info-row hidden";
+        protected string StatutoryFeesClass => StatutoryFees?.Any() == true ? "" : "hidden";
+        
+        // 明細の分類
+        protected IEnumerable<AutoDealerSphere.Shared.Models.InvoiceDetail> RegularDetails => _invoice?.InvoiceDetails?.Where(d => d.Type != "法定費用") ?? Enumerable.Empty<AutoDealerSphere.Shared.Models.InvoiceDetail>();
+        protected IEnumerable<AutoDealerSphere.Shared.Models.InvoiceDetail> StatutoryFees => _invoice?.InvoiceDetails?.Where(d => d.Type == "法定費用") ?? Enumerable.Empty<AutoDealerSphere.Shared.Models.InvoiceDetail>();
 
         protected override async Task OnInitializedAsync()
         {
@@ -267,8 +272,7 @@ namespace AutoDealerSphere.Client.Pages
         protected string MileageDisplay => _invoice?.Mileage?.ToString("N0") ?? string.Empty;
         protected string NotesDisplay => _invoice?.Notes ?? string.Empty;
         
-        protected decimal TaxableSubTotal => _invoice?.TaxableSubTotal ?? 0;
-        protected decimal NonTaxableSubTotal => _invoice?.NonTaxableSubTotal ?? 0;
+        protected decimal SubTotal => (_invoice?.TaxableSubTotal ?? 0) + (_invoice?.NonTaxableSubTotal ?? 0);
         protected decimal TaxRate => _invoice?.TaxRate ?? 10m;
         protected decimal Tax => _invoice?.Tax ?? 0;
         protected decimal Total => _invoice?.Total ?? 0;

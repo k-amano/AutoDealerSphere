@@ -112,18 +112,16 @@
                         </div>
                         
                         <div class="form-row">
-                            <label>課税</label>
-                            <SfCheckBox @bind-Checked="_model.IsTaxable"></SfCheckBox>
-                        </div>
-                        
-                        <div class="form-row">
                             <label>小計</label>
                             <span class="subtotal">¥@($"{_subTotal:N0}")</span>
                         </div>
                         
                         <div class="dialog-buttons">
-                            <SfButton @onclick="BackToPartSelection">戻る</SfButton>
                             <SfButton Type="ButtonType.Submit" IsPrimary="true">保存</SfButton>
+                            @if (_isEditMode)
+                            {
+                                <SfButton @onclick="DeleteDetail" CssClass="e-danger">削除</SfButton>
+                            }
                             <SfButton @onclick="Cancel">キャンセル</SfButton>
                         </div>
                     </EditForm>

@@ -63,37 +63,50 @@
 
     <div class="invoice-details @InvoiceDetailsClass">
         <h3>明細一覧</h3>
-        <SfGrid DataSource="@_invoice?.InvoiceDetails" AllowSorting="false" AllowPaging="false">
+        <SfGrid DataSource="@RegularDetails" AllowSorting="false" AllowPaging="false" CssClass="invoice-detail-grid two-line-grid">
+            <GridTemplates>
+                <RowTemplate>
+                    @{
+                        var detail = context as AutoDealerSphere.Shared.Models.InvoiceDetail;
+                        <td colspan="7">
+                            <div class="detail-row">
+                                <span class="detail-name">
+                                    <span @onclick="() => EditDetail(detail)" class="grid-link">
+                                        @detail.ItemName
+                                    </span>
+                                </span>
+                                <span class="detail-type">@detail.Type</span>
+                                <span class="detail-repair">@detail.RepairMethod</span>
+                                <span class="detail-quantity">@($"{detail.Quantity:N2}")</span>
+                                <span class="detail-unitprice">¥@($"{detail.UnitPrice:N0}")</span>
+                                <span class="detail-labor">¥@($"{detail.LaborCost:N0}")</span>
+                                <span class="detail-subtotal">¥@($"{detail.SubTotal:N0}")</span>
+                            </div>
+                        </td>
+                    }
+                </RowTemplate>
+                <EmptyRecordTemplate>
+                    <div class="empty-record">明細データがありません</div>
+                </EmptyRecordTemplate>
+            </GridTemplates>
             <GridColumns>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.ItemName)" HeaderText="項目名" Width="200"></GridColumn>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.Type)" HeaderText="タイプ" Width="120"></GridColumn>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.RepairMethod)" HeaderText="修理方法" Width="150"></GridColumn>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.Quantity)" HeaderText="数量" Width="80" Format="N2"></GridColumn>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.UnitPrice)" HeaderText="単価" Width="100">
-                    <Template>
-                        @{
-                            var detail = (context as AutoDealerSphere.Shared.Models.InvoiceDetail);
-                            <span>¥@($"{detail?.UnitPrice:N0}")</span>
-                        }
-                    </Template>
-                </GridColumn>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.LaborCost)" HeaderText="工賃" Width="100">
-                    <Template>
-                        @{
-                            var detail = (context as AutoDealerSphere.Shared.Models.InvoiceDetail);
-                            <span>¥@($"{detail?.LaborCost:N0}")</span>
-                        }
-                    </Template>
-                </GridColumn>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.IsTaxable)" HeaderText="課税" Width="60">
-                    <Template>
-                        @{
-                            var detail = (context as AutoDealerSphere.Shared.Models.InvoiceDetail);
-                            <span>@(detail?.IsTaxable == true ? "○" : "×")</span>
-                        }
-                    </Template>
-                </GridColumn>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.SubTotal)" HeaderText="小計" Width="100">
+                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.ItemName)" HeaderText="項目名"></GridColumn>
+                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.Type)" HeaderText="タイプ"></GridColumn>
+                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.RepairMethod)" HeaderText="修理方法"></GridColumn>
+                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.Quantity)" HeaderText="数量"></GridColumn>
+                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.UnitPrice)" HeaderText="単価"></GridColumn>
+                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.LaborCost)" HeaderText="工賃"></GridColumn>
+                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.SubTotal)" HeaderText="小計"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+
+    <div class="statutory-fees @StatutoryFeesClass">
+        <h3>法定費用一覧</h3>
+        <SfGrid DataSource="@StatutoryFees" AllowSorting="false" AllowPaging="false" CssClass="statutory-fee-grid">
+            <GridColumns>
+                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.ItemName)" HeaderText="項目名" Width="300"></GridColumn>
+                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.SubTotal)" HeaderText="金額" Width="150">
                     <Template>
                         @{
                             var detail = (context as AutoDealerSphere.Shared.Models.InvoiceDetail);
@@ -101,19 +114,10 @@
                         }
                     </Template>
                 </GridColumn>
-                <GridColumn HeaderText="操作" Width="120">
-                    <Template>
-                        @{
-                            var detail = (context as AutoDealerSphere.Shared.Models.InvoiceDetail);
-                            <SfButton @onclick="() => EditDetail(detail)">編集</SfButton>
-                            <SfButton @onclick="() => DeleteDetail(detail)" CssClass="e-danger">削除</SfButton>
-                        }
-                    </Template>
-                </GridColumn>
             </GridColumns>
             <GridTemplates>
                 <EmptyRecordTemplate>
-                    <div class="empty-record">明細データがありません</div>
+                    <div class="empty-record">法定費用データがありません</div>
                 </EmptyRecordTemplate>
             </GridTemplates>
         </SfGrid>
@@ -123,12 +127,8 @@
         <h3>合計</h3>
         <div class="summary-grid">
             <div class="summary-row">
-                <span class="summary-label">課税対象小計:</span>
-                <span class="summary-value">¥@($"{TaxableSubTotal:N0}")</span>
-            </div>
-            <div class="summary-row">
-                <span class="summary-label">非課税小計:</span>
-                <span class="summary-value">¥@($"{NonTaxableSubTotal:N0}")</span>
+                <span class="summary-label">小計:</span>
+                <span class="summary-value">¥@($"{SubTotal:N0}")</span>
             </div>
             <div class="summary-row">
                 <span class="summary-label">消費税（@(TaxRate)%）:</span>
