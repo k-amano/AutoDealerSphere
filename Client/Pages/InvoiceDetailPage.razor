@@ -63,7 +63,7 @@
 
     <div class="invoice-details @InvoiceDetailsClass">
         <h3>明細一覧</h3>
-        <SfGrid DataSource="@RegularDetails" AllowSorting="false" AllowPaging="false" CssClass="invoice-detail-grid">
+        <SfGrid DataSource="@RegularDetails" AllowSorting="false" AllowPaging="false" CssClass="invoice-detail-grid two-line-grid">
             <GridTemplates>
                 <RowTemplate>
                     @{
@@ -77,10 +77,10 @@
                                 </span>
                                 <span class="detail-type">@detail.Type</span>
                                 <span class="detail-repair">@detail.RepairMethod</span>
-                                <span class="detail-quantity">数量: @($"{detail.Quantity:N2}")</span>
-                                <span class="detail-unitprice">単価: ¥@($"{detail.UnitPrice:N0}")</span>
-                                <span class="detail-labor">工賃: ¥@($"{detail.LaborCost:N0}")</span>
-                                <span class="detail-subtotal">小計: ¥@($"{detail.SubTotal:N0}")</span>
+                                <span class="detail-quantity">@($"{detail.Quantity:N2}")</span>
+                                <span class="detail-unitprice">¥@($"{detail.UnitPrice:N0}")</span>
+                                <span class="detail-labor">¥@($"{detail.LaborCost:N0}")</span>
+                                <span class="detail-subtotal">¥@($"{detail.SubTotal:N0}")</span>
                             </div>
                         </td>
                     }
