@@ -9,8 +9,10 @@
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Popups
 @using Newtonsoft.Json
 @using AutoDealerSphere.Shared.Models
+@using AutoDealerSphere.Client.Components
 
 <SfBreadcrumb>
     <BreadcrumbItems>
@@ -55,7 +57,7 @@
 <div class="register-form">
     @if (HasClients)
     {
-        <SfButton @onclick="@(() => NavigationManager.NavigateTo("/invoice/create"))" CssClass="e-primary">
+        <SfButton @onclick="@(() => OpenNewInvoiceDialog())" CssClass="e-primary">
             新規追加
         </SfButton>
     }
@@ -124,10 +126,14 @@ else
     <p class="error-message">請求書情報が見つかりません。</p>
 }
 
+<InvoiceBasicInfoDialog @ref="basicInfoDialog" Invoice="newInvoice" OnSave="OnBasicInfoSaved" />
+
 @code {
     private Invoice[]? Invoices;
     private InvoiceSearchModel Search = new InvoiceSearchModel();
     private bool HasClients = false;
+    private InvoiceBasicInfoDialog? basicInfoDialog;
+    private Invoice newInvoice = new Invoice();
 
     protected override async Task OnInitializedAsync()
     {
@@ -202,5 +208,29 @@ else
         public string? ClientName { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+    }
+
+    private async void OpenNewInvoiceDialog()
+    {
+        newInvoice = new Invoice
+        {
+            InvoiceNumber = GenerateInvoiceNumber(),
+            InvoiceDate = DateTime.Now,
+            WorkCompletedDate = DateTime.Now
+        };
+        if (basicInfoDialog != null)
+        {
+            await basicInfoDialog.Open(newInvoice);
+        }
+    }
+
+    private string GenerateInvoiceNumber()
+    {
+        return $"INV-{DateTime.Now:yyyyMMdd}-{DateTime.Now:HHmmss}";
+    }
+
+    private async Task OnBasicInfoSaved(Invoice invoice)
+    {
+        NavigationManager.NavigateTo($"/invoice/detail/{invoice.Id}");
     }
 }
