@@ -1,4 +1,6 @@
 @page "/invoice/detail/{InvoiceId:int}"
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Navigations
 
 <SfBreadcrumb>
     <BreadcrumbItems>
@@ -16,13 +18,6 @@
             <div class="@NewInvoiceButtonClass">
                 <p>請求書の基本情報を登録してください。</p>
                 <SfButton @onclick="OpenBasicInfoDialog" CssClass="e-primary">新規登録</SfButton>
-            </div>
-            <div class="@ExistingInvoiceButtonClass">
-                <SfButton @onclick="OpenBasicInfoDialog" CssClass="e-primary">基本編集</SfButton>
-                <SfButton @onclick="OpenDetailDialog" CssClass="e-success">明細追加</SfButton>
-                <SfButton @onclick="OpenStatutoryFeeDialog" CssClass="e-info">法定費用</SfButton>
-                <SfButton @onclick="ExportExcel">Excel出力</SfButton>
-                <SfButton @onclick="DeleteInvoice" CssClass="e-danger">削除実行</SfButton>
             </div>
         </div>
     </div>
@@ -58,6 +53,9 @@
                 <span class="info-label">走行距離:</span>
                 <span class="info-value">@MileageDisplay km</span>
             </div>
+        </div>
+        <div class="@ExistingInvoiceButtonClass form-buttons">
+            <SfButton @onclick="OpenBasicInfoDialog" CssClass="e-primary">基本編集</SfButton>
         </div>
     </div>
 
@@ -99,6 +97,9 @@
                 <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.SubTotal)" HeaderText="小計"></GridColumn>
             </GridColumns>
         </SfGrid>
+        <div class="form-buttons">
+            <SfButton @onclick="OpenDetailDialog" CssClass="e-success">明細追加</SfButton>
+        </div>
     </div>
 
     <div class="statutory-fees @StatutoryFeesClass">
@@ -121,6 +122,9 @@
                 </EmptyRecordTemplate>
             </GridTemplates>
         </SfGrid>
+        <div class="form-buttons">
+            <SfButton @onclick="OpenStatutoryFeeDialog" CssClass="e-info">法定費用</SfButton>
+        </div>
     </div>
 
     <div class="invoice-summary @InvoiceSummaryClass">
@@ -148,6 +152,8 @@
 
     <div class="form-buttons">
         <SfButton @onclick="NavigateToInvoiceList">一覧へ戻る</SfButton>
+        <SfButton @onclick="ExportExcel" class="@ExistingInvoiceButtonClass">Excel出力</SfButton>
+        <SfButton @onclick="ShowDeleteConfirmation" CssClass="e-danger" class="@ExistingInvoiceButtonClass">削除実行</SfButton>
     </div>
 </div>
 
@@ -163,3 +169,15 @@
 
 <!-- 法定費用選択ダイアログ -->
 <AutoDealerSphere.Client.Components.StatutoryFeeDialog @ref="_statutoryFeeDialog" OnSave="OnStatutoryFeeSaved" />
+
+<!-- 削除確認ダイアログ -->
+<SfDialog Width="250px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@_showDeleteConfirmation">
+    <DialogTemplates>
+        <Header> 確認 </Header>
+        <Content> 削除してもよろしいですか? </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton Content="実行" IsPrimary="true" OnClick="@DeleteInvoice" />
+        <DialogButton Content="キャンセル" OnClick="@CloseDeleteConfirmation" />
+    </DialogButtons>
+</SfDialog>
