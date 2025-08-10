@@ -25,6 +25,7 @@ namespace AutoDealerSphere.Client.Pages
         private AutoDealerSphere.Client.Components.InvoiceBasicInfoDialog? _basicInfoDialog;
         private AutoDealerSphere.Client.Components.InvoiceDetailDialog? _detailDialog;
         private AutoDealerSphere.Client.Components.StatutoryFeeDialog? _statutoryFeeDialog;
+        private bool _showDeleteConfirmation = false;
 
         // UI表示制御プロパティ
         protected bool IsLoading => _invoice == null;
@@ -230,8 +231,19 @@ namespace AutoDealerSphere.Client.Pages
             await LoadInvoice();
         }
 
+        protected void ShowDeleteConfirmation()
+        {
+            _showDeleteConfirmation = true;
+        }
+
+        protected void CloseDeleteConfirmation()
+        {
+            _showDeleteConfirmation = false;
+        }
+
         protected async Task DeleteInvoice()
         {
+            _showDeleteConfirmation = false;
             var response = await Http.DeleteAsync($"api/Invoices/{InvoiceId}");
             if (response.IsSuccessStatusCode)
             {
