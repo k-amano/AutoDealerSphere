@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.CLAUDE_CODE_PAT || secrets.GITHUB_TOKEN }}
       
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -39,7 +40,7 @@ jobs:
         uses: anthropics/claude-code-action@main
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.CLAUDE_CODE_PAT || secrets.GITHUB_TOKEN }}
           max_iterations: 10
           model: claude-opus-4-20250514
           plan: max
