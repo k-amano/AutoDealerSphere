@@ -231,6 +231,20 @@ else
 
     private async Task OnBasicInfoSaved(Invoice invoice)
     {
-        NavigationManager.NavigateTo($"/invoice/detail/{invoice.Id}");
+        // 新規作成の場合、サーバーに保存
+        var response = await Http.PostAsJsonAsync("api/Invoices", invoice);
+        if (response.IsSuccessStatusCode)
+        {
+            var created = await response.Content.ReadFromJsonAsync<Invoice>();
+            if (created != null)
+            {
+                NavigationManager.NavigateTo($"/invoice/detail/{created.Id}");
+            }
+        }
+        else
+        {
+            // エラーハンドリング（実際のアプリケーションでは適切なエラー表示を実装）
+            Console.WriteLine($"Failed to save invoice: {response.StatusCode}");
+        }
     }
 }
