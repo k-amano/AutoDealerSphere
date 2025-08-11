@@ -126,7 +126,7 @@ else
     <p class="error-message">請求書情報が見つかりません。</p>
 }
 
-<InvoiceBasicInfoDialog @ref="basicInfoDialog" Invoice="newInvoice" OnSave="OnBasicInfoSaved" />
+<InvoiceBasicInfoDialog @ref="basicInfoDialog" OnSave="OnBasicInfoSaved" />
 
 @code {
     private Invoice[]? Invoices;
