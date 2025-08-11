@@ -29,7 +29,6 @@ namespace AutoDealerSphere.Client.Pages
 
         // UI表示制御プロパティ
         protected bool IsLoading => _invoice == null;
-        protected bool IsNewInvoice => InvoiceId == 0;
         protected bool HasInvoice => _invoice != null;
         protected bool CanShowDetails => InvoiceId > 0;
         protected bool HasNotes => !string.IsNullOrEmpty(_invoice?.Notes);
@@ -37,8 +36,6 @@ namespace AutoDealerSphere.Client.Pages
         // CSS制御用プロパティ
         protected string MainContentClass => IsLoading ? "hidden" : "";
         protected string LoadingContentClass => IsLoading ? "" : "hidden";
-        protected string NewInvoiceButtonClass => IsNewInvoice ? "" : "hidden";
-        protected string ExistingInvoiceButtonClass => !IsNewInvoice ? "" : "hidden";
         protected string InvoiceDetailsClass => CanShowDetails ? "" : "hidden";
         protected string InvoiceSummaryClass => CanShowDetails ? "" : "hidden";
         protected string InvoiceNotesClass => HasNotes ? "" : "hidden";
@@ -59,27 +56,13 @@ namespace AutoDealerSphere.Client.Pages
         {
             if (InvoiceId == 0)
             {
-                // 新規作成モード
-                _invoice = new Invoice
-                {
-                    InvoiceDate = DateTime.Today,
-                    WorkCompletedDate = DateTime.Today,
-                    TaxRate = 10m,
-                    InvoiceDetails = new List<AutoDealerSphere.Shared.Models.InvoiceDetail>()
-                };
-                
-                // 請求書番号を取得
-                var response = await Http.GetFromJsonAsync<InvoiceNumberResponse>("api/Invoices/new-number");
-                if (response != null)
-                {
-                    _invoice.InvoiceNumber = response.InvoiceNumber;
-                }
+                // ID 0 はサポートしない - 請求書一覧へリダイレクト
+                NavigationManager.NavigateTo("/invoicelist");
+                return;
             }
-            else
-            {
-                // 既存データの読み込み
-                _invoice = await Http.GetFromJsonAsync<Invoice>($"api/Invoices/{InvoiceId}");
-            }
+            
+            // 既存データの読み込み
+            _invoice = await Http.GetFromJsonAsync<Invoice>($"api/Invoices/{InvoiceId}");
         }
 
         protected async Task OpenBasicInfoDialog()
@@ -135,27 +118,11 @@ namespace AutoDealerSphere.Client.Pages
 
         protected async Task OnBasicInfoSaved(Invoice invoice)
         {
-            if (InvoiceId == 0)
+            // 更新のみサポート（新規作成は請求書一覧画面から行う）
+            var response = await Http.PutAsJsonAsync($"api/Invoices/{InvoiceId}", invoice);
+            if (response.IsSuccessStatusCode)
             {
-                // 新規作成
-                var response = await Http.PostAsJsonAsync("api/Invoices", invoice);
-                if (response.IsSuccessStatusCode)
-                {
-                    var created = await response.Content.ReadFromJsonAsync<Invoice>();
-                    if (created != null)
-                    {
-                        NavigationManager.NavigateTo($"/invoice/detail/{created.Id}");
-                    }
-                }
-            }
-            else
-            {
-                // 更新
-                var response = await Http.PutAsJsonAsync($"api/Invoices/{InvoiceId}", invoice);
-                if (response.IsSuccessStatusCode)
-                {
-                    await LoadInvoice();
-                }
+                await LoadInvoice();
             }
         }
 
