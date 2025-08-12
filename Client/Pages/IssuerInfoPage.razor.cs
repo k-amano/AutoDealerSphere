@@ -13,9 +13,6 @@ namespace AutoDealerSphere.Client.Pages
         private NavigationManager Navigation { get; set; }
 
         private IssuerInfo issuerInfo = new IssuerInfo();
-        private bool isLoading = true;
-        private bool isSaving = false;
-        private string errorMessage = null;
 
         protected override async Task OnInitializedAsync()
         {
@@ -26,8 +23,6 @@ namespace AutoDealerSphere.Client.Pages
         {
             try
             {
-                isLoading = true;
-                errorMessage = null;
                 var response = await Http.GetFromJsonAsync<IssuerInfo>("api/IssuerInfo");
                 if (response != null)
                 {
@@ -36,22 +31,16 @@ namespace AutoDealerSphere.Client.Pages
             }
             catch (Exception ex)
             {
-                errorMessage = $"データの読み込みに失敗しました: {ex.Message}";
-            }
-            finally
-            {
-                isLoading = false;
+                // エラーがあってもデフォルト値で表示
+                Console.WriteLine($"データの読み込みに失敗しました: {ex.Message}");
             }
         }
 
-        private async Task SaveIssuerInfo()
+        private async Task SaveIssuerInfo(IssuerInfo issuer)
         {
             try
             {
-                isSaving = true;
-                errorMessage = null;
-                
-                var response = await Http.PostAsJsonAsync("api/IssuerInfo", issuerInfo);
+                var response = await Http.PostAsJsonAsync("api/IssuerInfo", issuer);
                 
                 if (response.IsSuccessStatusCode)
                 {
@@ -62,21 +51,17 @@ namespace AutoDealerSphere.Client.Pages
                     }
                     
                     // 保存成功のメッセージを表示するか、別のページにリダイレクト
-                    // ここでは簡単のため、そのまま表示を更新
                     StateHasChanged();
                 }
                 else
                 {
-                    errorMessage = "保存に失敗しました。";
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"保存に失敗しました: {errorContent}");
                 }
             }
             catch (Exception ex)
             {
-                errorMessage = $"保存中にエラーが発生しました: {ex.Message}";
-            }
-            finally
-            {
-                isSaving = false;
+                Console.WriteLine($"保存中にエラーが発生しました: {ex.Message}");
             }
         }
     }
