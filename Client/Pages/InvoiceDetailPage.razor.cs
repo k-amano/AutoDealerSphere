@@ -41,7 +41,7 @@ namespace AutoDealerSphere.Client.Pages
         protected string InvoiceNotesClass => HasNotes ? "" : "hidden";
         protected string NextInspectionRowClass => !string.IsNullOrEmpty(NextInspectionDateDisplay) ? "info-row" : "info-row hidden";
         protected string MileageRowClass => !string.IsNullOrEmpty(MileageDisplay) ? "info-row" : "info-row hidden";
-        protected string StatutoryFeesClass => StatutoryFees?.Any() == true ? "" : "hidden";
+        protected string StatutoryFeesClass => "";
         
         // 明細の分類
         protected IEnumerable<AutoDealerSphere.Shared.Models.InvoiceDetail> RegularDetails => _invoice?.InvoiceDetails?.Where(d => d.Type != "法定費用") ?? Enumerable.Empty<AutoDealerSphere.Shared.Models.InvoiceDetail>();
