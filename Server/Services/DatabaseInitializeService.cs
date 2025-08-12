@@ -36,6 +36,7 @@ namespace AutoDealerSphere.Server.Services
                 CreateStatutoryFeesTableIfNotExists();
                 CreateInvoicesTableIfNotExists();
                 CreateInvoiceDetailsTableIfNotExists();
+                CreateIssuerInfoTableIfNotExists();
 
                 // 初期データの作成
                 CreateInitialAdminUser();
@@ -473,6 +474,37 @@ namespace AutoDealerSphere.Server.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Warning: Could not create initial parts: {ex.Message}");
+            }
+        }
+
+        private void CreateIssuerInfoTableIfNotExists()
+        {
+            try
+            {
+                _context.Database.ExecuteSqlRaw(@"
+                        CREATE TABLE IF NOT EXISTS IssuerInfos (
+                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            PostalCode TEXT NOT NULL,
+                            Address TEXT NOT NULL,
+                            CompanyName TEXT NOT NULL,
+                            Position TEXT,
+                            Name TEXT NOT NULL,
+                            PhoneNumber TEXT NOT NULL,
+                            FaxNumber TEXT,
+                            Bank1Name TEXT,
+                            Bank1BranchName TEXT,
+                            Bank1AccountType TEXT,
+                            Bank1AccountNumber TEXT,
+                            Bank2Name TEXT,
+                            Bank2BranchName TEXT,
+                            Bank2AccountType TEXT,
+                            Bank2AccountNumber TEXT
+                        )
+                    ");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Could not create IssuerInfos table: {ex.Message}");
             }
         }
     }

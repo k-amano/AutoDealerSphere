@@ -6,10 +6,12 @@ namespace AutoDealerSphere.Server.Services
     public class InvoiceService : IInvoiceService
     {
         private readonly IDbContextFactory<SQLDBContext> _contextFactory;
+        private readonly IIssuerInfoService _issuerInfoService;
 
-        public InvoiceService(IDbContextFactory<SQLDBContext> contextFactory)
+        public InvoiceService(IDbContextFactory<SQLDBContext> contextFactory, IIssuerInfoService issuerInfoService)
         {
             _contextFactory = contextFactory;
+            _issuerInfoService = issuerInfoService;
         }
 
         public async Task<IEnumerable<Invoice>> GetAllInvoicesAsync()
@@ -121,7 +123,7 @@ namespace AutoDealerSphere.Server.Services
         public async Task<byte[]> ExportToExcelAsync(int invoiceId)
         {
             // ExcelExportServiceに委譲
-            var excelExportService = new ExcelExportService(this);
+            var excelExportService = new ExcelExportService(this, _issuerInfoService);
             return await excelExportService.ExportInvoiceToExcelAsync(invoiceId);
         }
 
