@@ -1,0 +1,124 @@
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using System.ComponentModel.DataAnnotations
+
+<div class="issuer-info-form">
+	<EditForm Model="@Item" OnValidSubmit="OnValidated" OnInvalidSubmit="OnUnvalidated">
+		<DataAnnotationsValidator />
+		<div class="form">
+			<h5>基本情報</h5>
+			<div class="form-row">
+				<label class="required">郵便番号</label>
+				<SfTextBox @bind-Value="Item.PostalCode" Placeholder="郵便番号"></SfTextBox>
+				<ValidationMessage For="@(() => Item.PostalCode)" />
+			</div>
+			<div class="form-row">
+				<label class="required">社名</label>
+				<SfTextBox @bind-Value="Item.CompanyName" Placeholder="社名"></SfTextBox>
+				<ValidationMessage For="@(() => Item.CompanyName)" />
+			</div>
+			<div class="form-row">
+				<label class="required">住所</label>
+				<SfTextBox @bind-Value="Item.Address" Placeholder="住所"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Address)" />
+			</div>
+			<div class="form-row">
+				<label>役職</label>
+				<SfTextBox @bind-Value="Item.Position" Placeholder="役職"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Position)" />
+			</div>
+			<div class="form-row">
+				<label class="required">氏名</label>
+				<SfTextBox @bind-Value="Item.Name" Placeholder="氏名"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Name)" />
+			</div>
+			<div class="form-row">
+				<label class="required">電話番号</label>
+				<SfTextBox @bind-Value="Item.PhoneNumber" Placeholder="電話番号"></SfTextBox>
+				<ValidationMessage For="@(() => Item.PhoneNumber)" />
+			</div>
+			<div class="form-row">
+				<label>FAX番号</label>
+				<SfTextBox @bind-Value="Item.FaxNumber" Placeholder="FAX番号"></SfTextBox>
+				<ValidationMessage For="@(() => Item.FaxNumber)" />
+			</div>
+
+			<h5>口座情報1</h5>
+			<div class="form-row">
+				<label class="required">銀行名</label>
+				<SfTextBox @bind-Value="Item.Bank1Name" Placeholder="銀行名"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Bank1Name)" />
+			</div>
+			<div class="form-row">
+				<label class="required">支店名</label>
+				<SfTextBox @bind-Value="Item.Bank1BranchName" Placeholder="支店名"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Bank1BranchName)" />
+			</div>
+			<div class="form-row">
+				<label class="required">口座種別</label>
+				<SfDropDownList TValue="string" TItem="AccountType" 
+					@bind-Value="@Item.Bank1AccountType" 
+					DataSource="@AccountTypes"
+					Placeholder="口座種別を選択"
+					AllowFiltering="false">
+					<DropDownListFieldSettings Value="Value" Text="Text">
+					</DropDownListFieldSettings>
+				</SfDropDownList>
+				<ValidationMessage For="@(() => Item.Bank1AccountType)" />
+			</div>
+			<div class="form-row">
+				<label class="required">口座番号</label>
+				<SfTextBox @bind-Value="Item.Bank1AccountNumber" Placeholder="口座番号"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Bank1AccountNumber)" />
+			</div>
+			<div class="form-row">
+				<label class="required">名義人</label>
+				<SfTextBox @bind-Value="Item.Bank1AccountHolder" Placeholder="名義人"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Bank1AccountHolder)" />
+			</div>
+
+			<h5>口座情報2</h5>
+			<div class="form-row">
+				<label>銀行名</label>
+				<SfTextBox @bind-Value="Item.Bank2Name" Placeholder="銀行名"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Bank2Name)" />
+			</div>
+			<div class="form-row">
+				<label>支店名</label>
+				<SfTextBox @bind-Value="Item.Bank2BranchName" Placeholder="支店名"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Bank2BranchName)" />
+			</div>
+			<div class="form-row">
+				<label>口座種別</label>
+				<SfDropDownList TValue="string" TItem="AccountType" 
+					@bind-Value="@Item.Bank2AccountType" 
+					DataSource="@AccountTypes"
+					Placeholder="口座種別を選択"
+					AllowFiltering="false">
+					<DropDownListFieldSettings Value="Value" Text="Text">
+					</DropDownListFieldSettings>
+				</SfDropDownList>
+				<ValidationMessage For="@(() => Item.Bank2AccountType)" />
+			</div>
+			<div class="form-row">
+				<label>口座番号</label>
+				<SfTextBox @bind-Value="Item.Bank2AccountNumber" Placeholder="口座番号"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Bank2AccountNumber)" />
+			</div>
+			<div class="form-row">
+				<label>名義人</label>
+				<SfTextBox @bind-Value="Item.Bank2AccountHolder" Placeholder="名義人"></SfTextBox>
+				<ValidationMessage For="@(() => Item.Bank2AccountHolder)" />
+			</div>
+
+			<div class="form-buttons">
+				<SfButton OnClick="OnRegister" IsPrimary="true">保存</SfButton>
+				<SfButton OnClick="OnCancel">キャンセル</SfButton>
+			</div>
+		</div>
+	</EditForm>
+</div>

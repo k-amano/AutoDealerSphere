@@ -42,20 +42,29 @@ namespace AutoDealerSphere.Shared.Models
 
         // 口座1
         [Display(Name = "口座1銀行名")]
+        [Required(ErrorMessage = "口座1銀行名は必須です")]
         [StringLength(50, ErrorMessage = "銀行名は50文字以内で入力してください")]
         public string Bank1Name { get; set; }
 
         [Display(Name = "口座1支店名")]
+        [Required(ErrorMessage = "口座1支店名は必須です")]
         [StringLength(50, ErrorMessage = "支店名は50文字以内で入力してください")]
         public string Bank1BranchName { get; set; }
 
         [Display(Name = "口座1種別")]
+        [Required(ErrorMessage = "口座1種別は必須です")]
         [StringLength(20, ErrorMessage = "口座種別は20文字以内で入力してください")]
         public string Bank1AccountType { get; set; }
 
         [Display(Name = "口座1番号")]
+        [Required(ErrorMessage = "口座1番号は必須です")]
         [StringLength(20, ErrorMessage = "口座番号は20文字以内で入力してください")]
         public string Bank1AccountNumber { get; set; }
+
+        [Display(Name = "口座1名義人")]
+        [Required(ErrorMessage = "口座1名義人は必須です")]
+        [StringLength(50, ErrorMessage = "名義人は50文字以内で入力してください")]
+        public string Bank1AccountHolder { get; set; }
 
         // 口座2
         [Display(Name = "口座2銀行名")]
@@ -73,5 +82,9 @@ namespace AutoDealerSphere.Shared.Models
         [Display(Name = "口座2番号")]
         [StringLength(20, ErrorMessage = "口座番号は20文字以内で入力してください")]
         public string Bank2AccountNumber { get; set; }
+
+        [Display(Name = "口座2名義人")]
+        [StringLength(50, ErrorMessage = "名義人は50文字以内で入力してください")]
+        public string Bank2AccountHolder { get; set; }
     }
 }
