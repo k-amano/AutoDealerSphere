@@ -495,10 +495,12 @@ namespace AutoDealerSphere.Server.Services
                             Bank1BranchName TEXT,
                             Bank1AccountType TEXT,
                             Bank1AccountNumber TEXT,
+                            Bank1AccountHolder TEXT,
                             Bank2Name TEXT,
                             Bank2BranchName TEXT,
                             Bank2AccountType TEXT,
-                            Bank2AccountNumber TEXT
+                            Bank2AccountNumber TEXT,
+                            Bank2AccountHolder TEXT
                         )
                     ");
             }
