@@ -198,7 +198,7 @@ namespace AutoDealerSphere.Server.Services
                 worksheet.Range["A15"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                 
                 worksheet.Range["B15:E15"].Merge();
-                worksheet.Range["B15"].Text = invoice.Vehicle?.InspectionExpirationDate?.ToString("yyyy/MM/dd") ?? "";
+                worksheet.Range["B15"].Text = invoice.Vehicle?.InspectionExpiryDate?.ToString("yyyy/MM/dd") ?? "";
                 worksheet.Range["B15"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
                 
                 // 形式 ラベル F15 データ G15(J15までセル結合)
@@ -208,7 +208,7 @@ namespace AutoDealerSphere.Server.Services
                 worksheet.Range["F15"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                 
                 worksheet.Range["G15:J15"].Merge();
-                worksheet.Range["G15"].Text = invoice.Vehicle?.Model ?? "";
+                worksheet.Range["G15"].Text = invoice.Vehicle?.VehicleModel ?? "";
                 worksheet.Range["G15"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
                 
                 // 走行距離 ラベル K15 データ L15(N15までセル結合)
