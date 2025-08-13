@@ -61,9 +61,6 @@ namespace AutoDealerSphere.Server.Services
                 worksheet.SetColumnWidth(13, 10);  // M列
                 worksheet.SetColumnWidth(14, 10);  // N列
 
-                // 全体のフォントを游ゴシックに設定
-                worksheet.UsedRange.CellStyle.Font.FontName = "游ゴシック";
-
                 // タイトル（行1）
                 worksheet.Range["C1:H1"].Merge();
                 worksheet.Range["C1"].Text = "御　請　求　書";
@@ -437,6 +434,12 @@ namespace AutoDealerSphere.Server.Services
                 worksheet.Range["D46"].NumberFormat = "#,##0";
                 worksheet.Range["D46"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
                 worksheet.Range["D46"].CellStyle.Font.Bold = true;
+
+                // 全体のフォントを游ゴシックに設定（すべてのコンテンツ書き込み後）
+                if (worksheet.UsedRange != null)
+                {
+                    worksheet.UsedRange.CellStyle.Font.FontName = "游ゴシック";
+                }
 
                 // MemoryStreamに保存
                 using (MemoryStream stream = new MemoryStream())
