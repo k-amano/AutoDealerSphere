@@ -147,49 +147,80 @@ namespace AutoDealerSphere.Server.Services
                 }
 
                 // 車両情報ヘッダー（行13）
-                worksheet.Range["B13"].Text = "車両番号";
-                worksheet.Range["B13"].CellStyle.Color = Color.FromArgb(217, 217, 217);
-                worksheet.Range["B13"].CellStyle.Font.Bold = true;
-                worksheet.Range["B13"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                worksheet.Range["A13"].Text = "車両番号";
+                worksheet.Range["A13"].CellStyle.Color = Color.FromArgb(169, 208, 142); // #A9D08E
+                worksheet.Range["A13"].CellStyle.Font.Bold = true;
+                worksheet.Range["A13"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                 
-                worksheet.Range["D13:E13"].Merge();
                 worksheet.Range["D13"].Text = "車名";
-                worksheet.Range["D13"].CellStyle.Color = Color.FromArgb(217, 217, 217);
+                worksheet.Range["D13"].CellStyle.Color = Color.FromArgb(169, 208, 142); // #A9D08E
                 worksheet.Range["D13"].CellStyle.Font.Bold = true;
                 worksheet.Range["D13"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                 
-                worksheet.Range["F13:G13"].Merge();
                 worksheet.Range["F13"].Text = "車体番号";
-                worksheet.Range["F13"].CellStyle.Color = Color.FromArgb(217, 217, 217);
+                worksheet.Range["F13"].CellStyle.Color = Color.FromArgb(169, 208, 142); // #A9D08E
                 worksheet.Range["F13"].CellStyle.Font.Bold = true;
                 worksheet.Range["F13"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                 
-                worksheet.Range["I13"].Text = "初年度登録";
-                worksheet.Range["I13"].CellStyle.Color = Color.FromArgb(217, 217, 217);
-                worksheet.Range["I13"].CellStyle.Font.Bold = true;
-                worksheet.Range["I13"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                
-                worksheet.Range["L13:M13"].Merge();
-                worksheet.Range["L13"].Text = "走行距離";
-                worksheet.Range["L13"].CellStyle.Color = Color.FromArgb(217, 217, 217);
-                worksheet.Range["L13"].CellStyle.Font.Bold = true;
-                worksheet.Range["L13"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                worksheet.Range["K13"].Text = "初年度登録";
+                worksheet.Range["K13"].CellStyle.Color = Color.FromArgb(169, 208, 142); // #A9D08E
+                worksheet.Range["K13"].CellStyle.Font.Bold = true;
+                worksheet.Range["K13"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
 
-                // 車両情報データ（行15）
+                // 車両番号 データ B13(C13までセル結合)
+                worksheet.Range["B13:C13"].Merge();
                 string licensePlate = "";
                 if (invoice.Vehicle != null)
                 {
                     licensePlate = $"{invoice.Vehicle.LicensePlateLocation ?? ""} {invoice.Vehicle.LicensePlateClassification ?? ""} {invoice.Vehicle.LicensePlateHiragana ?? ""} {invoice.Vehicle.LicensePlateNumber ?? ""}".Trim();
                 }
-                worksheet.Range["B15"].Text = licensePlate;
-                worksheet.Range["D15:E15"].Merge();
-                worksheet.Range["D15"].Text = invoice.Vehicle?.VehicleName ?? "";
-                worksheet.Range["F15:G15"].Merge();
-                worksheet.Range["F15"].Text = invoice.Vehicle?.ChassisNumber ?? "";
-                worksheet.Range["I15"].Text = invoice.Vehicle?.FirstRegistrationDate?.ToString("yyyy/MM/dd") ?? "";
-                worksheet.Range["L15:M15"].Merge();
+                worksheet.Range["B13"].Text = licensePlate;
+                worksheet.Range["B13"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
+                
+                // 車名 データ E13
+                worksheet.Range["E13"].Text = invoice.Vehicle?.VehicleName ?? "";
+                worksheet.Range["E13"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
+                
+                // 車体番号 データ G13(J13までセル結合)
+                worksheet.Range["G13:J13"].Merge();
+                worksheet.Range["G13"].Text = invoice.Vehicle?.ChassisNumber ?? "";
+                worksheet.Range["G13"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
+                
+                // 初年度登録 データ L13(N13までセル結合)
+                worksheet.Range["L13:N13"].Merge();
+                worksheet.Range["L13"].Text = invoice.Vehicle?.FirstRegistrationDate?.ToString("yyyy/MM/dd") ?? "";
+                worksheet.Range["L13"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
+                
+                // 車検満了日 ラベル A15 データ B15(E15までセル結合)
+                worksheet.Range["A15"].Text = "車検満了日";
+                worksheet.Range["A15"].CellStyle.Color = Color.FromArgb(169, 208, 142); // #A9D08E
+                worksheet.Range["A15"].CellStyle.Font.Bold = true;
+                worksheet.Range["A15"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                
+                worksheet.Range["B15:E15"].Merge();
+                worksheet.Range["B15"].Text = invoice.Vehicle?.InspectionExpirationDate?.ToString("yyyy/MM/dd") ?? "";
+                worksheet.Range["B15"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
+                
+                // 形式 ラベル F15 データ G15(J15までセル結合)
+                worksheet.Range["F15"].Text = "形式";
+                worksheet.Range["F15"].CellStyle.Color = Color.FromArgb(169, 208, 142); // #A9D08E
+                worksheet.Range["F15"].CellStyle.Font.Bold = true;
+                worksheet.Range["F15"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                
+                worksheet.Range["G15:J15"].Merge();
+                worksheet.Range["G15"].Text = invoice.Vehicle?.Model ?? "";
+                worksheet.Range["G15"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
+                
+                // 走行距離 ラベル K15 データ L15(N15までセル結合)
+                worksheet.Range["K15"].Text = "走行距離";
+                worksheet.Range["K15"].CellStyle.Color = Color.FromArgb(169, 208, 142); // #A9D08E
+                worksheet.Range["K15"].CellStyle.Font.Bold = true;
+                worksheet.Range["K15"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                
+                worksheet.Range["L15:N15"].Merge();
                 worksheet.Range["L15"].Text = invoice.Mileage.HasValue ? $"{invoice.Mileage:N0} km" : "";
                 worksheet.Range["L15"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range["L15"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
 
                 // 明細ヘッダー（行17）
                 worksheet.Range["B17:C17"].Merge();
