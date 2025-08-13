@@ -37,14 +37,14 @@
                 <SfTextBox @bind-Value="Search.ClientName" Placeholder="顧客名"></SfTextBox>
             </div>
             <div class="form-row">
-                <label>請求日（開始）</label>
-                <SfDatePicker TValue="DateTime?" @bind-Value="Search.StartDate" 
-                    Placeholder="開始日" Format="yyyy/MM/dd"></SfDatePicker>
-            </div>
-            <div class="form-row">
-                <label>請求日（終了）</label>
-                <SfDatePicker TValue="DateTime?" @bind-Value="Search.EndDate" 
-                    Placeholder="終了日" Format="yyyy/MM/dd"></SfDatePicker>
+                <label>請求日</label>
+                <div class="date-range">
+                    <SfDatePicker TValue="DateTime?" @bind-Value="Search.StartDate" 
+                        Placeholder="開始日" Format="yyyy/MM/dd"></SfDatePicker>
+                    <span class="date-separator">～</span>
+                    <SfDatePicker TValue="DateTime?" @bind-Value="Search.EndDate" 
+                        Placeholder="終了日" Format="yyyy/MM/dd"></SfDatePicker>
+                </div>
             </div>
             <div class="form-buttons">
                 <SfButton Type="ButtonType.Submit">検索</SfButton>
@@ -71,9 +71,9 @@
 </div>
 <br />
 
-@if (Invoices != null && Invoices.Any())
+@if (SearchResults != null && SearchResults.Any())
 {
-    <SfGrid DataSource="@Invoices" AllowSorting="true" AllowPaging="true" AllowFiltering="false" AllowTextWrap="true">
+    <SfGrid DataSource="@SearchResults" AllowSorting="true" AllowPaging="true" AllowFiltering="false" AllowTextWrap="true">
         <GridPageSettings PageSize="20"></GridPageSettings>
         <GridColumns>
             <GridColumn Field="@nameof(Invoice.Id)" HeaderText="ID" Width="10%"></GridColumn>
@@ -122,6 +122,7 @@ else
 
 @code {
     private Invoice[]? Invoices;
+    private Invoice[]? SearchResults;
     private InvoiceSearchModel Search = new InvoiceSearchModel();
     private bool HasClients = false;
     private InvoiceBasicInfoDialog? basicInfoDialog;
@@ -142,26 +143,28 @@ else
     private async Task LoadInvoices()
     {
         Invoices = await Http.GetFromJsonAsync<Invoice[]>("api/Invoices");
+        SearchResults = Invoices;
     }
 
     private async Task OnSearch(InvoiceSearchModel search)
     {
+        // 検索条件がすべて空の場合は全件表示
         if (string.IsNullOrWhiteSpace(search.InvoiceNumber) && 
             string.IsNullOrWhiteSpace(search.ClientName) &&
             !search.StartDate.HasValue &&
             !search.EndDate.HasValue)
         {
-            await LoadInvoices();
+            SearchResults = Invoices;
         }
         else
         {
-            var filteredInvoices = Invoices?.Where(i =>
+            // Invoicesから検索（常に全データから検索する）
+            SearchResults = Invoices?.Where(i =>
                 (string.IsNullOrWhiteSpace(search.InvoiceNumber) || i.InvoiceNumber.Contains(search.InvoiceNumber)) &&
                 (string.IsNullOrWhiteSpace(search.ClientName) || (i.Client != null && i.Client.Name.Contains(search.ClientName))) &&
                 (!search.StartDate.HasValue || i.InvoiceDate >= search.StartDate.Value) &&
                 (!search.EndDate.HasValue || i.InvoiceDate <= search.EndDate.Value)
             ).ToArray();
-            Invoices = filteredInvoices;
         }
     }
 
