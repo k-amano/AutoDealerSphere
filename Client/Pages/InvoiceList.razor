@@ -76,8 +76,8 @@
     <SfGrid DataSource="@Invoices" AllowSorting="true" AllowPaging="true" AllowFiltering="false" AllowTextWrap="true">
         <GridPageSettings PageSize="20"></GridPageSettings>
         <GridColumns>
-            <GridColumn Field="@nameof(Invoice.Id)" HeaderText="ID" Width="70"></GridColumn>
-            <GridColumn Field="@nameof(Invoice.InvoiceNumber)" HeaderText="請求書番号" Width="120">
+            <GridColumn Field="@nameof(Invoice.Id)" HeaderText="ID" Width="10%"></GridColumn>
+            <GridColumn Field="@nameof(Invoice.InvoiceNumber)" HeaderText="請求書番号" Width="15%">
                 <Template>
                     @{
                         var invoice = (context as Invoice);
@@ -85,7 +85,7 @@
                     }
                 </Template>
             </GridColumn>
-            <GridColumn HeaderText="顧客名" Width="200">
+            <GridColumn HeaderText="顧客名" Width="25%">
                 <Template>
                     @{
                         var invoice = (context as Invoice);
@@ -93,7 +93,7 @@
                     }
                 </Template>
             </GridColumn>
-            <GridColumn HeaderText="車名" Width="150">
+            <GridColumn HeaderText="車名" Width="20%">
                 <Template>
                     @{
                         var invoice = (context as Invoice);
@@ -101,20 +101,12 @@
                     }
                 </Template>
             </GridColumn>
-            <GridColumn Field="@nameof(Invoice.InvoiceDate)" HeaderText="請求日" Width="100" Format="yyyy/MM/dd"></GridColumn>
-            <GridColumn Field="@nameof(Invoice.Total)" HeaderText="合計金額" Width="120" TextAlign="TextAlign.Right">
+            <GridColumn Field="@nameof(Invoice.InvoiceDate)" HeaderText="請求日" Width="15%" Format="yyyy/MM/dd"></GridColumn>
+            <GridColumn Field="@nameof(Invoice.Total)" HeaderText="合計金額" Width="15%" TextAlign="TextAlign.Right">
                 <Template>
                     @{
                         var invoice = (context as Invoice);
                         <span>¥@($"{invoice.Total:N0}")</span>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn HeaderText="操作" Width="100" TextAlign="TextAlign.Center">
-                <Template>
-                    @{
-                        var invoice = (context as Invoice);
-                        <SfButton CssClass="e-btn e-btn-sm" @onclick="() => OnExportClick(invoice.Id)">Excel出力</SfButton>
                     }
                 </Template>
             </GridColumn>
