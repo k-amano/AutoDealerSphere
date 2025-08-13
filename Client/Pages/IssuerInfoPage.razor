@@ -1,6 +1,14 @@
 @page "/issuerinfo"
 @using AutoDealerSphere.Client.Shared
+@using Syncfusion.Blazor.Navigations
 
-<h3>発行者情報管理</h3>
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/" />
+        <BreadcrumbItem Text="発行者情報管理" Url="/" />
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>発行者情報管理</h2>
 
 <IssuerInfoForm Item="@issuerInfo" OnClickOK="SaveIssuerInfo" />
