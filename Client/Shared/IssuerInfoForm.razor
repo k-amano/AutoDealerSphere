@@ -10,7 +10,8 @@
 	<EditForm Model="@Item" OnValidSubmit="OnValidated" OnInvalidSubmit="OnUnvalidated">
 		<DataAnnotationsValidator />
 		<div class="form">
-			<h5>基本情報</h5>
+			<h4>基本情報</h4>
+			<div class="form-section">
 			<div class="form-row">
 				<label class="required">郵便番号</label>
 				<SfTextBox @bind-Value="Item.PostalCode" Placeholder="郵便番号"></SfTextBox>
@@ -46,8 +47,10 @@
 				<SfTextBox @bind-Value="Item.FaxNumber" Placeholder="FAX番号"></SfTextBox>
 				<ValidationMessage For="@(() => Item.FaxNumber)" />
 			</div>
+			</div>
 
-			<h5>口座情報1</h5>
+			<h4>口座情報1</h4>
+			<div class="form-section">
 			<div class="form-row">
 				<label class="required">銀行名</label>
 				<SfTextBox @bind-Value="Item.Bank1Name" Placeholder="銀行名"></SfTextBox>
@@ -80,8 +83,10 @@
 				<SfTextBox @bind-Value="Item.Bank1AccountHolder" Placeholder="名義人"></SfTextBox>
 				<ValidationMessage For="@(() => Item.Bank1AccountHolder)" />
 			</div>
+			</div>
 
-			<h5>口座情報2</h5>
+			<h4>口座情報2</h4>
+			<div class="form-section">
 			<div class="form-row">
 				<label>銀行名</label>
 				<SfTextBox @bind-Value="Item.Bank2Name" Placeholder="銀行名"></SfTextBox>
@@ -113,6 +118,7 @@
 				<label>名義人</label>
 				<SfTextBox @bind-Value="Item.Bank2AccountHolder" Placeholder="名義人"></SfTextBox>
 				<ValidationMessage For="@(() => Item.Bank2AccountHolder)" />
+			</div>
 			</div>
 
 			<div class="form-buttons">

@@ -34,7 +34,8 @@
 .search-form .e-input-group,
 .client-form .e-input-group,
 .vehicle-form .e-input-group,
-.user-form .e-input-group {
+.user-form .e-input-group,
+.issuer-info-form .e-input-group {
     flex: 1;
     max-width: 400px;
 }
@@ -42,7 +43,8 @@
 .search-form .e-ddl,
 .client-form .e-ddl,
 .vehicle-form .e-ddl,
-.user-form .e-ddl {
+.user-form .e-ddl,
+.issuer-info-form .e-ddl {
     max-width: 400px;
 }
 
@@ -59,7 +61,8 @@
 /* バリデーション */
 .client-form .validation-message,
 .vehicle-form .validation-message,
-.user-form .validation-message {
+.user-form .validation-message,
+.issuer-info-form .validation-message {
     flex-basis: 100%;
     color: #dc3545;
     font-size: 0.9em;
@@ -69,7 +72,8 @@
 
 .client-form .e-error,
 .vehicle-form .e-error,
-.user-form .e-error {
+.user-form .e-error,
+.issuer-info-form .e-error {
     color: #dc3545;
     font-size: 0.9em;
     margin-top: 4px;
@@ -84,6 +88,33 @@
     padding: 0.3em;
     border-radius: 0.5em;
     margin-left: 0.3em;
+}
+
+/* フォームセクションのタイトル */
+.vehicle-form h4,
+.issuer-info-form h4 {
+    font-size: 16px;
+    font-weight: normal;
+    padding: 0 10px 0 15px;
+    margin-bottom: 1em;
+    margin-top: 1.5em;
+    border-bottom: 1px solid #d7d7d7;
+    color: #666;
+    position: relative;
+}
+
+.vehicle-form h4::before,
+.issuer-info-form h4::before {
+    content: "■";
+    color: #00A99D;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* フォームセクション */
+.form-section {
+    padding: 10px 0;
 }
 
 /* ツールバー */
