@@ -71,56 +71,61 @@ namespace AutoDealerSphere.Server.Services
                 worksheet.Range["C1"].CellStyle.Color = Color.FromArgb(146, 208, 80);
                 worksheet.Range["C1"].RowHeight = 35;
 
-                // 作成日（行3）
-                worksheet.Range["J3"].Text = "作成日";
-                worksheet.Range["K3:L3"].Merge();
-                worksheet.Range["K3"].Text = $"令和{DateTime.Now.Year - 2018}年{DateTime.Now.Month}月{DateTime.Now.Day}日";
+                // 作成日（行2）
+                worksheet.Range["K2"].Text = "作成日";
+                worksheet.Range["L2:M2"].Merge();
+                worksheet.Range["L2"].Text = $"令和{DateTime.Now.Year - 2018}年{DateTime.Now.Month}月{DateTime.Now.Day}日";
 
-                // 発行者情報（行4-8の右側）
+                // 発行者情報（行3-8の右側）
                 if (issuerInfo != null)
                 {
-                    // 郵便番号（行4）
-                    worksheet.Range["J4:L4"].Merge();
-                    worksheet.Range["J4"].Text = issuerInfo.PostalCode;
+                    // 郵便番号（行3）
+                    worksheet.Range["J3"].Text = issuerInfo.PostalCode;
                     
-                    // 住所（行5）
-                    worksheet.Range["J5:N5"].Merge();
-                    worksheet.Range["J5"].Text = issuerInfo.Address;
+                    // 住所（行4）
+                    worksheet.Range["J4"].Text = issuerInfo.Address;
                     
-                    // 会社名（行6）
-                    worksheet.Range["J6:N6"].Merge();
-                    worksheet.Range["J6"].Text = issuerInfo.CompanyName;
+                    // 社名（行5）
+                    worksheet.Range["J5"].Text = issuerInfo.CompanyName;
                     
-                    // 代表者（行7）
-                    worksheet.Range["J7:N7"].Merge();
-                    worksheet.Range["J7"].Text = $"代表　{issuerInfo.Position}　{issuerInfo.Name}";
+                    // 役職・氏名（行6-7、セル結合）
+                    worksheet.Range["J6:K7"].Merge();
+                    worksheet.Range["J6"].Text = $"{issuerInfo.Position}\n{issuerInfo.Name}";
+                    worksheet.Range["J6"].CellStyle.WrapText = true;
+                    worksheet.Range["J6"].CellStyle.VerticalAlignment = ExcelVAlign.VAlignCenter;
                     
-                    // 電話番号とFAX（行8）
-                    worksheet.Range["J8:K8"].Merge();
+                    // 電話番号（行8）
                     worksheet.Range["J8"].Text = $"TEL {issuerInfo.PhoneNumber}";
-                    worksheet.Range["L8:N8"].Merge();
+                    
+                    // FAX番号（行8）
                     worksheet.Range["L8"].Text = $"FAX {issuerInfo.FaxNumber}";
                 }
 
                 // 請求先情報（行4-6の左側）
-                worksheet.Range["B4"].Text = "郵便番号";
-                worksheet.Range["B5"].Text = "住所";
-                worksheet.Range["B6"].Text = "氏名";
-                worksheet.Range["D6"].Text = "様";
+                worksheet.Range["A4"].Text = "郵便番号";
+                worksheet.Range["B4"].Text = invoice.Client?.Zip ?? "";
+                
+                worksheet.Range["A5"].Text = "住所";
+                worksheet.Range["B5"].Text = invoice.Client?.Address ?? "";
+                
+                worksheet.Range["A7"].Text = "氏名";
+                worksheet.Range["B7"].Text = invoice.Client?.Name ?? "";
+                worksheet.Range["D7"].Text = "様";
 
                 // 合計金額（行9）
-                worksheet.Range["B9"].Text = "合計金額";
-                worksheet.Range["B9"].CellStyle.Font.Bold = true;
+                worksheet.Range["A9"].Text = "合計金額";
+                worksheet.Range["A9"].CellStyle.Font.Bold = true;
                 
-                // 合計金額セル（行11）
-                worksheet.Range["C11:E11"].Merge();
-                worksheet.Range["C11"].Text = $"¥{invoice.Total:N0}";
-                worksheet.Range["C11"].CellStyle.Font.Size = 20;
-                worksheet.Range["C11"].CellStyle.Font.Bold = true;
-                worksheet.Range["C11"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                worksheet.Range["C11"].CellStyle.VerticalAlignment = ExcelVAlign.VAlignCenter;
-                worksheet.Range["C11"].RowHeight = 30;
-                worksheet.Range["C11:E11"].BorderAround(ExcelLineStyle.Medium);
+                // 合計金額セル（B10-E11セル結合）
+                worksheet.Range["B10:E11"].Merge();
+                worksheet.Range["B10"].Text = $"¥{invoice.Total:N0}";
+                worksheet.Range["B10"].CellStyle.Font.Size = 20;
+                worksheet.Range["B10"].CellStyle.Font.Bold = true;
+                worksheet.Range["B10"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                worksheet.Range["B10"].CellStyle.VerticalAlignment = ExcelVAlign.VAlignCenter;
+                worksheet.Range["B10"].RowHeight = 30;
+                // 下線のみの罫線
+                worksheet.Range["B11:E11"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Medium;
 
                 // 振込案内（行9の右側）
                 worksheet.Range["H9:N9"].Merge();
