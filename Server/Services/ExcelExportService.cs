@@ -228,166 +228,267 @@ namespace AutoDealerSphere.Server.Services
                 worksheet.Range["L15"].CellStyle.Color = Color.FromArgb(226, 239, 218); // #E2EFDA
 
                 // 明細ヘッダー（行17）
-                worksheet.Range["B17:C17"].Merge();
-                worksheet.Range["B17"].Text = "部品名称／項目";
-                worksheet.Range["B17"].CellStyle.Color = Color.FromArgb(217, 217, 217);
-                worksheet.Range["B17"].CellStyle.Font.Bold = true;
-                worksheet.Range["B17"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                worksheet.Range["B17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["B17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["B17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["B17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                // 部品名称／項目 A17-E17
+                worksheet.Range["A17:E17"].Merge();
+                worksheet.Range["A17"].Text = "部品名称／項目";
+                worksheet.Range["A17"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                worksheet.Range["A17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["A17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["A17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["B17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["B17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["C17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["C17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["D17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["D17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["E17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["E17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["E17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                 
-                worksheet.Range["D17:E17"].Merge();
-                worksheet.Range["D17"].Text = "修理方法";
-                worksheet.Range["D17"].CellStyle.Color = Color.FromArgb(217, 217, 217);
-                worksheet.Range["D17"].CellStyle.Font.Bold = true;
-                worksheet.Range["D17"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                worksheet.Range["D17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["D17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["D17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["D17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
-                
-                worksheet.Range["F17"].Text = "部品単価";
-                worksheet.Range["F17"].CellStyle.Color = Color.FromArgb(217, 217, 217);
-                worksheet.Range["F17"].CellStyle.Font.Bold = true;
+                // 修理方法 F17-G17
+                worksheet.Range["F17:G17"].Merge();
+                worksheet.Range["F17"].Text = "修理方法";
                 worksheet.Range["F17"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                worksheet.Range["F17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["F17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["F17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["F17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                worksheet.Range["F17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["F17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["F17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["G17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["G17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["G17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                 
-                worksheet.Range["G17"].Text = "個数";
-                worksheet.Range["G17"].CellStyle.Color = Color.FromArgb(217, 217, 217);
-                worksheet.Range["G17"].CellStyle.Font.Bold = true;
-                worksheet.Range["G17"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                worksheet.Range["G17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["G17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["G17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["G17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
-                
-                worksheet.Range["H17"].Text = "部品価格";
-                worksheet.Range["H17"].CellStyle.Color = Color.FromArgb(217, 217, 217);
-                worksheet.Range["H17"].CellStyle.Font.Bold = true;
+                // 部品単価 H17-I17
+                worksheet.Range["H17:I17"].Merge();
+                worksheet.Range["H17"].Text = "部品単価";
                 worksheet.Range["H17"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                worksheet.Range["H17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["H17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["H17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["H17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                worksheet.Range["H17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["H17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["H17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["I17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["I17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["I17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                 
-                worksheet.Range["J17"].Text = "工賃";
-                worksheet.Range["J17"].CellStyle.Color = Color.FromArgb(217, 217, 217);
-                worksheet.Range["J17"].CellStyle.Font.Bold = true;
+                // 個数 J17
+                worksheet.Range["J17"].Text = "個数";
                 worksheet.Range["J17"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                worksheet.Range["J17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["J17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["J17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                worksheet.Range["J17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                worksheet.Range["J17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["J17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["J17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["J17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
+                
+                // 部品価格 K17-L17
+                worksheet.Range["K17:L17"].Merge();
+                worksheet.Range["K17"].Text = "部品価格";
+                worksheet.Range["K17"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                worksheet.Range["K17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["K17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["K17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["L17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["L17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["L17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
+                
+                // 工賃 M17-N17
+                worksheet.Range["M17:N17"].Merge();
+                worksheet.Range["M17"].Text = "工賃";
+                worksheet.Range["M17"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                worksheet.Range["M17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["M17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["M17"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["N17"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["N17"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["N17"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
 
                 // 明細行（行18から開始、法定費用以外）
                 int row = 18;
                 var taxableDetails = invoice.InvoiceDetails
                     .Where(d => d.Type != "法定費用")
                     .OrderBy(d => d.DisplayOrder);
+                
+                // 部品価格と工賃の小計を計算
+                decimal partsSubTotal = 0;
+                decimal laborSubTotal = 0;
                     
                 foreach (var detail in taxableDetails)
                 {
-                    worksheet.Range[$"B{row}:C{row}"].Merge();
-                    worksheet.Range[$"B{row}"].Text = detail.ItemName;
-                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    // 部品名称 A-E
+                    worksheet.Range[$"A{row}:E{row}"].Merge();
+                    worksheet.Range[$"A{row}"].Text = detail.ItemName;
+                    worksheet.Range[$"A{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignLeft;
+                    worksheet.Range[$"A{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"A{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"A{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"C{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"C{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"E{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"E{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"E{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                     
-                    worksheet.Range[$"D{row}:E{row}"].Merge();
-                    worksheet.Range[$"D{row}"].Text = detail.RepairMethod ?? "";
-                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    // 修理方法 F-G
+                    worksheet.Range[$"F{row}:G{row}"].Merge();
+                    worksheet.Range[$"F{row}"].Text = detail.RepairMethod ?? "";
+                    worksheet.Range[$"F{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                     
-                    worksheet.Range[$"F{row}"].Number = (double)detail.UnitPrice;
-                    worksheet.Range[$"F{row}"].NumberFormat = "#,##0";
-                    worksheet.Range[$"F{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
-                    
-                    worksheet.Range[$"G{row}"].Number = (double)detail.Quantity;
-                    worksheet.Range[$"G{row}"].NumberFormat = "#,##0.0";
-                    worksheet.Range[$"G{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
-                    
-                    worksheet.Range[$"H{row}"].Number = (double)(detail.Quantity * detail.UnitPrice);
+                    // 部品単価 H-I
+                    worksheet.Range[$"H{row}:I{row}"].Merge();
+                    worksheet.Range[$"H{row}"].Number = (double)detail.UnitPrice;
                     worksheet.Range[$"H{row}"].NumberFormat = "#,##0";
                     worksheet.Range[$"H{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"I{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"I{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"I{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                     
-                    worksheet.Range[$"J{row}"].Number = (double)detail.LaborCost;
-                    worksheet.Range[$"J{row}"].NumberFormat = "#,##0";
+                    // 個数 J
+                    worksheet.Range[$"J{row}"].Number = (double)detail.Quantity;
+                    worksheet.Range[$"J{row}"].NumberFormat = "#,##0.0";
                     worksheet.Range[$"J{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
+                    
+                    // 部品価格 K-L
+                    worksheet.Range[$"K{row}:L{row}"].Merge();
+                    worksheet.Range[$"K{row}"].Number = (double)(detail.Quantity * detail.UnitPrice);
+                    worksheet.Range[$"K{row}"].NumberFormat = "#,##0";
+                    worksheet.Range[$"K{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                    worksheet.Range[$"K{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"K{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"K{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"L{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"L{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"L{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
+                    
+                    // 工賃 M-N
+                    worksheet.Range[$"M{row}:N{row}"].Merge();
+                    worksheet.Range[$"M{row}"].Number = (double)detail.LaborCost;
+                    worksheet.Range[$"M{row}"].NumberFormat = "#,##0";
+                    worksheet.Range[$"M{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                    worksheet.Range[$"M{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"M{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"M{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"N{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"N{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"N{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
+                    
+                    // 小計に加算
+                    partsSubTotal += detail.Quantity * detail.UnitPrice;
+                    laborSubTotal += detail.LaborCost;
 
                     row++;
                 }
 
                 // 空行を行38まで埋める（固定位置のため）
-                while (row < 38)
+                while (row <= 38)
                 {
-                    worksheet.Range[$"B{row}:C{row}"].Merge();
-                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    // 部品名称 A-E
+                    worksheet.Range[$"A{row}:E{row}"].Merge();
+                    worksheet.Range[$"A{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"A{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"A{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"B{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"C{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"C{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"E{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"E{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"E{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                     
-                    worksheet.Range[$"D{row}:E{row}"].Merge();
-                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"D{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    // 修理方法 F-G
+                    worksheet.Range[$"F{row}:G{row}"].Merge();
+                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                     
-                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"F{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    // 部品単価 H-I
+                    worksheet.Range[$"H{row}:I{row}"].Merge();
+                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"I{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"I{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"I{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                     
-                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"G{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    // 個数 J
+                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                     
-                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"H{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    // 部品価格 K-L
+                    worksheet.Range[$"K{row}:L{row}"].Merge();
+                    worksheet.Range[$"K{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"K{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"K{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"L{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"L{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"L{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                     
-                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
-                    worksheet.Range[$"J{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+                    // 工賃 M-N
+                    worksheet.Range[$"M{row}:N{row}"].Merge();
+                    worksheet.Range[$"M{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"M{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"M{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"N{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"N{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                    worksheet.Range[$"N{row}"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
                     
                     row++;
                 }
 
                 // ページ小計（行39）
-                worksheet.Range["G39"].Text = "ページ小計";
-                worksheet.Range["G39"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                worksheet.Range["H39"].Number = (double)invoice.TaxableSubTotal;
-                worksheet.Range["H39"].NumberFormat = "#,##0";
-                worksheet.Range["H39"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                worksheet.Range["J39"].Number = (double)invoice.TaxableSubTotal;
-                worksheet.Range["J39"].NumberFormat = "#,##0";
-                worksheet.Range["J39"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                // ページ小計ラベル H39:J39
+                worksheet.Range["H39:J39"].Merge();
+                worksheet.Range["H39"].Text = "ページ小計";
+                worksheet.Range["H39"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                worksheet.Range["H39"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["H39"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["H39"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["I39"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["I39"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["J39"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["J39"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["J39"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
+                
+                // 部品価格小計 K39:L39
+                worksheet.Range["K39:L39"].Merge();
+                worksheet.Range["K39"].Number = (double)partsSubTotal;
+                worksheet.Range["K39"].NumberFormat = "#,##0";
+                worksheet.Range["K39"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range["K39"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["K39"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["K39"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["L39"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["L39"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["L39"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
+                
+                // 工賃小計 M39:N39
+                worksheet.Range["M39:N39"].Merge();
+                worksheet.Range["M39"].Number = (double)laborSubTotal;
+                worksheet.Range["M39"].NumberFormat = "#,##0";
+                worksheet.Range["M39"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+                worksheet.Range["M39"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["M39"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["M39"].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["N39"].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["N39"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Hair;
+                worksheet.Range["N39"].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Hair;
 
                 // 非課税項目（行40）
                 worksheet.Range["B40:C40"].Merge();
