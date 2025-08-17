@@ -211,6 +211,7 @@ namespace AutoDealerSphere.Server.Services
 
                 // ワークシートの初期設定
                 SetupWorksheet(worksheet);
+                
 
                 // ヘッダー部分の設定
                 SetupHeader(worksheet, invoice, issuerInfo);
@@ -236,11 +237,8 @@ namespace AutoDealerSphere.Server.Services
                 // 合計計算部分の設定
                 SetupTotals(worksheet, partsSubTotal, laborSubTotal, nonTaxableTotal);
 
-                // 全体のフォントを游ゴシックに設定（すべてのコンテンツ書き込み後）
-                if (worksheet.UsedRange != null)
-                {
-                    worksheet.UsedRange.CellStyle.Font.FontName = "游ゴシック";
-                }
+                // 全体のフォントを設定（個別設定を保持）
+                ApplyDefaultFont(worksheet);
 
                 // MemoryStreamに保存
                 using (MemoryStream stream = new MemoryStream())
@@ -261,6 +259,7 @@ namespace AutoDealerSphere.Server.Services
             worksheet.PageSetup.BottomMargin = 0.75;
             worksheet.PageSetup.LeftMargin = 0.7;
             worksheet.PageSetup.RightMargin = 0.7;
+
 
             // 列幅設定（配列でまとめて設定）
             var columnWidths = new[] 
@@ -302,7 +301,7 @@ namespace AutoDealerSphere.Server.Services
         {
             MergeAndSetCell(worksheet, "C1:K1", "御　請　求　書", style =>
             {
-                style.Font.Size = 20;
+                style.Font.Size = 16;
                 style.Font.Bold = true;
                 style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                 style.VerticalAlignment = ExcelVAlign.VAlignCenter;
@@ -321,7 +320,11 @@ namespace AutoDealerSphere.Server.Services
             };
             SetCellTexts(worksheet, headerTexts);
             worksheet.Range["K2"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+            worksheet.Range["K2"].CellStyle.Font.Size = 8;
             worksheet.Range["L2:M2"].Merge();
+            worksheet.Range["L2"].CellStyle.Font.Size = 8;
+            worksheet.Range["M2"].CellStyle.Font.Size = 8;
+            worksheet.Range["N2"].CellStyle.Font.Size = 8;
         }
 
         // 発行者情報設定
@@ -339,6 +342,18 @@ namespace AutoDealerSphere.Server.Services
                 { "L8", $"FAX {issuerInfo.FaxNumber}" }
             };
             SetCellTexts(worksheet, issuerTexts);
+            
+            // フォントサイズを設定
+            worksheet.Range["J3"].CellStyle.Font.Size = 11;
+            worksheet.Range["J4"].CellStyle.Font.Size = 11;
+            worksheet.Range["J5"].CellStyle.Font.Size = 11;
+            
+            // J6:K7をマージして11ptに設定
+            worksheet.Range["J6:K7"].Merge();
+            worksheet.Range["J6"].CellStyle.Font.Size = 11;
+            
+            worksheet.Range["J8"].CellStyle.Font.Size = 9;
+            worksheet.Range["L8"].CellStyle.Font.Size = 9;
         }
 
         // 請求先情報設定
@@ -355,6 +370,14 @@ namespace AutoDealerSphere.Server.Services
                 { "F7", "様" }
             };
             SetCellTexts(worksheet, clientTexts);
+            
+            // フォントサイズを設定
+            worksheet.Range["A4"].CellStyle.Font.Size = 8;
+            worksheet.Range["B4"].CellStyle.Font.Size = 9;
+            worksheet.Range["A5"].CellStyle.Font.Size = 8;
+            worksheet.Range["B5"].CellStyle.Font.Size = 11;
+            worksheet.Range["A7"].CellStyle.Font.Size = 8;
+            worksheet.Range["B7"].CellStyle.Font.Size = 11;
         }
 
         // 合計金額設定
@@ -362,10 +385,11 @@ namespace AutoDealerSphere.Server.Services
         {
             worksheet.Range["A9"].Text = "合計金額";
             worksheet.Range["A9"].CellStyle.Font.Bold = true;
+            worksheet.Range["A9"].CellStyle.Font.Size = 12;
             
             MergeAndSetCell(worksheet, "B10:E11", $"¥{total:N0}", style =>
             {
-                style.Font.Size = 20;
+                style.Font.Size = 16;
                 style.Font.Bold = true;
                 style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                 style.VerticalAlignment = ExcelVAlign.VAlignBottom;
@@ -382,6 +406,7 @@ namespace AutoDealerSphere.Server.Services
                 style.Color = HeaderColor;
                 style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                 style.Font.Bold = true;
+                style.Font.Size = 8;
             });
             SetRangeBorders(worksheet, "H9:N9", ExcelLineStyle.Hair);
 
@@ -408,6 +433,7 @@ namespace AutoDealerSphere.Server.Services
                 {
                     style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                     style.Color = DataColor;
+                    style.Font.Size = 8;
                 });
             SetRangeBorders(worksheet, range, ExcelLineStyle.Hair);
         }
@@ -450,6 +476,7 @@ namespace AutoDealerSphere.Server.Services
                 worksheet.Range[kvp.Key].Text = kvp.Value;
                 worksheet.Range[kvp.Key].CellStyle.Color = HeaderColor;
                 worksheet.Range[kvp.Key].CellStyle.Font.Bold = true;
+                worksheet.Range[kvp.Key].CellStyle.Font.Size = 8;
                 worksheet.Range[kvp.Key].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
             }
         }
@@ -604,7 +631,10 @@ namespace AutoDealerSphere.Server.Services
         {
             // 行39の設定
             MergeAndSetCell(worksheet, "H39:J39", "ページ小計", style =>
-                style.HorizontalAlignment = ExcelHAlign.HAlignCenter);
+            {
+                style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                style.Font.Size = 11;
+            });
             SetRangeBorders(worksheet, "H39:J39", ExcelLineStyle.Hair);
             
             SetMergedNumberCells(worksheet,
@@ -749,7 +779,11 @@ namespace AutoDealerSphere.Server.Services
         private void SetupRow39(IWorksheet worksheet, decimal partsSubTotal, decimal laborSubTotal)
         {
             MergeAndSetCell(worksheet, "H39:J39", "ページ小計", 
-                style => style.HorizontalAlignment = ExcelHAlign.HAlignCenter);
+                style => 
+                {
+                    style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+                    style.Font.Size = 11;
+                });
             SetRangeBorders(worksheet, "H39:J39", ExcelLineStyle.Hair);
             
             SetMergedNumberCells(worksheet,
@@ -776,6 +810,32 @@ namespace AutoDealerSphere.Server.Services
             SetMergedNumberCells(worksheet,
                 new MergedNumberCell { Range = "K41:L41", Value = (double)partsSubTotal, BorderStyle = ExcelLineStyle.Hair },
                 new MergedNumberCell { Range = "M41:N41", Value = (double)laborSubTotal, BorderStyle = ExcelLineStyle.Hair });
+        }
+        
+        // デフォルトフォントを適用（個別設定は保持）
+        private void ApplyDefaultFont(IWorksheet worksheet)
+        {
+            if (worksheet.UsedRange != null)
+            {
+                // 使用範囲のすべてのセルに対してフォントを設定
+                var usedRange = worksheet.UsedRange;
+                for (int row = usedRange.Row; row <= usedRange.LastRow; row++)
+                {
+                    for (int col = usedRange.Column; col <= usedRange.LastColumn; col++)
+                    {
+                        var cell = worksheet.Range[row, col];
+                        // フォント名を游ゴシックに設定
+                        cell.CellStyle.Font.FontName = "游ゴシック";
+                        
+                        // フォントサイズが設定されていない場合のみ9ptに設定
+                        if (cell.CellStyle.Font.Size == 11) // Excelのデフォルトサイズ
+                        {
+                            cell.CellStyle.Font.Size = 9;
+                            cell.CellStyle.Font.Bold = true;
+                        }
+                    }
+                }
+            }
         }
     }
 }
