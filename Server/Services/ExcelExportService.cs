@@ -321,10 +321,14 @@ namespace AutoDealerSphere.Server.Services
             SetCellTexts(worksheet, headerTexts);
             worksheet.Range["K2"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
             worksheet.Range["K2"].CellStyle.Font.Size = 8;
+            worksheet.Range["K2"].CellStyle.Font.Bold = true;
             worksheet.Range["L2:M2"].Merge();
             worksheet.Range["L2"].CellStyle.Font.Size = 8;
+            worksheet.Range["L2"].CellStyle.Font.Bold = true;
             worksheet.Range["M2"].CellStyle.Font.Size = 8;
+            worksheet.Range["M2"].CellStyle.Font.Bold = true;
             worksheet.Range["N2"].CellStyle.Font.Size = 8;
+            worksheet.Range["N2"].CellStyle.Font.Bold = true;
         }
 
         // 発行者情報設定
@@ -345,15 +349,21 @@ namespace AutoDealerSphere.Server.Services
             
             // フォントサイズを設定
             worksheet.Range["J3"].CellStyle.Font.Size = 11;
+            worksheet.Range["J3"].CellStyle.Font.Bold = true;
             worksheet.Range["J4"].CellStyle.Font.Size = 11;
+            worksheet.Range["J4"].CellStyle.Font.Bold = true;
             worksheet.Range["J5"].CellStyle.Font.Size = 11;
+            worksheet.Range["J5"].CellStyle.Font.Bold = true;
             
             // J6:K7をマージして11ptに設定
             worksheet.Range["J6:K7"].Merge();
             worksheet.Range["J6"].CellStyle.Font.Size = 11;
+            worksheet.Range["J6"].CellStyle.Font.Bold = true;
             
             worksheet.Range["J8"].CellStyle.Font.Size = 9;
+            worksheet.Range["J8"].CellStyle.Font.Bold = true;
             worksheet.Range["L8"].CellStyle.Font.Size = 9;
+            worksheet.Range["L8"].CellStyle.Font.Bold = true;
         }
 
         // 請求先情報設定
@@ -373,11 +383,18 @@ namespace AutoDealerSphere.Server.Services
             
             // フォントサイズを設定
             worksheet.Range["A4"].CellStyle.Font.Size = 8;
+            worksheet.Range["A4"].CellStyle.Font.Bold = true;
             worksheet.Range["B4"].CellStyle.Font.Size = 9;
+            worksheet.Range["B4"].CellStyle.Font.Bold = true;
             worksheet.Range["A5"].CellStyle.Font.Size = 8;
+            worksheet.Range["A5"].CellStyle.Font.Bold = true;
             worksheet.Range["B5"].CellStyle.Font.Size = 11;
+            worksheet.Range["B5"].CellStyle.Font.Bold = true;
             worksheet.Range["A7"].CellStyle.Font.Size = 8;
+            worksheet.Range["A7"].CellStyle.Font.Bold = true;
             worksheet.Range["B7"].CellStyle.Font.Size = 11;
+            worksheet.Range["B7"].CellStyle.Font.Bold = true;
+            worksheet.Range["F7"].CellStyle.Font.Bold = true;
         }
 
         // 合計金額設定
@@ -394,7 +411,6 @@ namespace AutoDealerSphere.Server.Services
                 style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                 style.VerticalAlignment = ExcelVAlign.VAlignBottom;
             });
-            worksheet.Range["B10"].RowHeight = 30;
             worksheet.Range["B11:E11"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Double;
         }
 
@@ -434,6 +450,7 @@ namespace AutoDealerSphere.Server.Services
                     style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
                     style.Color = DataColor;
                     style.Font.Size = 8;
+                    style.Font.Bold = true;
                 });
             SetRangeBorders(worksheet, range, ExcelLineStyle.Hair);
         }
@@ -831,8 +848,10 @@ namespace AutoDealerSphere.Server.Services
                         if (cell.CellStyle.Font.Size == 11) // Excelのデフォルトサイズ
                         {
                             cell.CellStyle.Font.Size = 9;
-                            cell.CellStyle.Font.Bold = true;
                         }
+                        
+                        // すべてのセルをBoldにする
+                        cell.CellStyle.Font.Bold = true;
                     }
                 }
             }
