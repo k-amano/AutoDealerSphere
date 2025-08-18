@@ -262,6 +262,10 @@ namespace AutoDealerSphere.Server.Services
 
             // 印刷範囲の設定
             worksheet.PageSetup.PrintArea = "A1:N46";
+            
+            // すべての列を1ページに印刷する設定
+            worksheet.PageSetup.FitToPagesTall = 1;
+            worksheet.PageSetup.FitToPagesWide = 1;
 
             // 列幅設定（ピクセル単位）
             var columnWidthsInPixels = new[] 
@@ -271,11 +275,11 @@ namespace AutoDealerSphere.Server.Services
             };
             
             // ピクセルから文字数への変換
-            // 実測値に基づく調整: 現在の列幅が約2倍になっているため、変換係数を調整
+            // 実測値に基づく調整: 変換係数を12.0に設定
             for (int i = 0; i < columnWidthsInPixels.Length; i++)
             {
                 // ピクセル値を文字数に変換（調整済み）
-                double charWidth = columnWidthsInPixels[i] / 13.5;
+                double charWidth = columnWidthsInPixels[i] / 12.0;
                 worksheet.SetColumnWidth(i + 1, charWidth);
             }
 
@@ -288,6 +292,13 @@ namespace AutoDealerSphere.Server.Services
             foreach (var kvp in rowHeights)
             {
                 worksheet.SetRowHeight(kvp.Key, kvp.Value);
+            }
+            
+            // すべての行の高さに1.2倍の係数を適用
+            for (int row = 1; row <= 46; row++)
+            {
+                double currentHeight = worksheet.GetRowHeight(row);
+                worksheet.SetRowHeight(row, currentHeight * 1.2);
             }
         }
 
