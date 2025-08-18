@@ -255,22 +255,28 @@ namespace AutoDealerSphere.Server.Services
             // 用紙サイズをA4に設定
             worksheet.PageSetup.PaperSize = ExcelPaperSize.PaperA4;
             worksheet.PageSetup.Orientation = ExcelPageOrientation.Portrait;
-            worksheet.PageSetup.TopMargin = 0.75;
-            worksheet.PageSetup.BottomMargin = 0.75;
-            worksheet.PageSetup.LeftMargin = 0.7;
-            worksheet.PageSetup.RightMargin = 0.7;
+            worksheet.PageSetup.TopMargin = 0.4;
+            worksheet.PageSetup.BottomMargin = 0.4;
+            worksheet.PageSetup.LeftMargin = 0.3;
+            worksheet.PageSetup.RightMargin = 0.3;
 
+            // 印刷範囲の設定
+            worksheet.PageSetup.PrintArea = "A1:N46";
 
-            // 列幅設定（配列でまとめて設定）
-            var columnWidths = new[] 
+            // 列幅設定（ピクセル単位）
+            var columnWidthsInPixels = new[] 
             {
-                7.88, 8.38, 6.38, 2.63, 8.38, 8.38, 0.77, 8.38,
-                3.13, 8.13, 8.38, 3.13, 8.38, 3.13
+                108, 115, 87, 36, 115, 115, 11, 115,
+                43, 111, 115, 43, 115, 43, 115, 125, 115, 115
             };
             
-            for (int i = 0; i < columnWidths.Length; i++)
+            // ピクセルから文字数への変換
+            // 実測値に基づく調整: 現在の列幅が約2倍になっているため、変換係数を調整
+            for (int i = 0; i < columnWidthsInPixels.Length; i++)
             {
-                worksheet.SetColumnWidth(i + 1, columnWidths[i]);
+                // ピクセル値を文字数に変換（調整済み）
+                double charWidth = columnWidthsInPixels[i] / 13.5;
+                worksheet.SetColumnWidth(i + 1, charWidth);
             }
 
             // 行の高さ設定（配列でまとめて設定）
