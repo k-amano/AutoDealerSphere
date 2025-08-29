@@ -34,10 +34,10 @@ namespace AutoDealerSphere.Server.Controllers
             return Ok(invoice);
         }
 
-        [HttpGet("new-number")]
-        public async Task<ActionResult<string>> GetNewInvoiceNumber()
+        [HttpGet("new-number/{clientId}")]
+        public async Task<ActionResult<string>> GetNewInvoiceNumber(int clientId)
         {
-            var number = await _invoiceService.GenerateInvoiceNumberAsync();
+            var number = await _invoiceService.GenerateInvoiceNumberAsync(clientId);
             return Ok(new { invoiceNumber = number });
         }
 
@@ -99,7 +99,7 @@ namespace AutoDealerSphere.Server.Controllers
                 }
 
                 var excelData = await _invoiceService.ExportToExcelAsync(id);
-                var fileName = $"請求書_{invoice.InvoiceNumber}_{DateTime.Now:yyyyMMdd}.xlsx";
+                var fileName = $"請求書{invoice.InvoiceNumber}.xlsx";
                 
                 return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }

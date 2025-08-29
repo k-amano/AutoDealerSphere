@@ -40,7 +40,7 @@ namespace AutoDealerSphere.Server.Services
         public async Task<Invoice> CreateInvoiceAsync(Invoice invoice)
         {
             using var context = _contextFactory.CreateDbContext();
-            invoice.InvoiceNumber = await GenerateInvoiceNumberAsync();
+            invoice.InvoiceNumber = await GenerateInvoiceNumberAsync(invoice.ClientId);
             invoice.CreatedAt = DateTime.Now;
             invoice.UpdatedAt = DateTime.Now;
             
@@ -95,29 +95,34 @@ namespace AutoDealerSphere.Server.Services
             return true;
         }
 
-        public async Task<string> GenerateInvoiceNumberAsync()
+        public async Task<string> GenerateInvoiceNumberAsync(int clientId)
         {
-            var year = DateTime.Now.Year;
-            var month = DateTime.Now.Month;
-            var yearMonth = $"{year}{month:D2}";
+            var year = DateTime.Now.Year % 100;  // 2桁の年 (yy)
+            var month = DateTime.Now.Month;      // 月 (mm)
+            var yearMonth = $"{year:D2}{month:D2}";      // yymm形式
+            var clientIdPart = $"{clientId:D4}";         // ClientId 4桁0埋め
+            
+            var prefix = $"{yearMonth}{clientIdPart}";   // {yymm}{ClientId}
 
             using var context = _contextFactory.CreateDbContext();
             var lastInvoice = await context.Invoices
-                .Where(i => i.InvoiceNumber.StartsWith(yearMonth))
+                .Where(i => i.InvoiceNumber.StartsWith(prefix))
                 .OrderByDescending(i => i.InvoiceNumber)
                 .FirstOrDefaultAsync();
 
-            int nextNumber = 1;
+            int nextSequence = 1;
             if (lastInvoice != null)
             {
-                var lastNumber = lastInvoice.InvoiceNumber.Substring(6);
-                if (int.TryParse(lastNumber, out int number))
+                // 最後の2桁（連番）を取得
+                var lastSequence = lastInvoice.InvoiceNumber.Substring(10);
+                if (int.TryParse(lastSequence, out int sequence))
                 {
-                    nextNumber = number + 1;
+                    nextSequence = sequence + 1;
                 }
             }
 
-            return $"{yearMonth}{nextNumber:D4}";
+            // {yymm}{ClientId 4桁0埋め}{連番 2桁0埋め}
+            return $"{prefix}{nextSequence:D2}";
         }
 
         public async Task<byte[]> ExportToExcelAsync(int invoiceId)
