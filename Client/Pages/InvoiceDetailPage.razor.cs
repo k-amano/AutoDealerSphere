@@ -224,8 +224,7 @@ namespace AutoDealerSphere.Client.Pages
             if (response.IsSuccessStatusCode)
             {
                 var bytes = await response.Content.ReadAsByteArrayAsync();
-                var contentDisposition = response.Content.Headers.ContentDisposition;
-                var fileName = contentDisposition?.FileName?.Trim('"') ?? $"invoice_{InvoiceId}_{DateTime.Now:yyyyMMdd}.xlsx";
+                var fileName = $"請求書{_invoice?.InvoiceNumber ?? InvoiceId.ToString()}.xlsx";
                 
                 // JavaScript経由でファイルをダウンロード (MemoryStreamを使用)
                 using var stream = new System.IO.MemoryStream(bytes);
