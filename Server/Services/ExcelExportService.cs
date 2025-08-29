@@ -204,41 +204,18 @@ namespace AutoDealerSphere.Server.Services
                 IApplication application = excelEngine.Excel;
                 application.DefaultVersion = ExcelVersion.Excel2016;
 
-                // 新しいワークブックを作成
-                IWorkbook workbook = application.Workbooks.Create(1);
+                // テンプレートファイルを開く
+                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "invoice-template.xlsx");
+                if (!File.Exists(templatePath))
+                {
+                    throw new FileNotFoundException($"Template file not found: {templatePath}");
+                }
+
+                IWorkbook workbook = application.Workbooks.Open(templatePath);
                 IWorksheet worksheet = workbook.Worksheets[0];
-                worksheet.Name = "請求書";
 
-                // ワークシートの初期設定
-                SetupWorksheet(worksheet);
-                
-
-                // ヘッダー部分の設定
-                SetupHeader(worksheet, invoice, issuerInfo);
-
-                // 車両情報部分の設定
-                SetupVehicleInfo(worksheet, invoice);
-
-                // 明細ヘッダーの設定
-                SetupDetailHeader(worksheet);
-
-                // 明細行の入力
-                var (partsSubTotal, laborSubTotal) = FillInvoiceDetails(worksheet, invoice);
-
-                // 行39の設定をまとめて実行
-                SetupRow39(worksheet, partsSubTotal, laborSubTotal);
-                
-                // 行40-41の設定をまとめて実行
-                SetupRows40And41(worksheet, partsSubTotal, laborSubTotal);
-
-                // 非課税項目の入力
-                var nonTaxableTotal = FillNonTaxableItems(worksheet, invoice);
-
-                // 合計計算部分の設定
-                SetupTotals(worksheet, partsSubTotal, laborSubTotal, nonTaxableTotal);
-
-                // 全体のフォントを設定（個別設定を保持）
-                ApplyDefaultFont(worksheet);
+                // テンプレートにデータを投入
+                await PopulateTemplateWithDataAsync(worksheet, invoice, issuerInfo);
 
                 // MemoryStreamに保存
                 using (MemoryStream stream = new MemoryStream())
@@ -249,294 +226,8 @@ namespace AutoDealerSphere.Server.Services
             }
         }
 
-        // ワークシートの初期設定
-        private void SetupWorksheet(IWorksheet worksheet)
-        {
-            // 用紙サイズをA4に設定
-            worksheet.PageSetup.PaperSize = ExcelPaperSize.PaperA4;
-            worksheet.PageSetup.Orientation = ExcelPageOrientation.Portrait;
-            worksheet.PageSetup.TopMargin = 0.4;
-            worksheet.PageSetup.BottomMargin = 0.4;
-            worksheet.PageSetup.LeftMargin = 0.3;
-            worksheet.PageSetup.RightMargin = 0.3;
 
-            // 印刷範囲の設定
-            worksheet.PageSetup.PrintArea = "A1:N46";
-            
-            // すべての列を1ページに印刷する設定
-            worksheet.PageSetup.FitToPagesTall = 1;
-            worksheet.PageSetup.FitToPagesWide = 1;
 
-            // 列幅設定（ピクセル単位）
-            var columnWidthsInPixels = new[] 
-            {
-                108, 115, 87, 36, 115, 115, 11, 115,
-                43, 111, 115, 43, 115, 43, 115, 125, 115, 115
-            };
-            
-            // ピクセルから文字数への変換
-            // 実測値に基づく調整: 変換係数を12.0に設定
-            for (int i = 0; i < columnWidthsInPixels.Length; i++)
-            {
-                // ピクセル値を文字数に変換（調整済み）
-                double charWidth = columnWidthsInPixels[i] / 12.0;
-                worksheet.SetColumnWidth(i + 1, charWidth);
-            }
-
-            // 行の高さ設定（配列でまとめて設定）
-            var rowHeights = new Dictionary<int, double>
-            {
-                { 6, 6 }, { 12, 6 }, { 14, 6 }, { 16, 6 }
-            };
-            
-            foreach (var kvp in rowHeights)
-            {
-                worksheet.SetRowHeight(kvp.Key, kvp.Value);
-            }
-            
-            // すべての行の高さに1.2倍の係数を適用
-            for (int row = 1; row <= 46; row++)
-            {
-                double currentHeight = worksheet.GetRowHeight(row);
-                worksheet.SetRowHeight(row, currentHeight * 1.2);
-            }
-        }
-
-        // ヘッダー部分の設定
-        private void SetupHeader(IWorksheet worksheet, Invoice invoice, IssuerInfo issuerInfo)
-        {
-            SetupTitle(worksheet);
-            SetupCreationDate(worksheet);
-            SetupIssuerInfo(worksheet, issuerInfo);
-            SetupClientInfo(worksheet, invoice.Client);
-            SetupTotalAmount(worksheet, invoice.Total);
-            SetupBankInfo(worksheet, issuerInfo);
-        }
-
-        // タイトル設定
-        private void SetupTitle(IWorksheet worksheet)
-        {
-            MergeAndSetCell(worksheet, "C1:K1", "御　請　求　書", style =>
-            {
-                style.Font.Size = 16;
-                style.Font.Bold = true;
-                style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                style.VerticalAlignment = ExcelVAlign.VAlignCenter;
-                style.Color = HeaderColor;
-            });
-            worksheet.Range["C1"].RowHeight = 35;
-        }
-
-        // 作成日設定
-        private void SetupCreationDate(IWorksheet worksheet)
-        {
-            var headerTexts = new Dictionary<string, string>
-            {
-                { "K2", "作成日" },
-                { "L2", $"令和{DateTime.Now.Year - 2018}年{DateTime.Now.Month}月{DateTime.Now.Day}日" }
-            };
-            SetCellTexts(worksheet, headerTexts);
-            worksheet.Range["K2"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-            worksheet.Range["K2"].CellStyle.Font.Size = 8;
-            worksheet.Range["K2"].CellStyle.Font.Bold = true;
-            worksheet.Range["L2:M2"].Merge();
-            worksheet.Range["L2"].CellStyle.Font.Size = 8;
-            worksheet.Range["L2"].CellStyle.Font.Bold = true;
-            worksheet.Range["M2"].CellStyle.Font.Size = 8;
-            worksheet.Range["M2"].CellStyle.Font.Bold = true;
-            worksheet.Range["N2"].CellStyle.Font.Size = 8;
-            worksheet.Range["N2"].CellStyle.Font.Bold = true;
-        }
-
-        // 発行者情報設定
-        private void SetupIssuerInfo(IWorksheet worksheet, IssuerInfo issuerInfo)
-        {
-            if (issuerInfo == null) return;
-            
-            var issuerTexts = new Dictionary<string, string>
-            {
-                { "J3", issuerInfo.PostalCode },
-                { "J4", issuerInfo.Address },
-                { "J5", issuerInfo.CompanyName },
-                { "J6", $"{issuerInfo.Position}　{issuerInfo.Name}" },
-                { "J8", $"TEL {issuerInfo.PhoneNumber}" },
-                { "L8", $"FAX {issuerInfo.FaxNumber}" }
-            };
-            SetCellTexts(worksheet, issuerTexts);
-            
-            // フォントサイズを設定
-            worksheet.Range["J3"].CellStyle.Font.Size = 11;
-            worksheet.Range["J3"].CellStyle.Font.Bold = true;
-            worksheet.Range["J4"].CellStyle.Font.Size = 11;
-            worksheet.Range["J4"].CellStyle.Font.Bold = true;
-            worksheet.Range["J5"].CellStyle.Font.Size = 11;
-            worksheet.Range["J5"].CellStyle.Font.Bold = true;
-            
-            // J6:K7をマージして11ptに設定
-            worksheet.Range["J6:K7"].Merge();
-            worksheet.Range["J6"].CellStyle.Font.Size = 11;
-            worksheet.Range["J6"].CellStyle.Font.Bold = true;
-            
-            worksheet.Range["J8"].CellStyle.Font.Size = 9;
-            worksheet.Range["J8"].CellStyle.Font.Bold = true;
-            worksheet.Range["L8"].CellStyle.Font.Size = 9;
-            worksheet.Range["L8"].CellStyle.Font.Bold = true;
-        }
-
-        // 請求先情報設定
-        private void SetupClientInfo(IWorksheet worksheet, AutoDealerSphere.Shared.Models.Client client)
-        {
-            var clientTexts = new Dictionary<string, string>
-            {
-                { "A4", "郵便番号" },
-                { "B4", client?.Zip ?? "" },
-                { "A5", "住所" },
-                { "B5", client?.Address ?? "" },
-                { "A7", "氏名" },
-                { "B7", client?.Name ?? "" },
-                { "F7", "様" }
-            };
-            SetCellTexts(worksheet, clientTexts);
-            
-            // フォントサイズを設定
-            worksheet.Range["A4"].CellStyle.Font.Size = 8;
-            worksheet.Range["A4"].CellStyle.Font.Bold = true;
-            worksheet.Range["B4"].CellStyle.Font.Size = 9;
-            worksheet.Range["B4"].CellStyle.Font.Bold = true;
-            worksheet.Range["A5"].CellStyle.Font.Size = 8;
-            worksheet.Range["A5"].CellStyle.Font.Bold = true;
-            worksheet.Range["B5"].CellStyle.Font.Size = 11;
-            worksheet.Range["B5"].CellStyle.Font.Bold = true;
-            worksheet.Range["A7"].CellStyle.Font.Size = 8;
-            worksheet.Range["A7"].CellStyle.Font.Bold = true;
-            worksheet.Range["B7"].CellStyle.Font.Size = 11;
-            worksheet.Range["B7"].CellStyle.Font.Bold = true;
-            worksheet.Range["F7"].CellStyle.Font.Bold = true;
-        }
-
-        // 合計金額設定
-        private void SetupTotalAmount(IWorksheet worksheet, decimal total)
-        {
-            worksheet.Range["A9"].Text = "合計金額";
-            worksheet.Range["A9"].CellStyle.Font.Bold = true;
-            worksheet.Range["A9"].CellStyle.Font.Size = 12;
-            
-            MergeAndSetCell(worksheet, "B10:E11", $"¥{total:N0}", style =>
-            {
-                style.Font.Size = 16;
-                style.Font.Bold = true;
-                style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                style.VerticalAlignment = ExcelVAlign.VAlignBottom;
-            });
-            worksheet.Range["B11:E11"].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Double;
-        }
-
-        // 銀行振込情報設定
-        private void SetupBankInfo(IWorksheet worksheet, IssuerInfo issuerInfo)
-        {
-            MergeAndSetCell(worksheet, "H9:N9", "銀行振込の場合は、下記口座までお振込みください。", style =>
-            {
-                style.Color = HeaderColor;
-                style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                style.Font.Bold = true;
-                style.Font.Size = 8;
-            });
-            SetRangeBorders(worksheet, "H9:N9", ExcelLineStyle.Hair);
-
-            if (issuerInfo != null && !string.IsNullOrEmpty(issuerInfo.Bank1Name))
-            {
-                SetBankRow(worksheet, "H10:N10", issuerInfo.Bank1Name, issuerInfo.Bank1BranchName,
-                    issuerInfo.Bank1AccountType, issuerInfo.Bank1AccountNumber, issuerInfo.Bank1AccountHolder);
-            }
-            
-            if (issuerInfo != null && !string.IsNullOrEmpty(issuerInfo.Bank2Name))
-            {
-                SetBankRow(worksheet, "H11:N11", issuerInfo.Bank2Name, issuerInfo.Bank2BranchName,
-                    issuerInfo.Bank2AccountType, issuerInfo.Bank2AccountNumber, issuerInfo.Bank2AccountHolder);
-            }
-        }
-
-        // 銀行口座行設定
-        private void SetBankRow(IWorksheet worksheet, string range, string bankName, string branchName,
-            string accountType, string accountNumber, string accountHolder)
-        {
-            MergeAndSetCell(worksheet, range,
-                $"{bankName} {branchName} {accountType} {accountNumber} {accountHolder}",
-                style =>
-                {
-                    style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                    style.Color = DataColor;
-                    style.Font.Size = 8;
-                    style.Font.Bold = true;
-                });
-            SetRangeBorders(worksheet, range, ExcelLineStyle.Hair);
-        }
-
-        // 車両情報部分の設定
-        private void SetupVehicleInfo(IWorksheet worksheet, Invoice invoice)
-        {
-            SetupVehicleHeaders(worksheet);
-            SetupVehicleData(worksheet, invoice.Vehicle, invoice.Mileage);
-        }
-
-        // 車両情報ヘッダー設定
-        private void SetupVehicleHeaders(IWorksheet worksheet)
-        {
-            // 行13のヘッダー
-            var vehicleHeaders = new Dictionary<string, string>
-            {
-                { "A13", "車両番号" },
-                { "D13", "車名" },
-                { "F13", "車体番号" },
-                { "K13", "初年度登録" }
-            };
-            SetHeaderCells(worksheet, vehicleHeaders);
-
-            // 行15のヘッダー
-            var detailHeaders = new Dictionary<string, string>
-            {
-                { "A15", "車検満了日" },
-                { "F15", "形式" },
-                { "K15", "走行距離" }
-            };
-            SetHeaderCells(worksheet, detailHeaders);
-        }
-
-        // ヘッダーセルを設定
-        private void SetHeaderCells(IWorksheet worksheet, Dictionary<string, string> headers)
-        {
-            foreach (var kvp in headers)
-            {
-                worksheet.Range[kvp.Key].Text = kvp.Value;
-                worksheet.Range[kvp.Key].CellStyle.Color = HeaderColor;
-                worksheet.Range[kvp.Key].CellStyle.Font.Bold = true;
-                worksheet.Range[kvp.Key].CellStyle.Font.Size = 8;
-                worksheet.Range[kvp.Key].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-            }
-        }
-
-        // 車両データ設定
-        private void SetupVehicleData(IWorksheet worksheet, Vehicle vehicle, decimal? mileage)
-        {
-            // 行13のデータ
-            string licensePlate = FormatLicensePlate(vehicle);
-            MergeAndSetCell(worksheet, "B13:C13", licensePlate, style => style.Color = DataColor);
-            worksheet.Range["E13"].Text = vehicle?.VehicleName ?? "";
-            worksheet.Range["E13"].CellStyle.Color = DataColor;
-            MergeAndSetCell(worksheet, "G13:J13", vehicle?.ChassisNumber ?? "", style => style.Color = DataColor);
-            MergeAndSetCell(worksheet, "L13:N13", vehicle?.FirstRegistrationDate?.ToString("yyyy/MM/dd") ?? "", 
-                style => style.Color = DataColor);
-
-            // 行15のデータ
-            MergeAndSetCell(worksheet, "B15:E15", vehicle?.InspectionExpiryDate?.ToString("yyyy/MM/dd") ?? "", 
-                style => style.Color = DataColor);
-            MergeAndSetCell(worksheet, "G15:J15", vehicle?.VehicleModel ?? "", style => style.Color = DataColor);
-            MergeAndSetCell(worksheet, "L15:N15", mileage.HasValue ? $"{mileage:N0} km" : "", style =>
-            {
-                style.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                style.Color = DataColor;
-            });
-        }
 
         // ライセンスプレートをフォーマット
         private string FormatLicensePlate(Vehicle vehicle)
@@ -545,333 +236,197 @@ namespace AutoDealerSphere.Server.Services
             return $"{vehicle.LicensePlateLocation ?? ""} {vehicle.LicensePlateClassification ?? ""} {vehicle.LicensePlateHiragana ?? ""} {vehicle.LicensePlateNumber ?? ""}".Trim();
         }
 
-        // 明細ヘッダーの設定
-        private void SetupDetailHeader(IWorksheet worksheet)
-        {
-            // 明細ヘッダー定義（配列でまとめて管理）
-            var detailHeaders = new[]
-            {
-                new { Range = "A17:E17", Text = "部品名称／項目" },
-                new { Range = "F17:G17", Text = "修理方法" },
-                new { Range = "H17:I17", Text = "部品単価" },
-                new { Range = "J17", Text = "個数" },
-                new { Range = "K17:L17", Text = "部品価格" },
-                new { Range = "M17:N17", Text = "工賃" }
-            };
 
-            foreach (var header in detailHeaders)
+
+
+
+
+        
+        // テンプレートにデータを投入
+        private async Task PopulateTemplateWithDataAsync(IWorksheet worksheet, Invoice invoice, IssuerInfo issuerInfo)
+        {
+            // 作成日
+            PopulateCreationDate(worksheet);
+            
+            // 発行者情報
+            PopulateIssuerInfo(worksheet, issuerInfo);
+            
+            // 請求先情報
+            PopulateClientInfo(worksheet, invoice.Client);
+            
+            // 合計金額
+            PopulateTotalAmount(worksheet, invoice.Total);
+            
+            // 振込先口座情報 (H10, H11)
+            PopulateBankAccountInfo(worksheet, issuerInfo);
+            
+            // 車両情報
+            PopulateVehicleInfo(worksheet, invoice.Vehicle, invoice.Mileage);
+            
+            // 請求明細
+            PopulateInvoiceDetails(worksheet, invoice);
+            
+            // 非課税項目
+            PopulateNonTaxableItems(worksheet, invoice);
+            
+            // 合計計算
+            PopulateTotals(worksheet, invoice);
+        }
+
+        // 作成日を設定
+        private void PopulateCreationDate(IWorksheet worksheet)
+        {
+            worksheet.Range["L2"].Text = $"令和{DateTime.Now.Year - 2018}年{DateTime.Now.Month}月{DateTime.Now.Day}日";
+        }
+
+        // 発行者情報を設定
+        private void PopulateIssuerInfo(IWorksheet worksheet, IssuerInfo issuerInfo)
+        {
+            if (issuerInfo == null) return;
+            
+            worksheet.Range["J3"].Text = issuerInfo.PostalCode ?? "";
+            worksheet.Range["J4"].Text = issuerInfo.Address ?? "";
+            worksheet.Range["J5"].Text = issuerInfo.CompanyName ?? "";
+            worksheet.Range["J6"].Text = $"{issuerInfo.Position ?? ""}　{issuerInfo.Name ?? ""}";
+            worksheet.Range["J8"].Text = $"TEL {issuerInfo.PhoneNumber ?? ""}";
+            worksheet.Range["L8"].Text = $"FAX {issuerInfo.FaxNumber ?? ""}";
+        }
+
+        // 請求先情報を設定
+        private void PopulateClientInfo(IWorksheet worksheet, AutoDealerSphere.Shared.Models.Client client)
+        {
+            if (client == null) return;
+            
+            worksheet.Range["B4"].Text = client.Zip ?? "";
+            worksheet.Range["B5"].Text = client.Address ?? "";
+            worksheet.Range["B7"].Text = client.Name ?? "";
+        }
+
+        // 合計金額を設定
+        private void PopulateTotalAmount(IWorksheet worksheet, decimal total)
+        {
+            worksheet.Range["B10"].Text = $"¥{total:N0}";
+        }
+
+        // 振込先口座情報を設定 (H10, H11)
+        private void PopulateBankAccountInfo(IWorksheet worksheet, IssuerInfo issuerInfo)
+        {
+            if (issuerInfo == null) return;
+            
+            // 第1銀行口座 (H10)
+            if (!string.IsNullOrEmpty(issuerInfo.Bank1Name))
             {
-                if (header.Range.Contains(":"))
-                {
-                    MergeAndSetCell(worksheet, header.Range, header.Text, style =>
-                    {
-                        style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                    });
-                }
-                else
-                {
-                    worksheet.Range[header.Range].Text = header.Text;
-                    worksheet.Range[header.Range].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                }
-                SetRangeBorders(worksheet, header.Range, ExcelLineStyle.Hair);
+                var bank1Info = $"{issuerInfo.Bank1Name ?? ""} {issuerInfo.Bank1BranchName ?? ""} {issuerInfo.Bank1AccountType ?? ""} {issuerInfo.Bank1AccountNumber ?? ""} {issuerInfo.Bank1AccountHolder ?? ""}".Trim();
+                worksheet.Range["H10"].Text = bank1Info;
+            }
+            
+            // 第2銀行口座 (H11)
+            if (!string.IsNullOrEmpty(issuerInfo.Bank2Name))
+            {
+                var bank2Info = $"{issuerInfo.Bank2Name ?? ""} {issuerInfo.Bank2BranchName ?? ""} {issuerInfo.Bank2AccountType ?? ""} {issuerInfo.Bank2AccountNumber ?? ""} {issuerInfo.Bank2AccountHolder ?? ""}".Trim();
+                worksheet.Range["H11"].Text = bank2Info;
             }
         }
 
-        // 明細行の入力
-        private (decimal partsSubTotal, decimal laborSubTotal) FillInvoiceDetails(IWorksheet worksheet, Invoice invoice)
+        // 車両情報を設定
+        private void PopulateVehicleInfo(IWorksheet worksheet, Vehicle vehicle, decimal? mileage)
+        {
+            if (vehicle == null) return;
+            
+            // 車両番号
+            string licensePlate = FormatLicensePlate(vehicle);
+            worksheet.Range["B13"].Text = licensePlate;
+            
+            // 車名
+            worksheet.Range["E13"].Text = vehicle.VehicleName ?? "";
+            
+            // 車体番号
+            worksheet.Range["G13"].Text = vehicle.ChassisNumber ?? "";
+            
+            // 初年度登録
+            worksheet.Range["L13"].Text = vehicle.FirstRegistrationDate?.ToString("yyyy/MM/dd") ?? "";
+            
+            // 車検満了日
+            worksheet.Range["B15"].Text = vehicle.InspectionExpiryDate?.ToString("yyyy/MM/dd") ?? "";
+            
+            // 形式
+            worksheet.Range["G15"].Text = vehicle.VehicleModel ?? "";
+            
+            // 走行距離
+            worksheet.Range["L15"].Text = mileage.HasValue ? $"{mileage:N0} km" : "";
+        }
+
+        // 請求明細を設定
+        private void PopulateInvoiceDetails(IWorksheet worksheet, Invoice invoice)
         {
             int row = 18;
             var taxableDetails = invoice.InvoiceDetails
                 .Where(d => d.Type != "法定費用")
                 .OrderBy(d => d.DisplayOrder);
-            
-            decimal partsSubTotal = 0;
-            decimal laborSubTotal = 0;
 
             foreach (var detail in taxableDetails)
             {
-                FillDetailRow(worksheet, row, detail);
-                partsSubTotal += detail.Quantity * detail.UnitPrice;
-                laborSubTotal += detail.LaborCost;
+                if (row > 38) break;
+                
+                worksheet.Range[$"A{row}"].Text = detail.ItemName ?? "";
+                worksheet.Range[$"F{row}"].Text = detail.RepairMethod ?? "";
+                worksheet.Range[$"H{row}"].Number = (double)detail.UnitPrice;
+                worksheet.Range[$"J{row}"].Number = (double)detail.Quantity;
+                worksheet.Range[$"K{row}"].Number = (double)(detail.Quantity * detail.UnitPrice);
+                worksheet.Range[$"M{row}"].Number = (double)detail.LaborCost;
                 row++;
             }
-
-            FillEmptyDetailRows(worksheet, row, 38);
-            SetupPageSubtotal(worksheet, partsSubTotal, laborSubTotal);
-            return (partsSubTotal, laborSubTotal);
         }
 
-        // 明細行を入力する
-        private void FillDetailRow(IWorksheet worksheet, int row, InvoiceDetail detail)
-        {
-            // テキスト項目
-            MergeAndSetCell(worksheet, $"A{row}:E{row}", detail.ItemName, 
-                style => style.HorizontalAlignment = ExcelHAlign.HAlignLeft);
-            SetRangeBorders(worksheet, $"A{row}:E{row}", ExcelLineStyle.Hair);
-
-            MergeAndSetCell(worksheet, $"F{row}:G{row}", detail.RepairMethod ?? "", 
-                style => style.HorizontalAlignment = ExcelHAlign.HAlignCenter);
-            SetRangeBorders(worksheet, $"F{row}:G{row}", ExcelLineStyle.Hair);
-
-            // 数値項目を一括設定
-            SetMergedNumberCells(worksheet,
-                new MergedNumberCell { 
-                    Range = $"H{row}:I{row}", 
-                    Value = (double)detail.UnitPrice, 
-                    BorderStyle = ExcelLineStyle.Hair 
-                },
-                new MergedNumberCell { 
-                    Range = $"K{row}:L{row}", 
-                    Value = (double)(detail.Quantity * detail.UnitPrice), 
-                    BorderStyle = ExcelLineStyle.Hair 
-                },
-                new MergedNumberCell { 
-                    Range = $"M{row}:N{row}", 
-                    Value = (double)detail.LaborCost, 
-                    BorderStyle = ExcelLineStyle.Hair 
-                });
-
-            // 個数（マージなし）
-            worksheet.Range[$"J{row}"].Number = (double)detail.Quantity;
-            worksheet.Range[$"J{row}"].NumberFormat = "#,##0.0";
-            worksheet.Range[$"J{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-            SetRangeBorders(worksheet, $"J{row}", ExcelLineStyle.Hair);
-        }
-
-        // 空の明細行を埋める
-        private void FillEmptyDetailRows(IWorksheet worksheet, int startRow, int endRow)
-        {
-            var emptyRowRanges = new[]
-            {
-                "A{0}:E{0}", "F{0}:G{0}", "H{0}:I{0}", "J{0}", "K{0}:L{0}", "M{0}:N{0}"
-            };
-
-            for (int row = startRow; row <= endRow; row++)
-            {
-                foreach (var rangeTemplate in emptyRowRanges)
-                {
-                    var range = string.Format(rangeTemplate, row);
-                    if (range.Contains(":"))
-                    {
-                        worksheet.Range[range].Merge();
-                    }
-                    SetRangeBorders(worksheet, range, ExcelLineStyle.Hair);
-                }
-            }
-        }
-
-        // ページ小計の設定
-        private void SetupPageSubtotal(IWorksheet worksheet, decimal partsSubTotal, decimal laborSubTotal)
-        {
-            // 行39の設定
-            MergeAndSetCell(worksheet, "H39:J39", "ページ小計", style =>
-            {
-                style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                style.Font.Size = 11;
-            });
-            SetRangeBorders(worksheet, "H39:J39", ExcelLineStyle.Hair);
-            
-            SetMergedNumberCells(worksheet,
-                new MergedNumberCell { Range = "K39:L39", Value = (double)partsSubTotal, BorderStyle = ExcelLineStyle.Hair },
-                new MergedNumberCell { Range = "M39:N39", Value = (double)laborSubTotal, BorderStyle = ExcelLineStyle.Hair });
-
-            // 行40の非課税項目見出し
-            MergeAndSetCell(worksheet, "A40:F40", "非課税項目", style =>
-            {
-                style.Font.Bold = true;
-                style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                style.Color = HeaderColor;
-            });
-            SetRangeBorders(worksheet, "A40:F40", ExcelLineStyle.Hair);
-
-            // 行41の小計
-            MergeAndSetCell(worksheet, "H41:J41", "小計");
-            SetRangeBorders(worksheet, "H41:J41", ExcelLineStyle.Hair);
-            
-            SetMergedNumberCells(worksheet,
-                new MergedNumberCell { Range = "K41:L41", Value = (double)partsSubTotal, BorderStyle = ExcelLineStyle.Hair },
-                new MergedNumberCell { Range = "M41:N41", Value = (double)laborSubTotal, BorderStyle = ExcelLineStyle.Hair });
-        }
-
-        // 非課税項目の入力
-        private decimal FillNonTaxableItems(IWorksheet worksheet, Invoice invoice)
+        // 非課税項目を設定
+        private void PopulateNonTaxableItems(IWorksheet worksheet, Invoice invoice)
         {
             int row = 41;
             var nonTaxableItems = invoice.InvoiceDetails
                 .Where(d => d.Type == "法定費用")
                 .OrderBy(d => d.DisplayOrder);
-            
-            decimal nonTaxableTotal = 0;
 
             foreach (var item in nonTaxableItems)
             {
                 if (row > 45) break;
                 
-                MergeAndSetCell(worksheet, $"A{row}:E{row}", item.ItemName);
-                SetRangeBorders(worksheet, $"A{row}:E{row}", ExcelLineStyle.Hair);
-                
+                worksheet.Range[$"A{row}"].Text = item.ItemName ?? "";
                 worksheet.Range[$"F{row}"].Number = (double)item.UnitPrice;
-                worksheet.Range[$"F{row}"].NumberFormat = "#,##0";
-                worksheet.Range[$"F{row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-                SetRangeBorders(worksheet, $"F{row}", ExcelLineStyle.Hair);
-                
-                nonTaxableTotal += item.UnitPrice;
                 row++;
             }
-            
-            // 残りの行を空白で埋める
-            for (int i = row; i <= 45; i++)
-            {
-                worksheet.Range[$"A{i}:E{i}"].Merge();
-                SetRangeBorders(worksheet, $"A{i}:E{i}", ExcelLineStyle.Hair);
-                SetRangeBorders(worksheet, $"F{i}", ExcelLineStyle.Hair);
-            }
-
-            return nonTaxableTotal;
         }
 
-        // 合計計算部分の設定
-        private void SetupTotals(IWorksheet worksheet, decimal partsSubTotal, decimal laborSubTotal, decimal nonTaxableTotal)
+        // 合計を設定
+        private void PopulateTotals(IWorksheet worksheet, Invoice invoice)
         {
+            var taxableDetails = invoice.InvoiceDetails.Where(d => d.Type != "法定費用");
+            var partsSubTotal = taxableDetails.Sum(d => d.Quantity * d.UnitPrice);
+            var laborSubTotal = taxableDetails.Sum(d => d.LaborCost);
+            var nonTaxableTotal = invoice.InvoiceDetails.Where(d => d.Type == "法定費用").Sum(d => d.UnitPrice);
+            
             decimal taxableTotal = partsSubTotal + laborSubTotal;
             int tax = (int)(taxableTotal * 0.1m);
 
-            SetupTotalRows(worksheet, taxableTotal, tax);
-            SetupNonTaxableTotal(worksheet, nonTaxableTotal);
-        }
-
-        // 合計行の設定
-        private void SetupTotalRows(IWorksheet worksheet, decimal taxableTotal, int tax)
-        {
-            var totalItems = new[]
-            {
-                new TotalItem { Row = 42, Label = "課税額計", Value = taxableTotal },
-                new TotalItem { Row = 43, Label = "消費税 10%", Value = tax },
-                new TotalItem { Row = 44, Label = "非課税額計", HasColor = true, Formula = "=F46" },
-                new TotalItem { Row = 45, Label = "合計", Formula = "=K42+K43+K44" }
-            };
-
-            foreach (var item in totalItems)
-            {
-                SetupTotalRow(worksheet, item);
-            }
-        }
-
-        // 合計行を設定
-        private void SetupTotalRow(IWorksheet worksheet, TotalItem item)
-        {
-            // ラベル部分
-            MergeAndSetCell(worksheet, $"H{item.Row}:J{item.Row}", item.Label, style =>
-            {
-                if (item.HasColor) style.Color = HeaderColor;
-            });
-            SetRangeBorders(worksheet, $"H{item.Row}:J{item.Row}", ExcelLineStyle.Hair);
-
-            // 値部分
-            var range = $"K{item.Row}:N{item.Row}";
-            worksheet.Range[range].Merge();
+            // ページ小計
+            worksheet.Range["K39"].Number = (double)partsSubTotal;
+            worksheet.Range["M39"].Number = (double)laborSubTotal;
             
-            if (item.Formula != null)
-            {
-                worksheet.Range[$"K{item.Row}"].Formula = item.Formula;
-            }
-            else
-            {
-                worksheet.Range[$"K{item.Row}"].Number = (double)item.Value;
-            }
+            // 小計
+            worksheet.Range["K41"].Number = (double)partsSubTotal;
+            worksheet.Range["M41"].Number = (double)laborSubTotal;
             
-            worksheet.Range[$"K{item.Row}"].NumberFormat = "#,##0";
-            worksheet.Range[$"K{item.Row}"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-            if (item.Row == 44) worksheet.Range[$"K{item.Row}"].CellStyle.Color = DataColor;
-            SetRangeBorders(worksheet, range, ExcelLineStyle.Hair);
-        }
-
-        // 非課税額計の設定
-        private void SetupNonTaxableTotal(IWorksheet worksheet, decimal nonTaxableTotal)
-        {
-            MergeAndSetCell(worksheet, "A46:E46", "非課税額計", style => style.Color = HeaderColor);
-            SetRangeBorders(worksheet, "A46:E46", ExcelLineStyle.Hair);
+            // 課税額計
+            worksheet.Range["K42"].Number = (double)taxableTotal;
             
+            // 消費税
+            worksheet.Range["K43"].Number = tax;
+            
+            // 非課税額計
             worksheet.Range["F46"].Number = (double)nonTaxableTotal;
-            worksheet.Range["F46"].NumberFormat = "#,##0";
-            worksheet.Range["F46"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-            worksheet.Range["F46"].CellStyle.Color = DataColor;
-            SetRangeBorders(worksheet, "F46", ExcelLineStyle.Hair);
-        }
-
-        // 合計項目の定義
-        private class TotalItem
-        {
-            public int Row { get; set; }
-            public string Label { get; set; }
-            public decimal Value { get; set; }
-            public bool HasColor { get; set; }
-            public string Formula { get; set; }
-        }
-
-        // 行39の設定
-        private void SetupRow39(IWorksheet worksheet, decimal partsSubTotal, decimal laborSubTotal)
-        {
-            MergeAndSetCell(worksheet, "H39:J39", "ページ小計", 
-                style => 
-                {
-                    style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                    style.Font.Size = 11;
-                });
-            SetRangeBorders(worksheet, "H39:J39", ExcelLineStyle.Hair);
+            worksheet.Range["K44"].Formula = "=F46";
             
-            SetMergedNumberCells(worksheet,
-                new MergedNumberCell { Range = "K39:L39", Value = (double)partsSubTotal, BorderStyle = ExcelLineStyle.Hair },
-                new MergedNumberCell { Range = "M39:N39", Value = (double)laborSubTotal, BorderStyle = ExcelLineStyle.Hair });
-        }
-
-        // 行40-41の設定
-        private void SetupRows40And41(IWorksheet worksheet, decimal partsSubTotal, decimal laborSubTotal)
-        {
-            // 行40: 非課税項目
-            MergeAndSetCell(worksheet, "A40:F40", "非課税項目", style =>
-            {
-                style.Font.Bold = true;
-                style.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-                style.Color = HeaderColor;
-            });
-            SetRangeBorders(worksheet, "A40:F40", ExcelLineStyle.Hair);
-
-            // 行41: 小計
-            MergeAndSetCell(worksheet, "H41:J41", "小計");
-            SetRangeBorders(worksheet, "H41:J41", ExcelLineStyle.Hair);
-            
-            SetMergedNumberCells(worksheet,
-                new MergedNumberCell { Range = "K41:L41", Value = (double)partsSubTotal, BorderStyle = ExcelLineStyle.Hair },
-                new MergedNumberCell { Range = "M41:N41", Value = (double)laborSubTotal, BorderStyle = ExcelLineStyle.Hair });
-        }
-        
-        // デフォルトフォントを適用（個別設定は保持）
-        private void ApplyDefaultFont(IWorksheet worksheet)
-        {
-            if (worksheet.UsedRange != null)
-            {
-                // 使用範囲のすべてのセルに対してフォントを設定
-                var usedRange = worksheet.UsedRange;
-                for (int row = usedRange.Row; row <= usedRange.LastRow; row++)
-                {
-                    for (int col = usedRange.Column; col <= usedRange.LastColumn; col++)
-                    {
-                        var cell = worksheet.Range[row, col];
-                        // フォント名を游ゴシックに設定
-                        cell.CellStyle.Font.FontName = "游ゴシック";
-                        
-                        // フォントサイズが設定されていない場合のみ9ptに設定
-                        if (cell.CellStyle.Font.Size == 11) // Excelのデフォルトサイズ
-                        {
-                            cell.CellStyle.Font.Size = 9;
-                        }
-                        
-                        // すべてのセルをBoldにする
-                        cell.CellStyle.Font.Bold = true;
-                    }
-                }
-            }
+            // 合計
+            worksheet.Range["K45"].Formula = "=K42+K43+K44";
         }
     }
 }
