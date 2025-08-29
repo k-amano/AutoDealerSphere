@@ -9,7 +9,7 @@ namespace AutoDealerSphere.Server.Services
         Task<Invoice> CreateInvoiceAsync(Invoice invoice);
         Task<bool> UpdateInvoiceAsync(Invoice invoice);
         Task<bool> DeleteInvoiceAsync(int id);
-        Task<string> GenerateInvoiceNumberAsync();
+        Task<string> GenerateInvoiceNumberAsync(int clientId);
         Task<byte[]> ExportToExcelAsync(int invoiceId);
         
         // 明細CRUD操作
