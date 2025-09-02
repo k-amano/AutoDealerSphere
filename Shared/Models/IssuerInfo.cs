@@ -40,6 +40,10 @@ namespace AutoDealerSphere.Shared.Models
         [StringLength(20, ErrorMessage = "FAX番号は20文字以内で入力してください")]
         public string FaxNumber { get; set; }
 
+        [Display(Name = "インボイス番号")]
+        [StringLength(50, ErrorMessage = "インボイス番号は50文字以内で入力してください")]
+        public string InvoiceNumber { get; set; }
+
         // 口座1
         [Display(Name = "口座1銀行名")]
         [Required(ErrorMessage = "口座1銀行名は必須です")]

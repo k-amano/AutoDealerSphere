@@ -491,6 +491,7 @@ namespace AutoDealerSphere.Server.Services
                             Name TEXT NOT NULL,
                             PhoneNumber TEXT NOT NULL,
                             FaxNumber TEXT,
+                            InvoiceNumber TEXT,
                             Bank1Name TEXT,
                             Bank1BranchName TEXT,
                             Bank1AccountType TEXT,
@@ -503,6 +504,18 @@ namespace AutoDealerSphere.Server.Services
                             Bank2AccountHolder TEXT
                         )
                     ");
+                
+                // 既存のテーブルにInvoiceNumberカラムを追加（存在しない場合）
+                try
+                {
+                    _context.Database.ExecuteSqlRaw(@"
+                        ALTER TABLE IssuerInfos ADD COLUMN InvoiceNumber TEXT
+                    ");
+                }
+                catch
+                {
+                    // カラムが既に存在する場合はエラーを無視
+                }
             }
             catch (Exception ex)
             {
