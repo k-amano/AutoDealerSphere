@@ -245,8 +245,8 @@ namespace AutoDealerSphere.Server.Services
         // テンプレートにデータを投入
         private async Task PopulateTemplateWithDataAsync(IWorksheet worksheet, Invoice invoice, IssuerInfo issuerInfo)
         {
-            // 作成日
-            PopulateCreationDate(worksheet);
+            // 請求書情報（L2:請求書番号、L3:請求書発行日、L4:インボイス番号）
+            PopulateInvoiceInfo(worksheet, invoice, issuerInfo);
             
             // 発行者情報
             PopulateIssuerInfo(worksheet, issuerInfo);
@@ -257,7 +257,7 @@ namespace AutoDealerSphere.Server.Services
             // 合計金額
             PopulateTotalAmount(worksheet, invoice.Total);
             
-            // 振込先口座情報 (H10, H11)
+            // 振込先口座情報
             PopulateBankAccountInfo(worksheet, issuerInfo);
             
             // 車両情報
@@ -273,100 +273,107 @@ namespace AutoDealerSphere.Server.Services
             PopulateTotals(worksheet, invoice);
         }
 
-        // 作成日を設定
-        private void PopulateCreationDate(IWorksheet worksheet)
+        // 請求書情報を設定（L2:請求書番号、L3:請求書発行日、L4:インボイス番号）
+        private void PopulateInvoiceInfo(IWorksheet worksheet, Invoice invoice, IssuerInfo issuerInfo)
         {
-            worksheet.Range["L2"].Text = $"令和{DateTime.Now.Year - 2018}年{DateTime.Now.Month}月{DateTime.Now.Day}日";
+            // L2: 請求書番号
+            worksheet.Range["L2"].Text = invoice.InvoiceNumber ?? "";
+            
+            // L3: 請求書発行日
+            worksheet.Range["L3"].Text = invoice.InvoiceDate.ToString("yyyy/MM/dd");
+            
+            // L4: インボイス番号
+            worksheet.Range["L4"].Text = issuerInfo?.InvoiceNumber ?? "";
         }
 
-        // 発行者情報を設定
+        // 発行者情報を設定（J3からの行が2行下にずれる）
         private void PopulateIssuerInfo(IWorksheet worksheet, IssuerInfo issuerInfo)
         {
             if (issuerInfo == null) return;
             
-            worksheet.Range["J3"].Text = issuerInfo.PostalCode ?? "";
-            worksheet.Range["J4"].Text = issuerInfo.Address ?? "";
-            worksheet.Range["J5"].Text = issuerInfo.CompanyName ?? "";
-            worksheet.Range["J6"].Text = $"{issuerInfo.Position ?? ""}　{issuerInfo.Name ?? ""}";
-            worksheet.Range["J8"].Text = $"TEL {issuerInfo.PhoneNumber ?? ""}";
-            worksheet.Range["L8"].Text = $"FAX {issuerInfo.FaxNumber ?? ""}";
+            worksheet.Range["J5"].Text = issuerInfo.PostalCode ?? "";
+            worksheet.Range["J6"].Text = issuerInfo.Address ?? "";
+            worksheet.Range["J7"].Text = issuerInfo.CompanyName ?? "";
+            worksheet.Range["J8"].Text = $"{issuerInfo.Position ?? ""}　{issuerInfo.Name ?? ""}";
+            worksheet.Range["J10"].Text = $"TEL {issuerInfo.PhoneNumber ?? ""}";
+            worksheet.Range["L10"].Text = $"FAX {issuerInfo.FaxNumber ?? ""}";
         }
 
-        // 請求先情報を設定
+        // 請求先情報を設定（2行下にずれる）
         private void PopulateClientInfo(IWorksheet worksheet, AutoDealerSphere.Shared.Models.Client client)
         {
             if (client == null) return;
             
-            worksheet.Range["B4"].Text = client.Zip ?? "";
-            worksheet.Range["B5"].Text = client.Address ?? "";
-            worksheet.Range["B7"].Text = client.Name ?? "";
+            worksheet.Range["B6"].Text = client.Zip ?? "";
+            worksheet.Range["B7"].Text = client.Address ?? "";
+            worksheet.Range["B9"].Text = client.Name ?? "";
         }
 
-        // 合計金額を設定
+        // 合計金額を設定（2行下にずれる）
         private void PopulateTotalAmount(IWorksheet worksheet, decimal total)
         {
-            worksheet.Range["B10"].Text = $"¥{total:N0}";
+            worksheet.Range["B12"].Text = $"¥{total:N0}";
         }
 
-        // 振込先口座情報を設定 (H10, H11)
+        // 振込先口座情報を設定（2行下にずれる）
         private void PopulateBankAccountInfo(IWorksheet worksheet, IssuerInfo issuerInfo)
         {
             if (issuerInfo == null) return;
             
-            // 第1銀行口座 (H10)
+            // 第1銀行口座 (H12)
             if (!string.IsNullOrEmpty(issuerInfo.Bank1Name))
             {
                 var bank1Info = $"{issuerInfo.Bank1Name ?? ""} {issuerInfo.Bank1BranchName ?? ""} {issuerInfo.Bank1AccountType ?? ""} {issuerInfo.Bank1AccountNumber ?? ""} {issuerInfo.Bank1AccountHolder ?? ""}".Trim();
-                worksheet.Range["H10"].Text = bank1Info;
+                worksheet.Range["H12"].Text = bank1Info;
             }
             
-            // 第2銀行口座 (H11)
+            // 第2銀行口座 (H13)
             if (!string.IsNullOrEmpty(issuerInfo.Bank2Name))
             {
                 var bank2Info = $"{issuerInfo.Bank2Name ?? ""} {issuerInfo.Bank2BranchName ?? ""} {issuerInfo.Bank2AccountType ?? ""} {issuerInfo.Bank2AccountNumber ?? ""} {issuerInfo.Bank2AccountHolder ?? ""}".Trim();
-                worksheet.Range["H11"].Text = bank2Info;
+                worksheet.Range["H13"].Text = bank2Info;
             }
         }
 
-        // 車両情報を設定
+        // 車両情報を設定（2行下にずれる）
         private void PopulateVehicleInfo(IWorksheet worksheet, Vehicle vehicle, decimal? mileage)
         {
             if (vehicle == null) return;
             
             // 車両番号
             string licensePlate = FormatLicensePlate(vehicle);
-            worksheet.Range["B13"].Text = licensePlate;
+            worksheet.Range["B15"].Text = licensePlate;
             
             // 車名
-            worksheet.Range["E13"].Text = vehicle.VehicleName ?? "";
+            worksheet.Range["E15"].Text = vehicle.VehicleName ?? "";
             
             // 車体番号
-            worksheet.Range["G13"].Text = vehicle.ChassisNumber ?? "";
+            worksheet.Range["G15"].Text = vehicle.ChassisNumber ?? "";
             
             // 初年度登録
-            worksheet.Range["L13"].Text = vehicle.FirstRegistrationDate?.ToString("yyyy/MM/dd") ?? "";
+            worksheet.Range["L15"].Text = vehicle.FirstRegistrationDate?.ToString("yyyy/MM/dd") ?? "";
             
             // 車検満了日
-            worksheet.Range["B15"].Text = vehicle.InspectionExpiryDate?.ToString("yyyy/MM/dd") ?? "";
+            worksheet.Range["B17"].Text = vehicle.InspectionExpiryDate?.ToString("yyyy/MM/dd") ?? "";
             
             // 形式
-            worksheet.Range["G15"].Text = vehicle.VehicleModel ?? "";
+            worksheet.Range["G17"].Text = vehicle.VehicleModel ?? "";
             
             // 走行距離
-            worksheet.Range["L15"].Text = mileage.HasValue ? $"{mileage:N0} km" : "";
+            worksheet.Range["L17"].Text = mileage.HasValue ? $"{mileage:N0} km" : "";
         }
 
-        // 請求明細を設定
+        // 請求明細を設定（明細行は2行下に移動、1行減らす）
         private void PopulateInvoiceDetails(IWorksheet worksheet, Invoice invoice)
         {
-            int row = 18;
+            int row = 20;  // 18から2行下に移動
             var taxableDetails = invoice.InvoiceDetails
                 .Where(d => d.Type != "法定費用")
                 .OrderBy(d => d.DisplayOrder);
 
             foreach (var detail in taxableDetails)
             {
-                if (row > 38) break;
+                if (row > 39) break;  // 38から1行下に移動（明細行が1行減る）
                 
                 worksheet.Range[$"A{row}"].Text = detail.ItemName ?? "";
                 worksheet.Range[$"F{row}"].Text = detail.RepairMethod ?? "";
@@ -378,17 +385,17 @@ namespace AutoDealerSphere.Server.Services
             }
         }
 
-        // 非課税項目を設定
+        // 非課税項目を設定（1行下に移動）
         private void PopulateNonTaxableItems(IWorksheet worksheet, Invoice invoice)
         {
-            int row = 41;
+            int row = 42;  // 41から1行下に移動
             var nonTaxableItems = invoice.InvoiceDetails
                 .Where(d => d.Type == "法定費用")
                 .OrderBy(d => d.DisplayOrder);
 
             foreach (var item in nonTaxableItems)
             {
-                if (row > 45) break;
+                if (row > 46) break;  // 45から1行下に移動
                 
                 worksheet.Range[$"A{row}"].Text = item.ItemName ?? "";
                 worksheet.Range[$"F{row}"].Number = (double)item.UnitPrice;
@@ -407,26 +414,26 @@ namespace AutoDealerSphere.Server.Services
             decimal taxableTotal = partsSubTotal + laborSubTotal;
             int tax = (int)(taxableTotal * 0.1m);
 
-            // ページ小計
-            worksheet.Range["K39"].Number = (double)partsSubTotal;
-            worksheet.Range["M39"].Number = (double)laborSubTotal;
+            // ページ小計（1行下に移動）
+            worksheet.Range["K40"].Number = (double)partsSubTotal;
+            worksheet.Range["M40"].Number = (double)laborSubTotal;
             
-            // 小計
-            worksheet.Range["K41"].Number = (double)partsSubTotal;
-            worksheet.Range["M41"].Number = (double)laborSubTotal;
+            // 小計（1行下に移動）
+            worksheet.Range["K42"].Number = (double)partsSubTotal;
+            worksheet.Range["M42"].Number = (double)laborSubTotal;
             
-            // 課税額計
-            worksheet.Range["K42"].Number = (double)taxableTotal;
+            // 課税額計（1行下に移動）
+            worksheet.Range["K43"].Number = (double)taxableTotal;
             
-            // 消費税
-            worksheet.Range["K43"].Number = tax;
+            // 消費税（1行下に移動）
+            worksheet.Range["K44"].Number = tax;
             
-            // 非課税額計
-            worksheet.Range["F46"].Number = (double)nonTaxableTotal;
-            worksheet.Range["K44"].Formula = "=F46";
+            // 非課税額計（1行下に移動）
+            worksheet.Range["F47"].Number = (double)nonTaxableTotal;
+            worksheet.Range["K45"].Formula = "=F47";
             
-            // 合計
-            worksheet.Range["K45"].Formula = "=K42+K43+K44";
+            // 合計（1行下に移動）
+            worksheet.Range["K46"].Formula = "=K43+K44+K45";
         }
     }
 }

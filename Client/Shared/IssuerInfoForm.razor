@@ -47,6 +47,11 @@
 				<SfTextBox @bind-Value="Item.FaxNumber" Placeholder="FAX番号"></SfTextBox>
 				<ValidationMessage For="@(() => Item.FaxNumber)" />
 			</div>
+			<div class="form-row">
+				<label>インボイス番号</label>
+				<SfTextBox @bind-Value="Item.InvoiceNumber" Placeholder="インボイス番号"></SfTextBox>
+				<ValidationMessage For="@(() => Item.InvoiceNumber)" />
+			</div>
 			</div>
 
 			<h4>口座情報1</h4>
