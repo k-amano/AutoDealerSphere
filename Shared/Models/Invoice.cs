@@ -16,6 +16,9 @@ namespace AutoDealerSphere.Shared.Models
         [StringLength(20, ErrorMessage = "請求書番号は20文字以内で入力してください。")]
         public string InvoiceNumber { get; set; } = string.Empty;
 
+        [Range(1, 99, ErrorMessage = "枝番は1～99の範囲で入力してください。")]
+        public int Subnumber { get; set; } = 1;
+
         [Required(ErrorMessage = "顧客は必須です。")]
         [Range(1, int.MaxValue, ErrorMessage = "顧客を選択してください。")]
         public int ClientId { get; set; }
@@ -23,9 +26,7 @@ namespace AutoDealerSphere.Shared.Models
         [ForeignKey("ClientId")]
         public Client? Client { get; set; }
 
-        [Required(ErrorMessage = "車両は必須です。")]
-        [Range(1, int.MaxValue, ErrorMessage = "車両を選択してください。")]
-        public int VehicleId { get; set; }
+        public int? VehicleId { get; set; }
 
         [ForeignKey("VehicleId")]
         public Vehicle? Vehicle { get; set; }

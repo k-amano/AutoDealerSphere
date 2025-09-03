@@ -91,7 +91,7 @@ namespace AutoDealerSphere.Server.Services
 			{
 				b.HasKey(e => e.Id);
 				b.Property(e => e.Id).UseIdentityColumn();
-				b.HasIndex(e => e.InvoiceNumber).IsUnique();
+				b.HasIndex(e => new { e.InvoiceNumber, e.Subnumber }).IsUnique();
 				
 				b.HasOne(i => i.Client)
 					.WithMany()
@@ -101,7 +101,7 @@ namespace AutoDealerSphere.Server.Services
 				b.HasOne(i => i.Vehicle)
 					.WithMany()
 					.HasForeignKey(i => i.VehicleId)
-					.OnDelete(DeleteBehavior.Restrict);
+					.OnDelete(DeleteBehavior.SetNull);
 			});
 
 			modelBuilder.Entity<InvoiceDetail>(b =>
