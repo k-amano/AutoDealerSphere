@@ -196,6 +196,9 @@ namespace AutoDealerSphere.Server.Services
                 throw new InvalidOperationException($"Invoice with ID {invoiceId} not found.");
             }
 
+            // 同一請求書番号の全ての請求書を取得
+            var relatedInvoices = await GetRelatedInvoicesAsync(invoice.InvoiceNumber);
+            
             // 発行者情報を取得
             var issuerInfo = await _issuerInfoService.GetIssuerInfoAsync();
 
@@ -212,10 +215,26 @@ namespace AutoDealerSphere.Server.Services
                 }
 
                 IWorkbook workbook = application.Workbooks.Open(templatePath);
-                IWorksheet worksheet = workbook.Worksheets[0];
+                
+                // 複数の請求書がある場合は、追加のシートを作成
+                for (int i = 0; i < relatedInvoices.Count; i++)
+                {
+                    IWorksheet worksheet;
+                    if (i == 0)
+                    {
+                        // 最初のシートは既存のものを使用
+                        worksheet = workbook.Worksheets[0];
+                    }
+                    else
+                    {
+                        // 2枚目以降は最初のシートをコピー
+                        worksheet = workbook.Worksheets.AddCopyAfter(workbook.Worksheets[0], workbook.Worksheets[0]);
+                        worksheet.Name = $"請求書{i + 1}";
+                    }
 
-                // テンプレートにデータを投入
-                await PopulateTemplateWithDataAsync(worksheet, invoice, issuerInfo);
+                    // テンプレートにデータを投入
+                    await PopulateTemplateWithDataAsync(worksheet, relatedInvoices[i], issuerInfo, i == 0);
+                }
 
                 // MemoryStreamに保存
                 using (MemoryStream stream = new MemoryStream())
@@ -224,6 +243,16 @@ namespace AutoDealerSphere.Server.Services
                     return stream.ToArray();
                 }
             }
+        }
+
+        // 同一請求書番号の全ての請求書を取得
+        private async Task<List<Invoice>> GetRelatedInvoicesAsync(string invoiceNumber)
+        {
+            var allInvoices = await _invoiceService.GetAllInvoicesAsync();
+            return allInvoices
+                .Where(i => i.InvoiceNumber == invoiceNumber)
+                .OrderBy(i => i.Subnumber)
+                .ToList();
         }
 
 
@@ -243,7 +272,7 @@ namespace AutoDealerSphere.Server.Services
 
         
         // テンプレートにデータを投入
-        private async Task PopulateTemplateWithDataAsync(IWorksheet worksheet, Invoice invoice, IssuerInfo issuerInfo)
+        private async Task PopulateTemplateWithDataAsync(IWorksheet worksheet, Invoice invoice, IssuerInfo issuerInfo, bool isFirstSheet = true)
         {
             // 請求書情報（L2:請求書番号、L3:請求書発行日、L4:インボイス番号）
             PopulateInvoiceInfo(worksheet, invoice, issuerInfo);
@@ -254,8 +283,19 @@ namespace AutoDealerSphere.Server.Services
             // 請求先情報
             PopulateClientInfo(worksheet, invoice.Client);
             
-            // 合計金額
-            PopulateTotalAmount(worksheet, invoice.Total);
+            // 合計金額（最初のシートのみ表示）
+            if (isFirstSheet)
+            {
+                // 同一請求書番号の全ての合計を計算
+                var relatedInvoices = await GetRelatedInvoicesAsync(invoice.InvoiceNumber);
+                var totalAmount = relatedInvoices.Sum(i => i.Total);
+                PopulateTotalAmount(worksheet, totalAmount);
+            }
+            else
+            {
+                // 2枚目以降は合計を表示しない
+                worksheet.Range["B12"].Text = "";
+            }
             
             // 振込先口座情報
             PopulateBankAccountInfo(worksheet, issuerInfo);
@@ -269,15 +309,25 @@ namespace AutoDealerSphere.Server.Services
             // 非課税項目
             PopulateNonTaxableItems(worksheet, invoice);
             
-            // 合計計算
-            PopulateTotals(worksheet, invoice);
+            // 合計計算（最初のシートのみ）
+            if (isFirstSheet)
+            {
+                // 同一請求書番号の全ての請求書の合計を計算
+                var relatedInvoices = await GetRelatedInvoicesAsync(invoice.InvoiceNumber);
+                PopulateAggregatedTotals(worksheet, relatedInvoices);
+            }
+            else
+            {
+                PopulateTotals(worksheet, invoice);
+            }
         }
 
         // 請求書情報を設定（L2:請求書番号、L3:請求書発行日、L4:インボイス番号）
         private void PopulateInvoiceInfo(IWorksheet worksheet, Invoice invoice, IssuerInfo issuerInfo)
         {
-            // L2: 請求書番号
-            worksheet.Range["L2"].Text = invoice.InvoiceNumber ?? "";
+            // L2: 請求書番号（複数車両の場合は{InvoiceNumber}-{Subnumber}の形式）
+            var displayInvoiceNumber = invoice.Subnumber > 1 ? $"{invoice.InvoiceNumber}-{invoice.Subnumber}" : invoice.InvoiceNumber;
+            worksheet.Range["L2"].Text = displayInvoiceNumber ?? "";
             
             // L3: 請求書発行日
             worksheet.Range["L3"].Text = invoice.InvoiceDate.ToString("yyyy/MM/dd");
@@ -430,6 +480,39 @@ namespace AutoDealerSphere.Server.Services
             
             // 非課税額計（1行下に移動）
             worksheet.Range["F47"].Number = (double)nonTaxableTotal;
+            worksheet.Range["K45"].Formula = "=F47";
+            
+            // 合計（1行下に移動）
+            worksheet.Range["K46"].Formula = "=K43+K44+K45";
+        }
+
+        // 複数請求書の集計合計を設定（最初のシートのみ）
+        private void PopulateAggregatedTotals(IWorksheet worksheet, List<Invoice> invoices)
+        {
+            var allTaxableDetails = invoices.SelectMany(i => i.InvoiceDetails.Where(d => d.Type != "法定費用"));
+            var allPartsSubTotal = allTaxableDetails.Sum(d => d.Quantity * d.UnitPrice);
+            var allLaborSubTotal = allTaxableDetails.Sum(d => d.LaborCost);
+            var allNonTaxableTotal = invoices.SelectMany(i => i.InvoiceDetails.Where(d => d.Type == "法定費用")).Sum(d => d.UnitPrice);
+            
+            decimal allTaxableTotal = allPartsSubTotal + allLaborSubTotal;
+            int allTax = (int)(allTaxableTotal * 0.1m);
+
+            // ページ小計（1行下に移動）
+            worksheet.Range["K40"].Number = (double)allPartsSubTotal;
+            worksheet.Range["M40"].Number = (double)allLaborSubTotal;
+            
+            // 小計（1行下に移動）
+            worksheet.Range["K42"].Number = (double)allPartsSubTotal;
+            worksheet.Range["M42"].Number = (double)allLaborSubTotal;
+            
+            // 課税額計（1行下に移動）
+            worksheet.Range["K43"].Number = (double)allTaxableTotal;
+            
+            // 消費税（1行下に移動）
+            worksheet.Range["K44"].Number = allTax;
+            
+            // 非課税額計（1行下に移動）
+            worksheet.Range["F47"].Number = (double)allNonTaxableTotal;
             worksheet.Range["K45"].Formula = "=F47";
             
             // 合計（1行下に移動）

@@ -40,7 +40,9 @@ namespace AutoDealerSphere.Server.Services
         public async Task<Invoice> CreateInvoiceAsync(Invoice invoice)
         {
             using var context = _contextFactory.CreateDbContext();
-            invoice.InvoiceNumber = await GenerateInvoiceNumberAsync(invoice.ClientId);
+            var (invoiceNumber, subnumber) = await GenerateInvoiceNumberAndSubnumberAsync(invoice.ClientId, invoice.InvoiceNumber);
+            invoice.InvoiceNumber = invoiceNumber;
+            invoice.Subnumber = subnumber;
             invoice.CreatedAt = DateTime.Now;
             invoice.UpdatedAt = DateTime.Now;
             
@@ -97,6 +99,25 @@ namespace AutoDealerSphere.Server.Services
 
         public async Task<string> GenerateInvoiceNumberAsync(int clientId)
         {
+            var (invoiceNumber, _) = await GenerateInvoiceNumberAndSubnumberAsync(clientId, null);
+            return invoiceNumber;
+        }
+
+        public async Task<(string invoiceNumber, int subnumber)> GenerateInvoiceNumberAndSubnumberAsync(int clientId, string? existingInvoiceNumber = null)
+        {
+            using var context = _contextFactory.CreateDbContext();
+
+            // 既存の請求書番号が指定されている場合（複数車両の追加）
+            if (!string.IsNullOrEmpty(existingInvoiceNumber))
+            {
+                var lastSubnumber = await context.Invoices
+                    .Where(i => i.InvoiceNumber == existingInvoiceNumber)
+                    .MaxAsync(i => (int?)i.Subnumber) ?? 0;
+                
+                return (existingInvoiceNumber, lastSubnumber + 1);
+            }
+
+            // 新規請求書番号を生成
             var year = DateTime.Now.Year % 100;  // 2桁の年 (yy)
             var month = DateTime.Now.Month;      // 月 (mm)
             var yearMonth = $"{year:D2}{month:D2}";      // yymm形式
@@ -104,7 +125,6 @@ namespace AutoDealerSphere.Server.Services
             
             var prefix = $"{yearMonth}{clientIdPart}";   // {yymm}{ClientId}
 
-            using var context = _contextFactory.CreateDbContext();
             var lastInvoice = await context.Invoices
                 .Where(i => i.InvoiceNumber.StartsWith(prefix))
                 .OrderByDescending(i => i.InvoiceNumber)
@@ -122,7 +142,8 @@ namespace AutoDealerSphere.Server.Services
             }
 
             // {yymm}{ClientId 4桁0埋め}{連番 2桁0埋め}
-            return $"{prefix}{nextSequence:D2}";
+            var newInvoiceNumber = $"{prefix}{nextSequence:D2}";
+            return (newInvoiceNumber, 1);
         }
 
         public async Task<byte[]> ExportToExcelAsync(int invoiceId)
