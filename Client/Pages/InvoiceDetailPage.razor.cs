@@ -92,7 +92,7 @@ namespace AutoDealerSphere.Client.Pages
         {
             if (_statutoryFeeDialog != null && _invoice != null)
             {
-                await _statutoryFeeDialog.Open(InvoiceId, _invoice.VehicleId);
+                await _statutoryFeeDialog.Open(InvoiceId, _invoice.VehicleId ?? 0);
             }
         }
 
@@ -240,11 +240,13 @@ namespace AutoDealerSphere.Client.Pages
         }
 
         // UI表示用のプロパティ
-        protected string InvoiceNumberDisplay => _invoice?.InvoiceNumber ?? string.Empty;
+        protected string InvoiceNumberDisplay => _invoice != null && _invoice.Subnumber > 1 
+            ? $"{_invoice.InvoiceNumber}-{_invoice.Subnumber}" 
+            : _invoice?.InvoiceNumber ?? string.Empty;
         protected string ClientNameDisplay => _invoice?.Client?.Name ?? string.Empty;
         protected string VehicleDisplay => _invoice?.Vehicle != null 
             ? $"{_invoice.Vehicle.VehicleName} ({_invoice.Vehicle.LicensePlateNumber})"
-            : string.Empty;
+            : "車両なし";
         protected string InvoiceDateDisplay => _invoice?.InvoiceDate.ToString("yyyy/MM/dd") ?? string.Empty;
         protected string WorkCompletedDateDisplay => _invoice?.WorkCompletedDate.ToString("yyyy/MM/dd") ?? string.Empty;
         protected string NextInspectionDateDisplay => _invoice?.NextInspectionDate?.ToString("yyyy/MM/dd") ?? string.Empty;
