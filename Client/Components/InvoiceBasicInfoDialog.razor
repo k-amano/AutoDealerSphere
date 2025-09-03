@@ -38,11 +38,11 @@
                     </div>
                     
                     <div class="form-row">
-                        <label class="required">車両</label>
-                        <SfDropDownList TValue="int" TItem="Vehicle" 
+                        <label>車両</label>
+                        <SfDropDownList TValue="int?" TItem="Vehicle" 
                             @bind-Value="@_model.VehicleId" 
                             DataSource="@_vehicles"
-                            Placeholder="車両を選択"
+                            Placeholder="車両を選択（任意）"
                             Enabled="@(_vehicles != null && _vehicles.Any())">
                             <DropDownListFieldSettings Value="Id" Text="VehicleName"></DropDownListFieldSettings>
                         </SfDropDownList>
@@ -170,7 +170,7 @@
         if (args.Value > 0)
         {
             await LoadVehicles(args.Value);
-            _model!.VehicleId = 0;
+            _model!.VehicleId = null;
         }
     }
 
