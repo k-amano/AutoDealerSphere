@@ -12,7 +12,6 @@ namespace AutoDealerSphere.Shared.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "請求書番号は必須です。")]
         [StringLength(20, ErrorMessage = "請求書番号は20文字以内で入力してください。")]
         public string InvoiceNumber { get; set; } = string.Empty;
 
