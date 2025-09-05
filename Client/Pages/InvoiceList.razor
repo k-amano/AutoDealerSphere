@@ -221,7 +221,7 @@ else
 
     private string GenerateInvoiceNumber()
     {
-        return "自動生成";
+        return string.Empty; // 空文字列を返してサーバー側で自動生成
     }
 
     private async Task OnBasicInfoSaved(Invoice invoice)
