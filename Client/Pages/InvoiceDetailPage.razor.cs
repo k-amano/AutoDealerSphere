@@ -118,11 +118,27 @@ namespace AutoDealerSphere.Client.Pages
 
         protected async Task OnBasicInfoSaved(Invoice invoice)
         {
-            // 更新のみサポート（新規作成は請求書一覧画面から行う）
-            var response = await Http.PutAsJsonAsync($"api/Invoices/{InvoiceId}", invoice);
-            if (response.IsSuccessStatusCode)
+            if (invoice.Id == 0)
             {
-                await LoadInvoice();
+                // 新規作成（請求書追加モード）
+                var response = await Http.PostAsJsonAsync("api/Invoices", invoice);
+                if (response.IsSuccessStatusCode)
+                {
+                    var created = await response.Content.ReadFromJsonAsync<Invoice>();
+                    if (created != null)
+                    {
+                        NavigationManager.NavigateTo($"/invoice/detail/{created.Id}");
+                    }
+                }
+            }
+            else
+            {
+                // 更新モード
+                var response = await Http.PutAsJsonAsync($"api/Invoices/{InvoiceId}", invoice);
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadInvoice();
+                }
             }
         }
 
@@ -239,8 +255,32 @@ namespace AutoDealerSphere.Client.Pages
             NavigationManager.NavigateTo("/invoicelist");
         }
 
+        protected async Task OpenAddInvoiceDialog()
+        {
+            if (_basicInfoDialog != null && _invoice != null)
+            {
+                // 新しい請求書を作成し、顧客情報を事前設定
+                var newInvoice = new Invoice
+                {
+                    InvoiceNumber = _invoice.InvoiceNumber, // 同じ請求書番号を使用
+                    ClientId = _invoice.ClientId,
+                    VehicleId = null, // 車両は未選択
+                    InvoiceDate = DateTime.Now,
+                    WorkCompletedDate = DateTime.Now
+                };
+                
+                // 顧客情報を読み込んで設定
+                if (_invoice.Client != null)
+                {
+                    newInvoice.Client = _invoice.Client;
+                }
+                
+                await _basicInfoDialog.Open(newInvoice, true); // 第二引数でAddMode=trueを指定
+            }
+        }
+
         // UI表示用のプロパティ
-        protected string InvoiceNumberDisplay => _invoice != null && _invoice.Subnumber > 1 
+        protected string InvoiceNumberDisplay => _invoice?.Subnumber > 1 
             ? $"{_invoice.InvoiceNumber}-{_invoice.Subnumber}" 
             : _invoice?.InvoiceNumber ?? string.Empty;
         protected string ClientNameDisplay => _invoice?.Client?.Name ?? string.Empty;

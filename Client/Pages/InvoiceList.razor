@@ -81,7 +81,10 @@
                 <Template>
                     @{
                         var invoice = (context as Invoice);
-                        <a href="@($"/invoice/detail/{invoice.Id}")" class="grid-link">@invoice.InvoiceNumber</a>
+                        var displayNumber = invoice.Subnumber > 1 
+                            ? $"{invoice.InvoiceNumber}-{invoice.Subnumber}" 
+                            : invoice.InvoiceNumber;
+                        <a href="@($"/invoice/detail/{invoice.Id}")" class="grid-link">@displayNumber</a>
                     }
                 </Template>
             </GridColumn>
