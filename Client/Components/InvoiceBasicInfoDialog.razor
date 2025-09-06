@@ -30,7 +30,8 @@
                             @bind-Value="@_model.ClientId" 
                             DataSource="@_clients"
                             Placeholder="顧客を選択"
-                            AllowFiltering="true">
+                            AllowFiltering="true"
+                            Enabled="@(!_isAddMode)">
                             <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
                             <DropDownListEvents TValue="int" TItem="AutoDealerSphere.Shared.Models.Client" ValueChange="OnClientChanged"></DropDownListEvents>
                         </SfDropDownList>
@@ -129,13 +130,15 @@
     private SfDialog? _dialog;
     private bool _isVisible = false;
     private bool _isNew = false;
+    private bool _isAddMode = false; // 請求書追加モード
     private Invoice? _model;
     private List<AutoDealerSphere.Shared.Models.Client> _clients = new();
     private List<Vehicle> _vehicles = new();
 
-    public async Task Open(Invoice invoice)
+    public async Task Open(Invoice invoice, bool isAddMode = false)
     {
         _isNew = invoice.Id == 0;
+        _isAddMode = isAddMode; // 請求書追加モードを設定
         _model = new Invoice
         {
             Id = invoice.Id,
