@@ -219,6 +219,7 @@ namespace AutoDealerSphere.Server.Services
                 // 複数の請求書がある場合は、追加のシートを作成
                 for (int i = 0; i < relatedInvoices.Count; i++)
                 {
+                    var currentInvoice = relatedInvoices[i];
                     IWorksheet worksheet;
                     if (i == 0)
                     {
@@ -229,11 +230,16 @@ namespace AutoDealerSphere.Server.Services
                     {
                         // 2枚目以降は最初のシートをコピー
                         worksheet = workbook.Worksheets.AddCopyAfter(workbook.Worksheets[0], workbook.Worksheets[0]);
-                        worksheet.Name = $"請求書{i + 1}";
                     }
 
+                    // シート名を{InvoiceNumber}-{Subnumber}形式に設定
+                    var sheetName = currentInvoice.Subnumber > 1 
+                        ? $"{currentInvoice.InvoiceNumber}-{currentInvoice.Subnumber}" 
+                        : currentInvoice.InvoiceNumber;
+                    worksheet.Name = sheetName;
+
                     // テンプレートにデータを投入
-                    await PopulateTemplateWithDataAsync(worksheet, relatedInvoices[i], issuerInfo, i == 0);
+                    await PopulateTemplateWithDataAsync(worksheet, currentInvoice, issuerInfo, i == 0);
                 }
 
                 // MemoryStreamに保存
