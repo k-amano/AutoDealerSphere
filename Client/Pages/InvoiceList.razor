@@ -96,11 +96,11 @@
                     }
                 </Template>
             </GridColumn>
-            <GridColumn HeaderText="車名" Width="20%">
+            <GridColumn HeaderText="車番" Width="20%">
                 <Template>
                     @{
                         var invoice = (context as Invoice);
-                        <span>@(invoice?.Vehicle?.VehicleName ?? "-")</span>
+                        <span>@(invoice?.Vehicle?.LicensePlateNumber ?? "-")</span>
                     }
                 </Template>
             </GridColumn>
