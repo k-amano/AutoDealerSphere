@@ -133,8 +133,22 @@ namespace AutoDealerSphere.Client.Pages
             }
             else
             {
-                // 更新モード
-                var response = await Http.PutAsJsonAsync($"api/Invoices/{InvoiceId}", invoice);
+                // 更新モード - 必要なプロパティのみ更新
+                var updateData = new
+                {
+                    invoice.Id,
+                    invoice.InvoiceNumber,
+                    invoice.Subnumber,
+                    invoice.ClientId,
+                    invoice.VehicleId,
+                    invoice.InvoiceDate,
+                    invoice.WorkCompletedDate,
+                    invoice.NextInspectionDate,
+                    invoice.Mileage,
+                    invoice.Notes,
+                    invoice.TaxRate
+                };
+                var response = await Http.PutAsJsonAsync($"api/Invoices/{InvoiceId}", updateData);
                 if (response.IsSuccessStatusCode)
                 {
                     await LoadInvoice();
