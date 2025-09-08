@@ -197,7 +197,7 @@ namespace AutoDealerSphere.Server.Services
             }
 
             // 同一請求書番号の全ての請求書を取得
-            var relatedInvoices = await GetRelatedInvoicesAsync(invoice.InvoiceNumber);
+            var relatedInvoices = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoice.InvoiceNumber);
             
             // 発行者情報を取得
             var issuerInfo = await _issuerInfoService.GetIssuerInfoAsync();
@@ -251,19 +251,6 @@ namespace AutoDealerSphere.Server.Services
             }
         }
 
-        // 同一請求書番号の全ての請求書を取得
-        private async Task<List<Invoice>> GetRelatedInvoicesAsync(string invoiceNumber)
-        {
-            var allInvoices = await _invoiceService.GetAllInvoicesAsync();
-            return allInvoices
-                .Where(i => i.InvoiceNumber == invoiceNumber)
-                .OrderBy(i => i.Subnumber)
-                .ToList();
-        }
-
-
-
-
         // ライセンスプレートをフォーマット
         private string FormatLicensePlate(Vehicle vehicle)
         {
@@ -293,7 +280,7 @@ namespace AutoDealerSphere.Server.Services
             if (isFirstSheet)
             {
                 // 同一請求書番号の全ての合計を計算
-                var relatedInvoices = await GetRelatedInvoicesAsync(invoice.InvoiceNumber);
+                var relatedInvoices = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoice.InvoiceNumber);
                 var totalAmount = relatedInvoices.Sum(i => i.Total);
                 PopulateTotalAmount(worksheet, totalAmount);
             }
@@ -319,7 +306,7 @@ namespace AutoDealerSphere.Server.Services
             if (isFirstSheet)
             {
                 // 同一請求書番号の全ての請求書の合計を計算
-                var relatedInvoices = await GetRelatedInvoicesAsync(invoice.InvoiceNumber);
+                var relatedInvoices = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoice.InvoiceNumber);
                 PopulateAggregatedTotals(worksheet, relatedInvoices);
             }
             else
@@ -424,7 +411,7 @@ namespace AutoDealerSphere.Server.Services
         {
             int row = 20;  // 18から2行下に移動
             var taxableDetails = invoice.InvoiceDetails
-                .Where(d => d.InvoiceId == invoice.Id && d.Type != "法定費用")
+                .Where(d => d.Type != "法定費用")
                 .OrderBy(d => d.DisplayOrder);
 
             foreach (var detail in taxableDetails)
@@ -446,7 +433,7 @@ namespace AutoDealerSphere.Server.Services
         {
             int row = 42;  // 41から1行下に移動
             var nonTaxableItems = invoice.InvoiceDetails
-                .Where(d => d.InvoiceId == invoice.Id && d.Type == "法定費用")
+                .Where(d => d.Type == "法定費用")
                 .OrderBy(d => d.DisplayOrder);
 
             foreach (var item in nonTaxableItems)
@@ -462,10 +449,10 @@ namespace AutoDealerSphere.Server.Services
         // 合計を設定
         private void PopulateTotals(IWorksheet worksheet, Invoice invoice)
         {
-            var taxableDetails = invoice.InvoiceDetails.Where(d => d.InvoiceId == invoice.Id && d.Type != "法定費用");
+            var taxableDetails = invoice.InvoiceDetails.Where(d => d.Type != "法定費用");
             var partsSubTotal = taxableDetails.Sum(d => d.Quantity * d.UnitPrice);
             var laborSubTotal = taxableDetails.Sum(d => d.LaborCost);
-            var nonTaxableTotal = invoice.InvoiceDetails.Where(d => d.InvoiceId == invoice.Id && d.Type == "法定費用").Sum(d => d.UnitPrice);
+            var nonTaxableTotal = invoice.InvoiceDetails.Where(d => d.Type == "法定費用").Sum(d => d.UnitPrice);
             
             decimal taxableTotal = partsSubTotal + laborSubTotal;
             int tax = (int)(taxableTotal * 0.1m);
