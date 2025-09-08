@@ -228,8 +228,8 @@ namespace AutoDealerSphere.Server.Services
                     }
                     else
                     {
-                        // 2枚目以降は最初のシートをコピー
-                        worksheet = workbook.Worksheets.AddCopyAfter(workbook.Worksheets[0], workbook.Worksheets[0]);
+                        // 2枚目以降は最後のシートの後にコピー
+                        worksheet = workbook.Worksheets.AddCopyAfter(workbook.Worksheets[0], workbook.Worksheets[workbook.Worksheets.Count - 1]);
                     }
 
                     // シート名を{InvoiceNumber}-{Subnumber}形式に設定
@@ -424,7 +424,7 @@ namespace AutoDealerSphere.Server.Services
         {
             int row = 20;  // 18から2行下に移動
             var taxableDetails = invoice.InvoiceDetails
-                .Where(d => d.Type != "法定費用")
+                .Where(d => d.InvoiceId == invoice.Id && d.Type != "法定費用")
                 .OrderBy(d => d.DisplayOrder);
 
             foreach (var detail in taxableDetails)
@@ -446,7 +446,7 @@ namespace AutoDealerSphere.Server.Services
         {
             int row = 42;  // 41から1行下に移動
             var nonTaxableItems = invoice.InvoiceDetails
-                .Where(d => d.Type == "法定費用")
+                .Where(d => d.InvoiceId == invoice.Id && d.Type == "法定費用")
                 .OrderBy(d => d.DisplayOrder);
 
             foreach (var item in nonTaxableItems)
@@ -462,10 +462,10 @@ namespace AutoDealerSphere.Server.Services
         // 合計を設定
         private void PopulateTotals(IWorksheet worksheet, Invoice invoice)
         {
-            var taxableDetails = invoice.InvoiceDetails.Where(d => d.Type != "法定費用");
+            var taxableDetails = invoice.InvoiceDetails.Where(d => d.InvoiceId == invoice.Id && d.Type != "法定費用");
             var partsSubTotal = taxableDetails.Sum(d => d.Quantity * d.UnitPrice);
             var laborSubTotal = taxableDetails.Sum(d => d.LaborCost);
-            var nonTaxableTotal = invoice.InvoiceDetails.Where(d => d.Type == "法定費用").Sum(d => d.UnitPrice);
+            var nonTaxableTotal = invoice.InvoiceDetails.Where(d => d.InvoiceId == invoice.Id && d.Type == "法定費用").Sum(d => d.UnitPrice);
             
             decimal taxableTotal = partsSubTotal + laborSubTotal;
             int tax = (int)(taxableTotal * 0.1m);
