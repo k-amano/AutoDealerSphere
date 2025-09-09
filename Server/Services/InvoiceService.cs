@@ -153,6 +153,31 @@ namespace AutoDealerSphere.Server.Services
             return await excelExportService.ExportInvoiceToExcelAsync(invoiceId);
         }
 
+        public async Task<List<Invoice>> GetInvoicesByInvoiceNumberAsync(string invoiceNumber)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            
+            // まず請求書番号で該当するInvoiceのIdを取得
+            var invoiceIds = await context.Invoices
+                .Where(i => i.InvoiceNumber == invoiceNumber)
+                .Select(i => i.Id)
+                .ToListAsync();
+            
+            // 各InvoiceIdに対して個別にクエリを実行し、その Invoice 固有の InvoiceDetails のみをロード
+            var invoices = new List<Invoice>();
+            foreach (var invoiceId in invoiceIds.OrderBy(id => id))
+            {
+                var invoice = await context.Invoices
+                    .Include(i => i.Client)
+                    .Include(i => i.Vehicle)
+                    .Include(i => i.InvoiceDetails.Where(d => d.InvoiceId == invoiceId))
+                    .FirstAsync(i => i.Id == invoiceId);
+                invoices.Add(invoice);
+            }
+            
+            return invoices.OrderBy(i => i.Subnumber).ToList();
+        }
+
         private void CalculateInvoiceTotals(Invoice invoice)
         {
             decimal taxableSubTotal = 0;
