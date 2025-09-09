@@ -153,7 +153,7 @@ namespace AutoDealerSphere.Server.Services
             return await excelExportService.ExportInvoiceToExcelAsync(invoiceId);
         }
 
-        public async Task<List<Invoice>> GetInvoicesByInvoiceNumberAsync(string invoiceNumber)
+        public async Task<Dictionary<int, Invoice>> GetInvoicesByInvoiceNumberAsync(string invoiceNumber)
         {
             using var context = _contextFactory.CreateDbContext();
             
@@ -164,7 +164,7 @@ namespace AutoDealerSphere.Server.Services
                 .ToListAsync();
             
             // 各InvoiceIdに対して個別にクエリを実行し、その Invoice 固有の InvoiceDetails のみをロード
-            var invoices = new List<Invoice>();
+            var invoicesDictionary = new Dictionary<int, Invoice>();
             foreach (var invoiceId in invoiceIds.OrderBy(id => id))
             {
                 var invoice = await context.Invoices
@@ -172,10 +172,10 @@ namespace AutoDealerSphere.Server.Services
                     .Include(i => i.Vehicle)
                     .Include(i => i.InvoiceDetails.Where(d => d.InvoiceId == invoiceId))
                     .FirstAsync(i => i.Id == invoiceId);
-                invoices.Add(invoice);
+                invoicesDictionary[invoiceId] = invoice;
             }
             
-            return invoices.OrderBy(i => i.Subnumber).ToList();
+            return invoicesDictionary;
         }
 
         private void CalculateInvoiceTotals(Invoice invoice)
