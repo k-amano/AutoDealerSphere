@@ -196,8 +196,14 @@ namespace AutoDealerSphere.Server.Services
                 throw new InvalidOperationException($"Invoice with ID {invoiceId} not found.");
             }
 
-            // 同一請求書番号の全ての請求書を取得
-            var relatedInvoices = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoice.InvoiceNumber);
+            // 同一請求書番号の全ての請求書を取得（Dictionary<InvoiceId, Invoice>形式）
+            var relatedInvoicesDict = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoice.InvoiceNumber);
+            
+            // 明細データがない請求書は除外
+            var invoicesWithDetails = relatedInvoicesDict
+                .Where(kvp => kvp.Value.InvoiceDetails.Any())
+                .OrderBy(kvp => kvp.Value.Subnumber)
+                .ToList();
             
             // 発行者情報を取得
             var issuerInfo = await _issuerInfoService.GetIssuerInfoAsync();
@@ -216,10 +222,13 @@ namespace AutoDealerSphere.Server.Services
 
                 IWorkbook workbook = application.Workbooks.Open(templatePath);
                 
-                // 複数の請求書がある場合は、追加のシートを作成
-                for (int i = 0; i < relatedInvoices.Count; i++)
+                // 明細データがある請求書のシートを作成
+                for (int i = 0; i < invoicesWithDetails.Count; i++)
                 {
-                    var currentInvoice = relatedInvoices[i];
+                    var invoiceEntry = invoicesWithDetails[i];
+                    var currentInvoice = invoiceEntry.Value;
+                    var currentInvoiceId = invoiceEntry.Key;
+                    
                     IWorksheet worksheet;
                     if (i == 0)
                     {
@@ -238,8 +247,8 @@ namespace AutoDealerSphere.Server.Services
                         : currentInvoice.InvoiceNumber;
                     worksheet.Name = sheetName;
 
-                    // テンプレートにデータを投入
-                    await PopulateTemplateWithDataAsync(worksheet, currentInvoice, issuerInfo, i == 0);
+                    // テンプレートにデータを投入（InvoiceIdも渡す）
+                    await PopulateTemplateWithDataAsync(worksheet, currentInvoice, issuerInfo, i == 0, currentInvoiceId);
                 }
 
                 // MemoryStreamに保存
@@ -265,7 +274,7 @@ namespace AutoDealerSphere.Server.Services
 
         
         // テンプレートにデータを投入
-        private async Task PopulateTemplateWithDataAsync(IWorksheet worksheet, Invoice invoice, IssuerInfo issuerInfo, bool isFirstSheet = true)
+        private async Task PopulateTemplateWithDataAsync(IWorksheet worksheet, Invoice invoice, IssuerInfo issuerInfo, bool isFirstSheet = true, int? invoiceId = null)
         {
             // 請求書情報（L2:請求書番号、L3:請求書発行日、L4:インボイス番号）
             PopulateInvoiceInfo(worksheet, invoice, issuerInfo);
@@ -279,9 +288,9 @@ namespace AutoDealerSphere.Server.Services
             // 合計金額（最初のシートのみ表示）
             if (isFirstSheet)
             {
-                // 同一請求書番号の全ての合計を計算
-                var relatedInvoices = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoice.InvoiceNumber);
-                var totalAmount = relatedInvoices.Sum(i => i.Total);
+                // 同一請求書番号の全ての合計を計算（既に取得済みのdictionaryから計算）
+                var relatedInvoicesDict = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoice.InvoiceNumber);
+                var totalAmount = relatedInvoicesDict.Values.Sum(i => i.Total);
                 PopulateTotalAmount(worksheet, totalAmount);
             }
             else
@@ -306,8 +315,8 @@ namespace AutoDealerSphere.Server.Services
             if (isFirstSheet)
             {
                 // 同一請求書番号の全ての請求書の合計を計算
-                var relatedInvoices = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoice.InvoiceNumber);
-                PopulateAggregatedTotals(worksheet, relatedInvoices);
+                var relatedInvoicesDict = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoice.InvoiceNumber);
+                PopulateAggregatedTotals(worksheet, relatedInvoicesDict.Values.ToList());
             }
             else
             {

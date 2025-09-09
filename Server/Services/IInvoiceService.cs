@@ -12,7 +12,7 @@ namespace AutoDealerSphere.Server.Services
         Task<string> GenerateInvoiceNumberAsync(int clientId);
         Task<(string invoiceNumber, int subnumber)> GenerateInvoiceNumberAndSubnumberAsync(int clientId, string? existingInvoiceNumber = null);
         Task<byte[]> ExportToExcelAsync(int invoiceId);
-        Task<List<Invoice>> GetInvoicesByInvoiceNumberAsync(string invoiceNumber);
+        Task<Dictionary<int, Invoice>> GetInvoicesByInvoiceNumberAsync(string invoiceNumber);
         
         // 明細CRUD操作
         Task<InvoiceDetail> CreateInvoiceDetailAsync(int invoiceId, InvoiceDetail detail);
