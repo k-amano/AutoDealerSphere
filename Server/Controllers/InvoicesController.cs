@@ -87,6 +87,13 @@ namespace AutoDealerSphere.Server.Controllers
             return NoContent();
         }
 
+        [HttpGet("by-invoice-number/{invoiceNumber}")]
+        public async Task<ActionResult<Dictionary<int, Invoice>>> GetInvoicesByInvoiceNumber(string invoiceNumber)
+        {
+            var invoices = await _invoiceService.GetInvoicesByInvoiceNumberAsync(invoiceNumber);
+            return Ok(invoices);
+        }
+
         [HttpGet("{id}/export")]
         public async Task<IActionResult> ExportToExcel(int id)
         {
