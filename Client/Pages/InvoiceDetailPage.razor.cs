@@ -55,6 +55,12 @@ namespace AutoDealerSphere.Client.Pages
             await LoadRelatedInvoices();
         }
 
+        protected override async Task OnParametersSetAsync()
+        {
+            await LoadInvoice();
+            await LoadRelatedInvoices();
+        }
+
         private async Task LoadInvoice()
         {
             if (InvoiceId == 0)
