@@ -26,6 +26,8 @@ namespace AutoDealerSphere.Client.Pages
         private AutoDealerSphere.Client.Components.InvoiceDetailDialog? _detailDialog;
         private AutoDealerSphere.Client.Components.StatutoryFeeDialog? _statutoryFeeDialog;
         private bool _showDeleteConfirmation = false;
+        private Dictionary<int, Invoice> _relatedInvoices = new();
+        private List<int> _sortedInvoiceIds = new();
 
         // UI表示制御プロパティ
         protected bool IsLoading => _invoice == null;
@@ -50,6 +52,7 @@ namespace AutoDealerSphere.Client.Pages
         protected override async Task OnInitializedAsync()
         {
             await LoadInvoice();
+            await LoadRelatedInvoices();
         }
 
         private async Task LoadInvoice()
@@ -63,6 +66,15 @@ namespace AutoDealerSphere.Client.Pages
             
             // 既存データの読み込み
             _invoice = await Http.GetFromJsonAsync<Invoice>($"api/Invoices/{InvoiceId}");
+        }
+
+        private async Task LoadRelatedInvoices()
+        {
+            if (_invoice != null && !string.IsNullOrEmpty(_invoice.InvoiceNumber))
+            {
+                _relatedInvoices = await Http.GetFromJsonAsync<Dictionary<int, Invoice>>($"api/Invoices/by-invoice-number/{_invoice.InvoiceNumber}") ?? new();
+                _sortedInvoiceIds = _relatedInvoices.Values.OrderBy(i => i.Subnumber).Select(i => i.Id).ToList();
+            }
         }
 
         protected async Task OpenBasicInfoDialog()
@@ -112,6 +124,7 @@ namespace AutoDealerSphere.Client.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     await LoadInvoice();
+                    await LoadRelatedInvoices();
                 }
             }
         }
@@ -152,6 +165,7 @@ namespace AutoDealerSphere.Client.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     await LoadInvoice();
+                    await LoadRelatedInvoices();
                 }
             }
         }
@@ -165,6 +179,7 @@ namespace AutoDealerSphere.Client.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     await LoadInvoice();
+                    await LoadRelatedInvoices();
                 }
             }
             else
@@ -174,6 +189,7 @@ namespace AutoDealerSphere.Client.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     await LoadInvoice();
+                    await LoadRelatedInvoices();
                 }
             }
         }
@@ -226,6 +242,7 @@ namespace AutoDealerSphere.Client.Pages
 
             // 明細を再読み込み
             await LoadInvoice();
+            await LoadRelatedInvoices();
         }
 
         protected void ShowDeleteConfirmation()
@@ -311,6 +328,32 @@ namespace AutoDealerSphere.Client.Pages
         protected decimal TaxRate => _invoice?.TaxRate ?? 10m;
         protected decimal Tax => _invoice?.Tax ?? 0;
         protected decimal Total => _invoice?.Total ?? 0;
+        
+        // ナビゲーション関連のプロパティ
+        protected bool IsFirstInvoice => _invoice != null && _invoice.Subnumber == 1;
+        protected bool IsLastInvoice => _sortedInvoiceIds.Count > 0 && _sortedInvoiceIds.LastOrDefault() == InvoiceId;
+        protected bool HasPreviousInvoice => _sortedInvoiceIds.Count > 1 && _sortedInvoiceIds.IndexOf(InvoiceId) > 0;
+        protected bool HasNextInvoice => _sortedInvoiceIds.Count > 1 && _sortedInvoiceIds.IndexOf(InvoiceId) < _sortedInvoiceIds.Count - 1;
+        
+        protected void NavigateToPreviousInvoice()
+        {
+            var currentIndex = _sortedInvoiceIds.IndexOf(InvoiceId);
+            if (currentIndex > 0)
+            {
+                var previousInvoiceId = _sortedInvoiceIds[currentIndex - 1];
+                NavigationManager.NavigateTo($"/invoice/detail/{previousInvoiceId}");
+            }
+        }
+        
+        protected void NavigateToNextInvoice()
+        {
+            var currentIndex = _sortedInvoiceIds.IndexOf(InvoiceId);
+            if (currentIndex >= 0 && currentIndex < _sortedInvoiceIds.Count - 1)
+            {
+                var nextInvoiceId = _sortedInvoiceIds[currentIndex + 1];
+                NavigationManager.NavigateTo($"/invoice/detail/{nextInvoiceId}");
+            }
+        }
 
         private class InvoiceNumberResponse
         {
