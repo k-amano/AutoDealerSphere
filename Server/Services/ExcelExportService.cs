@@ -601,7 +601,7 @@ namespace AutoDealerSphere.Server.Services
             int row = NON_TAXABLE_START_ROW;
             var nonTaxableItems = invoice.InvoiceDetails
                 .Where(d => d.Type == "法定費用")
-                .OrderBy(d => d.DisplayOrder);
+                .OrderBy(d => d.Id);
 
             foreach (var item in nonTaxableItems)
             {
