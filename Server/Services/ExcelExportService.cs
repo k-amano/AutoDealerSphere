@@ -330,6 +330,30 @@ namespace AutoDealerSphere.Server.Services
             return $"{vehicle.LicensePlateLocation ?? ""} {vehicle.LicensePlateClassification ?? ""} {vehicle.LicensePlateHiragana ?? ""} {vehicle.LicensePlateNumber ?? ""}".Trim();
         }
 
+        // 郵便番号をフォーマット（XXX-XXXX形式）
+        private string FormatPostalCode(string postalCode)
+        {
+            if (string.IsNullOrEmpty(postalCode)) return "";
+            
+            // 数字のみを抽出
+            var numbers = new string(postalCode.Where(char.IsDigit).ToArray());
+            
+            // 7桁の場合のみフォーマット
+            if (numbers.Length == 7)
+            {
+                return $"{numbers.Substring(0, 3)}-{numbers.Substring(3, 4)}";
+            }
+            
+            return postalCode;
+        }
+
+        // 日付をフォーマット（yyyy年mm月dd日形式）
+        private string FormatDate(DateTime? date)
+        {
+            if (!date.HasValue) return "";
+            return date.Value.ToString("yyyy年MM月dd日");
+        }
+
 
 
 
@@ -393,7 +417,7 @@ namespace AutoDealerSphere.Server.Services
         {
             // 請求書番号（複数車両の場合は{InvoiceNumber}-{Subnumber}の形式）
             var displayInvoiceNumber = invoice.Subnumber > 1 ? $"{invoice.InvoiceNumber}-{invoice.Subnumber}" : invoice.InvoiceNumber;
-            var invoiceDate = invoice.InvoiceDate.ToString("yyyy/MM/dd");
+            var invoiceDate = FormatDate(invoice.InvoiceDate);
             var invoiceRegistrationNumber = issuerInfo?.InvoiceNumber ?? "";
 
             // 原本
@@ -412,7 +436,7 @@ namespace AutoDealerSphere.Server.Services
         {
             if (issuerInfo == null) return;
             
-            var postalCode = issuerInfo.PostalCode ?? "";
+            var postalCode = FormatPostalCode(issuerInfo.PostalCode);
             var address = issuerInfo.Address ?? "";
             var companyName = issuerInfo.CompanyName ?? "";
             var positionName = $"{issuerInfo.Position ?? ""}　{issuerInfo.Name ?? ""}";
@@ -441,7 +465,7 @@ namespace AutoDealerSphere.Server.Services
         {
             if (client == null) return;
 
-            var zip = client.Zip ?? "";
+            var zip = FormatPostalCode(client.Zip);
             var address = client.Address ?? "";
             var name = client.Name ?? "";
             
@@ -507,8 +531,8 @@ namespace AutoDealerSphere.Server.Services
             var licensePlate = FormatLicensePlate(vehicle);
             var vehicleName = vehicle.VehicleName ?? "";
             var chassisNumber = vehicle.ChassisNumber ?? "";
-            var firstRegistrationDate = vehicle.FirstRegistrationDate?.ToString("yyyy/MM/dd") ?? "";
-            var inspectionExpiryDate = vehicle.InspectionExpiryDate?.ToString("yyyy/MM/dd") ?? "";
+            var firstRegistrationDate = FormatDate(vehicle.FirstRegistrationDate);
+            var inspectionExpiryDate = FormatDate(vehicle.InspectionExpiryDate);
             var vehicleModel = vehicle.VehicleModel ?? "";
             var mileageText = mileage.HasValue ? $"{mileage:N0} km" : "";
 
