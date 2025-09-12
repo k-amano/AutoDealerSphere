@@ -348,18 +348,21 @@ namespace AutoDealerSphere.Server.Services
                     fees.Add(new StatutoryFee { VehicleCategoryId = 1, FeeType = "自賠責保険（25ヶ月）", Amount = 18040, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 1, FeeType = "重量税", Amount = 8200, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 1, FeeType = "印紙代", Amount = 1800, EffectiveFrom = effectiveDate });
+                    fees.Add(new StatutoryFee { VehicleCategoryId = 1, FeeType = "証紙管理費", Amount = 400, EffectiveFrom = effectiveDate });
 
                     // 小型車
                     fees.Add(new StatutoryFee { VehicleCategoryId = 2, FeeType = "自賠責保険（24ヶ月）", Amount = 17650, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 2, FeeType = "自賠責保険（25ヶ月）", Amount = 18160, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 2, FeeType = "重量税", Amount = 16400, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 2, FeeType = "印紙代", Amount = 1800, EffectiveFrom = effectiveDate });
+                    fees.Add(new StatutoryFee { VehicleCategoryId = 2, FeeType = "証紙管理費", Amount = 400, EffectiveFrom = effectiveDate });
 
                     // 普通車
                     fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "自賠責保険（24ヶ月）", Amount = 20010, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "自賠責保険（25ヶ月）", Amount = 20610, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "重量税", Amount = 34200, EffectiveFrom = effectiveDate });
                     fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "印紙代", Amount = 1700, EffectiveFrom = effectiveDate });
+                    fees.Add(new StatutoryFee { VehicleCategoryId = 3, FeeType = "証紙管理費", Amount = 400, EffectiveFrom = effectiveDate });
 
                     _context.StatutoryFees.AddRange(fees);
                     _context.SaveChanges();
