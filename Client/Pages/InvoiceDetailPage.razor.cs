@@ -45,9 +45,26 @@ namespace AutoDealerSphere.Client.Pages
         protected string MileageRowClass => !string.IsNullOrEmpty(MileageDisplay) ? "info-row" : "info-row hidden";
         protected string StatutoryFeesClass => "";
         
+        // 法定費用の表示順序を定義
+        private readonly List<string> _statutoryFeeOrder = new List<string>
+        {
+            "自賠責保険（24ヶ月）",
+            "自賠責保険（25ヶ月）",
+            "重量税",
+            "印紙代",
+            "証紙管理費"
+        };
+
         // 明細の分類
         protected IEnumerable<AutoDealerSphere.Shared.Models.InvoiceDetail> RegularDetails => _invoice?.InvoiceDetails?.Where(d => d.Type != "法定費用") ?? Enumerable.Empty<AutoDealerSphere.Shared.Models.InvoiceDetail>();
-        protected IEnumerable<AutoDealerSphere.Shared.Models.InvoiceDetail> StatutoryFees => _invoice?.InvoiceDetails?.Where(d => d.Type == "法定費用") ?? Enumerable.Empty<AutoDealerSphere.Shared.Models.InvoiceDetail>();
+        protected IEnumerable<AutoDealerSphere.Shared.Models.InvoiceDetail> StatutoryFees => _invoice?.InvoiceDetails?
+            .Where(d => d.Type == "法定費用")
+            .OrderBy(d => 
+            {
+                var index = _statutoryFeeOrder.IndexOf(d.ItemName);
+                return index >= 0 ? index : int.MaxValue;
+            })
+            .ThenBy(d => d.ItemName) ?? Enumerable.Empty<AutoDealerSphere.Shared.Models.InvoiceDetail>();
 
         protected override async Task OnInitializedAsync()
         {
