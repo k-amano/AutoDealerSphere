@@ -47,7 +47,7 @@ namespace AutoDealerSphere.Client.Pages
         
         // 明細の分類
         protected IEnumerable<AutoDealerSphere.Shared.Models.InvoiceDetail> RegularDetails => _invoice?.InvoiceDetails?.Where(d => d.Type != "法定費用") ?? Enumerable.Empty<AutoDealerSphere.Shared.Models.InvoiceDetail>();
-        protected IEnumerable<AutoDealerSphere.Shared.Models.InvoiceDetail> StatutoryFees => _invoice?.InvoiceDetails?.Where(d => d.Type == "法定費用") ?? Enumerable.Empty<AutoDealerSphere.Shared.Models.InvoiceDetail>();
+        protected IEnumerable<AutoDealerSphere.Shared.Models.InvoiceDetail> StatutoryFees => _invoice?.InvoiceDetails?.Where(d => d.Type == "法定費用").OrderBy(d => d.Id) ?? Enumerable.Empty<AutoDealerSphere.Shared.Models.InvoiceDetail>();
 
         protected override async Task OnInitializedAsync()
         {
