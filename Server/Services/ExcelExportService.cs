@@ -595,13 +595,28 @@ namespace AutoDealerSphere.Server.Services
             }
         }
 
+        // 法定費用の表示順序を定義
+        private readonly List<string> _statutoryFeeOrder = new List<string>
+        {
+            "自賠責保険（24ヶ月）",
+            "自賠責保険（25ヶ月）",
+            "重量税",
+            "印紙代",
+            "証紙管理費"
+        };
+
         // 非課税項目を設定（原本と控え）
         private void PopulateNonTaxableItems(IWorksheet worksheet, Invoice invoice)
         {
             int row = NON_TAXABLE_START_ROW;
             var nonTaxableItems = invoice.InvoiceDetails
                 .Where(d => d.Type == "法定費用")
-                .OrderBy(d => d.DisplayOrder);
+                .OrderBy(d => 
+                {
+                    var index = _statutoryFeeOrder.IndexOf(d.ItemName);
+                    return index >= 0 ? index : int.MaxValue;
+                })
+                .ThenBy(d => d.ItemName);
 
             foreach (var item in nonTaxableItems)
             {
