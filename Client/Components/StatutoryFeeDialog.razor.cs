@@ -54,8 +54,11 @@ namespace AutoDealerSphere.Client.Components
                     // 車両カテゴリに対応する法定費用を取得
                     if (_vehicle.VehicleCategoryId > 0)
                     {
-                        _statutoryFees = await Http.GetFromJsonAsync<List<StatutoryFee>>($"api/StatutoryFees/category/{_vehicle.VehicleCategoryId}") ?? new();
-                        
+                        var fees = await Http.GetFromJsonAsync<List<StatutoryFee>>($"api/StatutoryFees/category/{_vehicle.VehicleCategoryId}") ?? new();
+
+                        // ID順でソート
+                        _statutoryFees = fees.OrderBy(f => f.Id).ToList();
+
                         // 各法定費用のチェックボックスを初期化
                         foreach (var fee in _statutoryFees)
                         {
