@@ -15,11 +15,12 @@
         <Content>
             @if (_model != null)
             {
-                <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    
-                    <div class="form-row">
+                <div class="@(!_isNew ? "edit-mode" : "")">
+                    <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="form-row">
                         <label>請求書番号</label>
                         <SfTextBox Value="@GetInvoiceNumberDisplay()" Readonly="true"></SfTextBox>
                     </div>
@@ -77,11 +78,12 @@
                         <SfTextBox @bind-Value="_model.Notes" Multiline="true" Placeholder="備考"></SfTextBox>
                     </div>
                     
-                    <div class="dialog-buttons">
-                        <SfButton Type="ButtonType.Submit" IsPrimary="true">保存</SfButton>
-                        <SfButton @onclick="Cancel">キャンセル</SfButton>
-                    </div>
-                </EditForm>
+                        <div class="dialog-buttons">
+                            <SfButton Type="ButtonType.Submit" IsPrimary="true">保存</SfButton>
+                            <SfButton @onclick="Cancel">キャンセル</SfButton>
+                        </div>
+                    </EditForm>
+                </div>
             }
         </Content>
     </DialogTemplates>
@@ -94,25 +96,31 @@
         margin-bottom: 15px;
         gap: 10px;
     }
-    
+
+    /* 新規作成モード */
     .form-row label {
         width: 120px;
         color: #333;
     }
-    
+
+    /* 編集モード - ラベル幅を広げる */
+    .edit-mode .form-row label {
+        width: 150px;
+    }
+
     .form-row .e-input-group,
     .form-row .e-ddl,
     .form-row .e-date-wrapper {
         flex: 1;
     }
-    
+
     .dialog-buttons {
         display: flex;
         justify-content: center;
         gap: 10px;
         margin-top: 20px;
     }
-    
+
     .required::after {
         content: "必須";
         color: #ffffff;
