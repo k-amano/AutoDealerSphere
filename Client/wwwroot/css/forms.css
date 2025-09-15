@@ -519,3 +519,67 @@
     text-align: right;
     white-space: nowrap;
 }
+
+/* ダイアログ特有のスタイル */
+.dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* 請求書基本情報ダイアログ用 */
+.invoice-basic-info-dialog .form-row .e-input-group,
+.invoice-basic-info-dialog .form-row .e-ddl,
+.invoice-basic-info-dialog .form-row .e-date-wrapper {
+    flex: 1;
+}
+
+/* 請求書明細ダイアログ用 */
+.invoice-detail-dialog .part-selection,
+.invoice-detail-dialog .detail-editing {
+    padding: 10px;
+}
+
+.invoice-detail-dialog .search-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 5px;
+}
+
+.invoice-detail-dialog .search-section .form-row:last-child {
+    justify-content: flex-end;
+    margin-bottom: 0;
+}
+
+.invoice-detail-dialog .parts-grid {
+    margin-bottom: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.invoice-detail-dialog .form-row .e-input-group,
+.invoice-detail-dialog .form-row .e-numerictextbox,
+.invoice-detail-dialog .form-row .e-ddl {
+    flex: 1;
+    max-width: 300px;
+}
+
+.invoice-detail-dialog .selected-part,
+.invoice-detail-dialog .selected-type {
+    font-weight: 500;
+    color: #333;
+}
+
+.invoice-detail-dialog .subtotal {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #333;
+}
+
+.invoice-detail-dialog .empty-record {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+}

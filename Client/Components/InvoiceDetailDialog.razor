@@ -12,6 +12,7 @@
             <span>@DialogTitle</span>
         </Header>
         <Content>
+            <div class="invoice-detail-dialog">
             @if (_currentStep == DialogStep.SelectPart)
             {
                 <div class="part-selection">
@@ -127,83 +128,7 @@
                     </EditForm>
                 </div>
             }
+            </div>
         </Content>
     </DialogTemplates>
 </SfDialog>
-
-<style>
-    .part-selection, .detail-editing {
-        padding: 10px;
-    }
-    
-    .search-section {
-        margin-bottom: 20px;
-        padding: 15px;
-        background: #f5f5f5;
-        border-radius: 5px;
-    }
-    
-    .search-section .form-row:last-child {
-        justify-content: flex-end;
-        margin-bottom: 0;
-    }
-    
-    .parts-grid {
-        margin-bottom: 20px;
-        max-height: 300px;
-        overflow-y: auto;
-    }
-    
-    .form-row {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        gap: 10px;
-    }
-    
-    .form-row label {
-        width: 100px;
-        color: #333;
-    }
-    
-    .form-row .e-input-group,
-    .form-row .e-numerictextbox,
-    .form-row .e-ddl {
-        flex: 1;
-        max-width: 300px;
-    }
-    
-    .selected-part, .selected-type {
-        font-weight: 500;
-        color: #333;
-    }
-    
-    .subtotal {
-        font-size: 1.1em;
-        font-weight: 500;
-        color: #333;
-    }
-    
-    .dialog-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 20px;
-    }
-    
-    .required::after {
-        content: "必須";
-        color: #ffffff;
-        background: #cc0000;
-        font-size: 0.8em;
-        padding: 0.3em;
-        border-radius: 0.5em;
-        margin-left: 0.3em;
-    }
-    
-    .empty-record {
-        padding: 20px;
-        text-align: center;
-        color: #666;
-    }
-</style>
