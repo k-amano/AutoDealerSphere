@@ -23,6 +23,7 @@ builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IExcelExportService, ExcelExportService>();
 builder.Services.AddScoped<IStatutoryFeeService, StatutoryFeeService>();
 builder.Services.AddScoped<IIssuerInfoService, IssuerInfoService>();
+builder.Services.AddScoped<JwtService>();
 
 var app = builder.Build();
 
