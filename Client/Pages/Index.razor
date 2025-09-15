@@ -1,10 +1,11 @@
 @page "/"
 @inject NavigationManager NavigationManager
-@inject HttpClient Http
+@inject AuthenticationService AuthService
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.DataForm
 @using Syncfusion.Blazor.Inputs
 @using AutoDealerSphere.Shared.Models
+@using AutoDealerSphere.Client.Services
 @using System.ComponentModel.DataAnnotations
 
 <div class="login-container">
@@ -130,16 +131,15 @@
         try
         {
             errorMessage = "";
-            
-            var loginRequest = new LoginRequest 
-            { 
-                Email = loginModel.Email, 
-                Password = loginModel.Password 
+
+            var loginRequest = new LoginRequest
+            {
+                Email = loginModel.Email,
+                Password = loginModel.Password
             };
-            
-            var response = await Http.PostAsJsonAsync<LoginRequest>("api/User/login", loginRequest);
-            var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-            
+
+            var loginResponse = await AuthService.LoginAsync(loginRequest);
+
             if (loginResponse != null && loginResponse.Success)
             {
                 // ログイン成功 - 顧客一覧へ遷移
