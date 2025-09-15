@@ -10,10 +10,12 @@ namespace AutoDealerSphere.Server.Controllers
 	public class UserController : ControllerBase
 	{
 		private readonly SQLDBContext? _context;
+		private readonly JwtService _jwtService;
 
-		public UserController(SQLDBContext context)
+		public UserController(SQLDBContext context, JwtService jwtService)
 		{
 			_context ??= context;
+			_jwtService = jwtService;
 		}
 
 		[HttpGet]
@@ -68,7 +70,8 @@ namespace AutoDealerSphere.Server.Controllers
 				return new LoginResponse { Success = false, ErrorMessage = "メールアドレスまたはパスワードが正しくありません。" };
 			}
 
-			return new LoginResponse { Success = true, User = user };
+			var token = _jwtService.GenerateToken(user);
+			return new LoginResponse { Success = true, User = user, Token = token };
 		}
 
 		[Route("add")]
