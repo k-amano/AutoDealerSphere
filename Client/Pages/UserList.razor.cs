@@ -7,7 +7,7 @@ namespace AutoDealerSphere.Client.Pages
 {
     public partial class UserList
     {
-        private List<User> Users { get; set; } = new();
+        private List<User>? Users { get; set; } = null;
         private UserSearch Search { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
@@ -40,13 +40,13 @@ namespace AutoDealerSphere.Client.Pages
                     await LoadData();
                     
                     // 名前の部分一致
-                    if (!string.IsNullOrEmpty(search.Name))
+                    if (!string.IsNullOrEmpty(search.Name) && Users != null)
                     {
                         Users = Users.Where(u => u.Name.Contains(search.Name)).ToList();
                     }
-                    
+
                     // メールアドレスの部分一致
-                    if (!string.IsNullOrEmpty(search.Email))
+                    if (!string.IsNullOrEmpty(search.Email) && Users != null)
                     {
                         Users = Users.Where(u => u.Email.Contains(search.Email)).ToList();
                     }

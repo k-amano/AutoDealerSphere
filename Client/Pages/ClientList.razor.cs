@@ -7,7 +7,7 @@ namespace AutoDealerSphere.Client.Pages
 {
     public partial class ClientList
     {
-        private List<AutoDealerSphere.Shared.Models.Client> Clients { get; set; } = new();
+        private List<AutoDealerSphere.Shared.Models.Client>? Clients { get; set; } = null;
         private AutoDealerSphere.Shared.Models.ClientSearch Search { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
@@ -40,30 +40,30 @@ namespace AutoDealerSphere.Client.Pages
                     await LoadData();
                     
                     // 名前またはカナの部分一致
-                    if (!string.IsNullOrEmpty(search.NameOrKana))
+                    if (!string.IsNullOrEmpty(search.NameOrKana) && Clients != null)
                     {
-                        Clients = Clients.Where(c => 
-                            c.Name.Contains(search.NameOrKana) || 
+                        Clients = Clients.Where(c =>
+                            c.Name.Contains(search.NameOrKana) ||
                             (c.Kana != null && c.Kana.Contains(search.NameOrKana))
                         ).ToList();
                     }
-                    
+
                     // メールアドレスの部分一致
-                    if (!string.IsNullOrEmpty(search.Email))
+                    if (!string.IsNullOrEmpty(search.Email) && Clients != null)
                     {
                         Clients = Clients.Where(c => c.Email.Contains(search.Email)).ToList();
                     }
-                    
+
                     // 電話番号の部分一致
-                    if (!string.IsNullOrEmpty(search.Phone))
+                    if (!string.IsNullOrEmpty(search.Phone) && Clients != null)
                     {
                         Clients = Clients.Where(c => c.Phone != null && c.Phone.Contains(search.Phone)).ToList();
                     }
-                    
+
                     // 住所の部分一致（郵便番号、都道府県、住所）
-                    if (!string.IsNullOrEmpty(search.Address))
+                    if (!string.IsNullOrEmpty(search.Address) && Clients != null)
                     {
-                        Clients = Clients.Where(c => 
+                        Clients = Clients.Where(c =>
                             c.Zip.Contains(search.Address) ||
                             GetPrefectureName(c.Prefecture).Contains(search.Address) ||
                             c.Address.Contains(search.Address)
