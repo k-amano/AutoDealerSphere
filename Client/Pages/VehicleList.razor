@@ -60,7 +60,7 @@
 </div>
 <br />
 
-@if (Vehicles.Any())
+@if (Vehicles != null && Vehicles.Any())
 {
     <SfGrid DataSource="@Vehicles" AllowPaging="true" AllowSorting="true" AllowMultiSorting="true" CssClass="two-line-grid">
         <GridTemplates>
@@ -118,7 +118,7 @@
         </GridColumns>
     </SfGrid>
 }
-else
+else if (Vehicles != null)
 {
     <p class="error-message">車両情報が見つかりません。</p>
 }

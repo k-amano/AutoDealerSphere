@@ -53,7 +53,7 @@
 </div>
 <br />
 
-@if (Clients.Any())
+@if (Clients != null && Clients.Any())
 {
     <SfGrid DataSource="@Clients" AllowPaging="true" AllowSorting="true" AllowMultiSorting="true" CssClass="two-line-grid">
         <GridTemplates>
@@ -109,7 +109,7 @@
         </GridColumns>
     </SfGrid>
 }
-else
+else if (Clients != null)
 {
     <p class="error-message">顧客情報が見つかりません。</p>
 }

@@ -45,7 +45,7 @@
 </div>
 <br />
 
-@if (Users.Any())
+@if (Users != null && Users.Any())
 {
     <SfGrid DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowMultiSorting="true" CssClass="user-grid">
         <GridTemplates>
@@ -78,7 +78,7 @@
         </GridColumns>
     </SfGrid>
 }
-else
+else if (Users != null)
 {
     <p class="error-message">ユーザー情報が見つかりません。</p>
 }
