@@ -6,7 +6,7 @@ namespace AutoDealerSphere.Client.Pages
 {
     public partial class VehicleList : ComponentBase
     {
-        private List<Vehicle> Vehicles = new();
+        private List<Vehicle>? Vehicles = null;
         private VehicleSearchModel Search = new();
 
         protected override async Task OnInitializedAsync()
