@@ -423,6 +423,9 @@ namespace AutoDealerSphere.Server.Services
             {
                 vehicle.Displacement = displacement;
             }
+
+            // 排気量と車両重量から車両カテゴリを自動判定
+            vehicle.VehicleCategoryId = DetermineVehicleCategory(vehicle.Displacement, vehicle.VehicleWeight);
         }
 
         private void ParseDateFields(List<string> values, ColumnIndexes indexes, Vehicle vehicle)
@@ -531,6 +534,39 @@ namespace AutoDealerSphere.Server.Services
                 hiragana.Length > 0 ? hiragana.ToString() : null,
                 number.Length > 0 ? number.ToString() : null
             );
+        }
+
+        private int? DetermineVehicleCategory(decimal? displacement, int? vehicleWeight)
+        {
+            // 排気量が660cc以下の場合は軽自動車（ID: 1）
+            if (displacement.HasValue && displacement.Value <= 660)
+            {
+                return 1; // 軽自動車
+            }
+
+            // 軽自動車以外は車両重量のみで判定（自動車重量税の基準）
+            if (vehicleWeight.HasValue)
+            {
+                if (vehicleWeight.Value <= 1000)
+                {
+                    return 2; // 小型車（1.0t以下）
+                }
+                else if (vehicleWeight.Value <= 1500)
+                {
+                    return 3; // 普通車（1.5t以下）
+                }
+                else if (vehicleWeight.Value <= 2000)
+                {
+                    return 4; // 中型車（2.0t以下）
+                }
+                else
+                {
+                    return 5; // 大型車（2.0t超）
+                }
+            }
+
+            // 車両重量がない場合はNULL
+            return null;
         }
 
         private class ColumnIndexes
