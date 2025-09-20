@@ -79,6 +79,30 @@ namespace AutoDealerSphere.Server.Services
         {
             try
             {
+                // 既存テーブルに新しいカラムを追加（エラーを無視）
+                AddColumnIfNotExists("Vehicles", "RatedOutput", "DECIMAL(18,2)");
+                AddColumnIfNotExists("Vehicles", "BodyColor", "TEXT");
+                AddColumnIfNotExists("Vehicles", "PassengerCapacity", "INTEGER");
+                AddColumnIfNotExists("Vehicles", "FrontAxleWeight", "INTEGER");
+                AddColumnIfNotExists("Vehicles", "RearAxleWeight", "INTEGER");
+                AddColumnIfNotExists("Vehicles", "RegistrationDate", "TEXT");
+                AddColumnIfNotExists("Vehicles", "ManufactureDate", "TEXT");
+                AddColumnIfNotExists("Vehicles", "InspectionType", "TEXT");
+                AddColumnIfNotExists("Vehicles", "InspectionDate", "TEXT");
+                AddColumnIfNotExists("Vehicles", "MileageUpdateDate", "TEXT");
+                AddColumnIfNotExists("Vehicles", "UserPostalCode", "TEXT");
+                AddColumnIfNotExists("Vehicles", "OwnerNameOrCompany", "TEXT");
+                AddColumnIfNotExists("Vehicles", "OwnerAddress", "TEXT");
+                AddColumnIfNotExists("Vehicles", "OwnerPostalCode", "TEXT");
+                AddColumnIfNotExists("Vehicles", "QRCodeData", "TEXT");
+                AddColumnIfNotExists("Vehicles", "ICTagId", "TEXT");
+                AddColumnIfNotExists("Vehicles", "ElectronicCertificateFlag", "INTEGER DEFAULT 0");
+                AddColumnIfNotExists("Vehicles", "IssueDate", "TEXT");
+                AddColumnIfNotExists("Vehicles", "IssueOffice", "TEXT");
+                AddColumnIfNotExists("Vehicles", "CertificateVersion", "TEXT");
+                AddColumnIfNotExists("Vehicles", "ImportSource", "TEXT");
+                AddColumnIfNotExists("Vehicles", "ImportDate", "TEXT");
+                AddColumnIfNotExists("Vehicles", "OriginalData", "TEXT");
                 _context.Database.ExecuteSqlRaw(@"
                         CREATE TABLE IF NOT EXISTS Vehicles (
                             Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -111,12 +135,34 @@ namespace AutoDealerSphere.Server.Services
                             EngineModel TEXT,
                             Displacement DECIMAL(18,2),
                             FuelType TEXT,
+                            RatedOutput DECIMAL(18,2),
+                            BodyColor TEXT,
+                            PassengerCapacity INTEGER,
+                            FrontAxleWeight INTEGER,
+                            RearAxleWeight INTEGER,
                             InspectionExpiryDate TEXT,
-                            NextInspectionDate TEXT,
                             InspectionCertificateNumber TEXT,
+                            RegistrationDate TEXT,
+                            ManufactureDate TEXT,
+                            InspectionType TEXT,
+                            InspectionDate TEXT,
+                            MileageUpdateDate TEXT,
                             UserNameOrCompany TEXT,
                             UserAddress TEXT,
+                            UserPostalCode TEXT,
+                            OwnerNameOrCompany TEXT,
+                            OwnerAddress TEXT,
+                            OwnerPostalCode TEXT,
                             BaseLocation TEXT,
+                            QRCodeData TEXT,
+                            ICTagId TEXT,
+                            ElectronicCertificateFlag INTEGER DEFAULT 0,
+                            IssueDate TEXT,
+                            IssueOffice TEXT,
+                            CertificateVersion TEXT,
+                            ImportSource TEXT,
+                            ImportDate TEXT,
+                            OriginalData TEXT,
                             VehicleCategoryId INTEGER,
                             CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
                             UpdatedAt TEXT,
@@ -523,6 +569,36 @@ namespace AutoDealerSphere.Server.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Warning: Could not create IssuerInfos table: {ex.Message}");
+            }
+        }
+
+        private void AddColumnIfNotExists(string tableName, string columnName, string columnDefinition)
+        {
+            try
+            {
+                // SQLiteでカラムの存在確認と追加
+                var sql = $@"
+                    SELECT COUNT(*) AS CNTREC FROM pragma_table_info('{tableName}')
+                    WHERE name='{columnName}'";
+
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = sql;
+                    _context.Database.OpenConnection();
+                    var result = command.ExecuteScalar();
+                    var count = Convert.ToInt32(result);
+
+                    if (count == 0)
+                    {
+                        _context.Database.ExecuteSqlRaw($"ALTER TABLE {tableName} ADD COLUMN {columnName} {columnDefinition}");
+                        Console.WriteLine($"Added column {columnName} to {tableName}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // カラムが既に存在する場合やテーブルが存在しない場合はエラーを無視
+                Console.WriteLine($"Note: Column {columnName} may already exist or table {tableName} doesn't exist: {ex.Message}");
             }
         }
     }

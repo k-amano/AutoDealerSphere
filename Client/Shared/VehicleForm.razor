@@ -123,13 +123,6 @@
             </div>
             
             <div class="form-row">
-                <label>次回車検日</label>
-                <SfDatePicker TValue="DateTime?" @bind-Value="Item.NextInspectionDate" 
-                    Placeholder="次回車検日を選択" Format="yyyy/MM/dd"></SfDatePicker>
-                <ValidationMessage For="@(() => Item.NextInspectionDate)" />
-            </div>
-            
-            <div class="form-row">
                 <label>車検証番号</label>
                 <SfTextBox @bind-Value="Item.InspectionCertificateNumber" Placeholder="車検証番号"></SfTextBox>
                 <ValidationMessage For="@(() => Item.InspectionCertificateNumber)" />
