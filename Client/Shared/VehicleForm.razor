@@ -66,16 +66,16 @@
         <div class="form-section">
             <div class="form-row">
                 <label>車種</label>
-                <SfDropDownList TValue="int?" TItem="VehicleCategory" @bind-Value="Item.VehicleCategoryId" 
+                <SfDropDownList TValue="int?" TItem="VehicleCategory" @bind-Value="Item.VehicleCategoryId"
                     DataSource="@VehicleCategories" Placeholder="車種を選択">
                     <DropDownListFieldSettings Text="CategoryName" Value="Id"></DropDownListFieldSettings>
                 </SfDropDownList>
                 <ValidationMessage For="@(() => Item.VehicleCategoryId)" />
             </div>
-            
+
             <div class="form-row">
                 <label>排気量(cc)</label>
-                <SfNumericTextBox TValue="decimal?" @bind-Value="Item.Displacement" 
+                <SfNumericTextBox TValue="decimal?" @bind-Value="DisplacementInCC"
                     Placeholder="排気量" Format="N0"></SfNumericTextBox>
                 <ValidationMessage For="@(() => Item.Displacement)" />
             </div>
@@ -154,22 +154,6 @@
                 <SfTextBox @bind-Value="Item.FuelType" Placeholder="燃料の種類"></SfTextBox>
                 <ValidationMessage For="@(() => Item.FuelType)" />
             </div>
-            
-            <div class="form-row">
-                <label>排気量(cc)</label>
-                <SfNumericTextBox TValue="decimal?" @bind-Value="Item.Displacement" 
-                    Placeholder="排気量" Format="N0"></SfNumericTextBox>
-                <ValidationMessage For="@(() => Item.Displacement)" />
-            </div>
-            
-            <div class="form-row">
-                <label>車種</label>
-                <SfDropDownList TValue="int?" TItem="VehicleCategory" @bind-Value="Item.VehicleCategoryId" 
-                    DataSource="@VehicleCategories" Placeholder="車種を選択">
-                    <DropDownListFieldSettings Text="CategoryName" Value="Id"></DropDownListFieldSettings>
-                </SfDropDownList>
-                <ValidationMessage For="@(() => Item.VehicleCategoryId)" />
-            </div>
         </div>
 
         <div class="form-buttons">
@@ -188,6 +172,43 @@
     [Parameter] public List<VehicleCategory> VehicleCategories { get; set; } = new();
     [Parameter] public EventCallback<Vehicle> OnClickOK { get; set; }
     [Parameter] public EventCallback<Vehicle> OnClickDelete { get; set; }
+
+    private decimal? _displacementInCC;
+
+    private decimal? DisplacementInCC
+    {
+        get
+        {
+            if (_displacementInCC == null && Item.Displacement != null)
+            {
+                // データベースのL値をcc表示用に1000倍する
+                _displacementInCC = Item.Displacement * 1000;
+            }
+            return _displacementInCC;
+        }
+        set
+        {
+            _displacementInCC = value;
+            // 画面入力のcc値をLに変換してモデルに設定
+            if (value != null)
+            {
+                Item.Displacement = value / 1000;
+            }
+            else
+            {
+                Item.Displacement = null;
+            }
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        // 編集モード時、既存データがある場合の初期化
+        if (Item != null && Item.Displacement != null)
+        {
+            _displacementInCC = Item.Displacement * 1000;
+        }
+    }
 
     private async Task ValidSubmit()
     {
