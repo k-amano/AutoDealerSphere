@@ -5,6 +5,7 @@
 @using Syncfusion.Blazor.Buttons
 @using System.ComponentModel.DataAnnotations
 @using Syncfusion.Blazor.Navigations
+@using Microsoft.AspNetCore.Components.Forms
 
 <SfBreadcrumb>
     <BreadcrumbItems>
@@ -16,6 +17,25 @@
 
 <h2>車両管理</h2>
 <h3>編集</h3>
+
+<div class="json-import-section">
+    <h4>車検証json取り込み</h4>
+    <div class="import-controls">
+        <InputFile OnChange="OnFileSelected" accept=".json" />
+        @if (_selectedFile != null)
+        {
+            <button class="btn-import" @onclick="ImportJsonAsync">JSONデータを取り込む</button>
+            <span class="file-info">選択ファイル: @_selectedFile.Name</span>
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(_importMessage))
+    {
+        <div class="import-message @(_importSuccess ? "success" : "error")">
+            @_importMessage
+        </div>
+    }
+</div>
+
 @if (_initialized)
 {
     @if (_item != null)
