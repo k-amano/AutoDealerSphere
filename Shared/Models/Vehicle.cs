@@ -59,7 +59,7 @@ namespace AutoDealerSphere.Shared.Models
         [StringLength(20)]
         public string? BodyShape { get; set; }
 
-        public int? SeatingCapacity { get; set; }
+        public int? SeatingCapacity { get; set; }  // 削除予定（PassengerCapacityと重複）
 
         public int? MaxLoadCapacity { get; set; }
 
@@ -88,12 +88,34 @@ namespace AutoDealerSphere.Shared.Models
         [StringLength(20)]
         public string? FuelType { get; set; }
 
-        public DateTime? InspectionExpiryDate { get; set; }
+        // 新規追加フィールド
+        public decimal? RatedOutput { get; set; }  // 定格出力（kW）
 
-        public DateTime? NextInspectionDate { get; set; }
+        [StringLength(20)]
+        public string? BodyColor { get; set; }  // 車体の色
+
+        public int? PassengerCapacity { get; set; }  // 乗車定員
+
+        public int? FrontAxleWeight { get; set; }  // 前前軸重（kg）
+
+        public int? RearAxleWeight { get; set; }  // 後後軸重（kg）
+
+        public DateTime? InspectionExpiryDate { get; set; }
 
         [StringLength(50)]
         public string? InspectionCertificateNumber { get; set; }
+
+        // 車検証JSON対応の新規フィールド
+        public DateTime? RegistrationDate { get; set; }  // 登録年月日
+
+        public DateTime? ManufactureDate { get; set; }  // 製造年月
+
+        [StringLength(20)]
+        public string? InspectionType { get; set; }  // 検査種別
+
+        public DateTime? InspectionDate { get; set; }  // 検査実施日
+
+        public DateTime? MileageUpdateDate { get; set; }  // 走行距離更新日
 
         [StringLength(100)]
         public string? UserNameOrCompany { get; set; }
@@ -101,8 +123,45 @@ namespace AutoDealerSphere.Shared.Models
         [StringLength(200)]
         public string? UserAddress { get; set; }
 
+        [StringLength(10)]
+        public string? UserPostalCode { get; set; }  // 使用者郵便番号
+
+        // 所有者情報（新規追加）
+        [StringLength(100)]
+        public string? OwnerNameOrCompany { get; set; }  // 所有者の氏名又は名称
+
+        [StringLength(200)]
+        public string? OwnerAddress { get; set; }  // 所有者の住所
+
+        [StringLength(10)]
+        public string? OwnerPostalCode { get; set; }  // 所有者郵便番号
+
         [StringLength(50)]
         public string? BaseLocation { get; set; }
+
+        // 電子車検証情報（新規追加）
+        public string? QRCodeData { get; set; }  // QRコード情報（JSON）
+
+        [StringLength(50)]
+        public string? ICTagId { get; set; }  // ICタグID
+
+        public bool ElectronicCertificateFlag { get; set; }  // 電子車検証フラグ
+
+        public DateTime? IssueDate { get; set; }  // 発行年月日
+
+        [StringLength(100)]
+        public string? IssueOffice { get; set; }  // 発行事務所
+
+        [StringLength(10)]
+        public string? CertificateVersion { get; set; }  // 車検証バージョン
+
+        // システム管理用
+        [StringLength(20)]
+        public string? ImportSource { get; set; }  // インポート元（JSON/CSV/Manual）
+
+        public DateTime? ImportDate { get; set; }  // インポート日時
+
+        public string? OriginalData { get; set; }  // 元データ（JSON保存用）
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
@@ -113,5 +172,23 @@ namespace AutoDealerSphere.Shared.Models
 
         [ForeignKey("VehicleCategoryId")]
         public VehicleCategory? VehicleCategory { get; set; }
+
+        // ハイブリッド方式: 計算プロパティとして統合された車両登録番号
+        [NotMapped]
+        public string RegistrationNumber
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(LicensePlateLocation) &&
+                    string.IsNullOrEmpty(LicensePlateClassification) &&
+                    string.IsNullOrEmpty(LicensePlateHiragana) &&
+                    string.IsNullOrEmpty(LicensePlateNumber))
+                {
+                    return string.Empty;
+                }
+
+                return $"{LicensePlateLocation ?? ""}{LicensePlateClassification ?? ""}{LicensePlateHiragana ?? ""}{LicensePlateNumber ?? ""}";
+            }
+        }
     }
 }
