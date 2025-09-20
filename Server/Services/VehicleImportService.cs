@@ -109,9 +109,18 @@ namespace AutoDealerSphere.Server.Services
                         
                         // 既存の顧客を氏名で検索（同じ氏名は1つのClientにまとめる）
                         var client = await context.Clients.FirstOrDefaultAsync(c => c.Name == name);
-                        
+
                         if (client == null)
                         {
+                            // 都道府県コードを取得し、住所から都道府県を削除
+                            var prefectureCode = Prefecture.GetCodeFromAddress(address);
+                            var prefectureName = Prefecture.GetName(prefectureCode);
+                            var addressWithoutPrefecture = address;
+                            if (!string.IsNullOrWhiteSpace(prefectureName) && address.StartsWith(prefectureName))
+                            {
+                                addressWithoutPrefecture = address.Substring(prefectureName.Length);
+                            }
+
                             // 新規顧客として作成
                             client = new AutoDealerSphere.Shared.Models.Client
                             {
@@ -119,8 +128,8 @@ namespace AutoDealerSphere.Server.Services
                                 Name = name,
                                 Email = "", // 必須フィールドのため空文字列
                                 Zip = !string.IsNullOrWhiteSpace(zip) ? zip.Replace("-", "") : "",
-                                Address = !string.IsNullOrWhiteSpace(address) ? address : "",
-                                Prefecture = Prefecture.GetCodeFromAddress(address) // 住所から都道府県コードを判定
+                                Address = !string.IsNullOrWhiteSpace(addressWithoutPrefecture) ? addressWithoutPrefecture : "",
+                                Prefecture = prefectureCode // 住所から都道府県コードを判定
                             };
                             
                             // 顧客を追加して保存
@@ -143,11 +152,18 @@ namespace AutoDealerSphere.Server.Services
                             // 住所が空で、インポートデータに住所がある場合は更新
                             if (string.IsNullOrWhiteSpace(client.Address) && !string.IsNullOrWhiteSpace(address))
                             {
-                                client.Address = address;
-                                client.Prefecture = Prefecture.GetCodeFromAddress(address);
+                                var prefectureCode = Prefecture.GetCodeFromAddress(address);
+                                var prefectureName = Prefecture.GetName(prefectureCode);
+                                var addressWithoutPrefecture = address;
+                                if (!string.IsNullOrWhiteSpace(prefectureName) && address.StartsWith(prefectureName))
+                                {
+                                    addressWithoutPrefecture = address.Substring(prefectureName.Length);
+                                }
+                                client.Address = addressWithoutPrefecture;
+                                client.Prefecture = prefectureCode;
                                 updated = true;
                             }
-                            
+
                             // 都道府県が未設定（0）で、住所がある場合は更新
                             if (client.Prefecture == 0 && !string.IsNullOrWhiteSpace(address))
                             {
@@ -161,14 +177,30 @@ namespace AutoDealerSphere.Server.Services
                             }
                         }
 
+                        // 車両番号を4つのパートに分割
+                        var vehicleNumber = GetValue(values, columnIndexes.LicensePlateNumber);
+                        string? plateLocation = null;
+                        string? plateClassification = null;
+                        string? plateHiragana = null;
+                        string? plateNumber = null;
+
+                        if (!string.IsNullOrWhiteSpace(vehicleNumber))
+                        {
+                            var parts = ParseVehicleNumber(vehicleNumber);
+                            plateLocation = parts.location;
+                            plateClassification = parts.classification;
+                            plateHiragana = parts.hiragana;
+                            plateNumber = parts.number;
+                        }
+
                         // 車両情報を作成
                         var vehicle = new Vehicle
                         {
                             ClientId = client.Id, // 保存後のIDを使用
-                            LicensePlateLocation = GetValue(values, columnIndexes.LicensePlateLocation),
-                            LicensePlateClassification = GetValue(values, columnIndexes.LicensePlateClassification),
-                            LicensePlateHiragana = GetValue(values, columnIndexes.LicensePlateHiragana),
-                            LicensePlateNumber = GetValue(values, columnIndexes.LicensePlateNumber),
+                            LicensePlateLocation = plateLocation ?? GetValue(values, columnIndexes.LicensePlateLocation),
+                            LicensePlateClassification = plateClassification ?? GetValue(values, columnIndexes.LicensePlateClassification),
+                            LicensePlateHiragana = plateHiragana ?? GetValue(values, columnIndexes.LicensePlateHiragana),
+                            LicensePlateNumber = plateNumber ?? GetValue(values, columnIndexes.LicensePlateNumber),
                             KeyNumber = GetValue(values, columnIndexes.KeyNumber),
                             ChassisNumber = GetValue(values, columnIndexes.ChassisNumber),
                             TypeCertificationNumber = GetValue(values, columnIndexes.TypeCertificationNumber),
@@ -395,12 +427,12 @@ namespace AutoDealerSphere.Server.Services
 
         private void ParseDateFields(List<string> values, ColumnIndexes indexes, Vehicle vehicle)
         {
-            var dateFormats = new[] { 
-                "yyyy/M/d H:mm:ss", 
-                "yyyy/M/d", 
+            var dateFormats = new[] {
+                "yyyy/M/d H:mm:ss",
+                "yyyy/M/d",
                 "yyyy年M月d日",
                 "令和y年M月d日",
-                "平成y年M月d日" 
+                "平成y年M月d日"
             };
 
             // 登録年月日
@@ -423,6 +455,82 @@ namespace AutoDealerSphere.Server.Services
                 }
             }
 
+        }
+
+        private (string? location, string? classification, string? hiragana, string? number) ParseVehicleNumber(string vehicleNumber)
+        {
+            if (string.IsNullOrWhiteSpace(vehicleNumber))
+                return (null, null, null, null);
+
+            // 車両番号の形式: "香川580め9544" または "香川500 め 3924"
+            // スペースを削除
+            vehicleNumber = vehicleNumber.Replace(" ", "").Replace("　", "");
+
+            // パターン解析
+            var location = new System.Text.StringBuilder();
+            var classification = new System.Text.StringBuilder();
+            var hiragana = new System.Text.StringBuilder();
+            var number = new System.Text.StringBuilder();
+
+            int phase = 0; // 0: location, 1: classification, 2: hiragana, 3: number
+
+            foreach (char c in vehicleNumber)
+            {
+                if (phase == 0)
+                {
+                    // 地域名（漢字、ひらがな、カタカナ）
+                    if (char.IsDigit(c))
+                    {
+                        phase = 1;
+                        classification.Append(c);
+                    }
+                    else
+                    {
+                        location.Append(c);
+                    }
+                }
+                else if (phase == 1)
+                {
+                    // 分類番号（数字）
+                    if (char.IsDigit(c))
+                    {
+                        classification.Append(c);
+                    }
+                    else
+                    {
+                        phase = 2;
+                        hiragana.Append(c);
+                    }
+                }
+                else if (phase == 2)
+                {
+                    // ひらがな（通常1文字）
+                    if (char.IsDigit(c))
+                    {
+                        phase = 3;
+                        number.Append(c);
+                    }
+                    else
+                    {
+                        hiragana.Append(c);
+                    }
+                }
+                else if (phase == 3)
+                {
+                    // 番号（数字とハイフン）
+                    if (char.IsDigit(c) || c == '-' || c == '・')
+                    {
+                        number.Append(c);
+                    }
+                }
+            }
+
+            return (
+                location.Length > 0 ? location.ToString() : null,
+                classification.Length > 0 ? classification.ToString() : null,
+                hiragana.Length > 0 ? hiragana.ToString() : null,
+                number.Length > 0 ? number.ToString() : null
+            );
         }
 
         private class ColumnIndexes
