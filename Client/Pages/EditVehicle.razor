@@ -16,6 +16,39 @@
 
 <h2>車両管理</h2>
 <h3>編集</h3>
+
+@* JSON Import Section *@
+@if (_initialized && _item != null && VehicleId > 0)
+{
+    <div class="json-import-section">
+        <h4>車検証json取り込み</h4>
+        <div class="import-controls">
+            <InputFile OnChange="@OnJsonFileSelected" accept=".json" />
+            @if (!string.IsNullOrEmpty(selectedJsonFileName))
+            {
+                <span class="selected-file">選択ファイル: @selectedJsonFileName</span>
+                <button class="btn btn-primary" @onclick="ImportJsonData" disabled="@isImporting">
+                    @if (isImporting)
+                    {
+                        <span>取り込み中...</span>
+                    }
+                    else
+                    {
+                        <span>JSONデータを取り込む</span>
+                    }
+                </button>
+            }
+        </div>
+        @if (!string.IsNullOrEmpty(importMessage))
+        {
+            <div class="import-message @(importSuccess ? "success" : "error")">
+                @importMessage
+            </div>
+        }
+    </div>
+}
+
+<h3>基本情報</h3>
 @if (_initialized)
 {
     @if (_item != null)
