@@ -184,7 +184,14 @@ namespace AutoDealerSphere.Server.Services
                             InspectionCertificateNumber = GetValue(values, columnIndexes.InspectionCertificateNumber),
                             UserNameOrCompany = GetValue(values, columnIndexes.UserNameOrCompany),
                             UserAddress = GetValue(values, columnIndexes.UserAddress),
-                            BaseLocation = GetValue(values, columnIndexes.BaseLocation)
+                            BaseLocation = GetValue(values, columnIndexes.BaseLocation),
+                            // 所有者情報（T_顧客情報.txtでは顧客が所有者）
+                            OwnerNameOrCompany = client.Name,
+                            OwnerAddress = client.Address,
+                            OwnerPostalCode = client.Zip,
+                            // インポート情報
+                            ImportSource = "CSV",
+                            ImportDate = DateTime.Now
                         };
 
                         // 数値フィールドの解析
@@ -294,14 +301,13 @@ namespace AutoDealerSphere.Server.Services
                     case "fld_長さ": indexes.VehicleLength = i; break;
                     case "fld_幅": indexes.VehicleWidth = i; break;
                     case "fld_高さ": indexes.VehicleHeight = i; break;
-                    case "fld_前軸重": indexes.FrontOverhang = i; break;
-                    case "fld_後軸重": indexes.RearOverhang = i; break;
+                    case "fld_前軸重": indexes.FrontAxleWeight = i; break;
+                    case "fld_後軸重": indexes.RearAxleWeight = i; break;
                     case "fld_型式": indexes.ModelCode = i; break;
                     case "fld_原動機の型式": indexes.EngineModel = i; break;
                     case "fld_総排気量又は定格出力": indexes.Displacement = i; break;
                     case "fld_燃料の種": indexes.FuelType = i; break;
                     case "fld_有効期限の満了する日": indexes.InspectionExpiryDate = i; break;
-                    case "fld_次回車検日付": indexes.NextInspectionDate = i; break;
                     case "fld_車検年月": indexes.InspectionCertificateNumber = i; break;
                     case "fld_使用者の氏名又は名称": indexes.UserNameOrCompany = i; break;
                     case "fld_使用者の住所": indexes.UserAddress = i; break;
@@ -370,14 +376,14 @@ namespace AutoDealerSphere.Server.Services
                 vehicle.VehicleHeight = height;
             }
 
-            if (int.TryParse(GetValue(values, indexes.FrontOverhang), out int front))
+            if (int.TryParse(GetValue(values, indexes.FrontAxleWeight), out int frontAxle))
             {
-                vehicle.FrontOverhang = front;
+                vehicle.FrontAxleWeight = frontAxle;
             }
 
-            if (int.TryParse(GetValue(values, indexes.RearOverhang), out int rear))
+            if (int.TryParse(GetValue(values, indexes.RearAxleWeight), out int rearAxle))
             {
-                vehicle.RearOverhang = rear;
+                vehicle.RearAxleWeight = rearAxle;
             }
 
             // 排気量
@@ -417,15 +423,6 @@ namespace AutoDealerSphere.Server.Services
                 }
             }
 
-            // 次回車検日
-            var nextInspection = GetValue(values, indexes.NextInspectionDate);
-            if (!string.IsNullOrWhiteSpace(nextInspection))
-            {
-                if (DateTime.TryParseExact(nextInspection, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
-                {
-                    vehicle.NextInspectionDate = date;
-                }
-            }
         }
 
         private class ColumnIndexes
@@ -456,14 +453,13 @@ namespace AutoDealerSphere.Server.Services
             public int VehicleLength { get; set; } = -1;
             public int VehicleWidth { get; set; } = -1;
             public int VehicleHeight { get; set; } = -1;
-            public int FrontOverhang { get; set; } = -1;
-            public int RearOverhang { get; set; } = -1;
+            public int FrontAxleWeight { get; set; } = -1;
+            public int RearAxleWeight { get; set; } = -1;
             public int ModelCode { get; set; } = -1;
             public int EngineModel { get; set; } = -1;
             public int Displacement { get; set; } = -1;
             public int FuelType { get; set; } = -1;
             public int InspectionExpiryDate { get; set; } = -1;
-            public int NextInspectionDate { get; set; } = -1;
             public int InspectionCertificateNumber { get; set; } = -1;
             public int UserNameOrCompany { get; set; } = -1;
             public int UserAddress { get; set; } = -1;

@@ -63,7 +63,6 @@ namespace AutoDealerSphere.Client.Pages
                             Displacement = vehicle.Displacement,
                             FuelType = vehicle.FuelType,
                             InspectionExpiryDate = vehicle.InspectionExpiryDate,
-                            NextInspectionDate = vehicle.NextInspectionDate,
                             InspectionCertificateNumber = vehicle.InspectionCertificateNumber,
                             UserNameOrCompany = vehicle.UserNameOrCompany,
                             UserAddress = vehicle.UserAddress,
