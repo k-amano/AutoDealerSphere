@@ -1,0 +1,62 @@
+.json-import-section {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.json-import-section h4 {
+    margin-top: 0;
+    color: #333;
+}
+
+.import-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.selected-file {
+    color: #555;
+    font-size: 0.9em;
+}
+
+.btn-import {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.btn-import:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.btn-import:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.import-message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.import-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.import-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
