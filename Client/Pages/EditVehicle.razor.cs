@@ -314,11 +314,24 @@ namespace AutoDealerSphere.Client.Pages
             // 初期値をFalseに設定 - 全項目が一致して初めてTrueになる
             bool allFieldsMatch = false;
 
+            // CertInfoオブジェクトを取得
+            JsonElement certInfo;
+            if (root.TryGetProperty("CertInfo", out certInfo))
+            {
+                await JSRuntime.InvokeVoidAsync("console.log", "CertInfoオブジェクトを検出しました");
+            }
+            else
+            {
+                certInfo = root;
+                await JSRuntime.InvokeVoidAsync("console.log", "CertInfoがないため、ルートを使用します");
+            }
+
             // 基本情報の検証
-            if (root.TryGetProperty("inspection_certificate_number", out var jsonCertNumber))
+            // 車検証番号 (ElectCertMgNo)
+            if (certInfo.TryGetProperty("ElectCertMgNo", out var jsonElectCertMgNo))
             {
                 checkedFields++;
-                var jsonValue = jsonCertNumber.GetString();
+                var jsonValue = jsonElectCertMgNo.GetString();
                 var dbValue = vehicle.InspectionCertificateNumber;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
@@ -327,10 +340,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "車検証番号", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("vehicle_name", out var jsonVehicleName))
+            // 車名 (CarName)
+            if (certInfo.TryGetProperty("CarName", out var jsonCarName))
             {
                 checkedFields++;
-                var jsonValue = jsonVehicleName.GetString();
+                var jsonValue = jsonCarName.GetString();
                 var dbValue = vehicle.VehicleName;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
@@ -339,7 +353,8 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "車名", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("vehicle_model", out var jsonModel))
+            // 型式 (Model)
+            if (certInfo.TryGetProperty("Model", out var jsonModel))
             {
                 checkedFields++;
                 var jsonValue = jsonModel.GetString();
@@ -351,10 +366,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "型式", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("chassis_number", out var jsonChassis))
+            // 車台番号 (CarNo)
+            if (certInfo.TryGetProperty("CarNo", out var jsonCarNo))
             {
                 checkedFields++;
-                var jsonValue = jsonChassis.GetString();
+                var jsonValue = jsonCarNo.GetString();
                 var dbValue = vehicle.ChassisNumber;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
@@ -363,10 +379,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "車台番号", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("engine_model", out var jsonEngine))
+            // エンジン型式 (EngineModel)
+            if (certInfo.TryGetProperty("EngineModel", out var jsonEngineModel))
             {
                 checkedFields++;
-                var jsonValue = jsonEngine.GetString();
+                var jsonValue = jsonEngineModel.GetString();
                 var dbValue = vehicle.EngineModel;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
@@ -375,10 +392,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "エンジン型式", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("type_certification_number", out var jsonTypeCert))
+            // 型式指定番号 (ModelSpecifyNo)
+            if (certInfo.TryGetProperty("ModelSpecifyNo", out var jsonModelSpecifyNo))
             {
                 checkedFields++;
-                var jsonValue = jsonTypeCert.GetString();
+                var jsonValue = jsonModelSpecifyNo.GetString();
                 var dbValue = vehicle.TypeCertificationNumber;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
@@ -387,10 +405,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "型式指定番号", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("category_number", out var jsonCategory))
+            // 類別区分番号 (ClassifyAroundNo)
+            if (certInfo.TryGetProperty("ClassifyAroundNo", out var jsonClassifyAroundNo))
             {
                 checkedFields++;
-                var jsonValue = jsonCategory.GetString();
+                var jsonValue = jsonClassifyAroundNo.GetString();
                 var dbValue = vehicle.CategoryNumber;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
@@ -399,60 +418,49 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "類別区分番号", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            // ナンバープレート情報
-            if (root.TryGetProperty("license_plate_location", out var jsonLocation))
+            // ナンバープレート情報 (EntryNoCarNoから解析)
+            if (certInfo.TryGetProperty("EntryNoCarNo", out var jsonEntryNoCarNo))
             {
-                checkedFields++;
-                var jsonValue = jsonLocation.GetString();
-                var dbValue = vehicle.LicensePlateLocation;
-                var isMatch = jsonValue == dbValue;
-                if (isMatch) matchedFields++;
-                else mismatches.Add($"登録地域: JSON=\"{jsonValue}\" DB=\"{dbValue ?? "null"}\"");
+                var plateInfo = jsonEntryNoCarNo.GetString();
+                if (!string.IsNullOrWhiteSpace(plateInfo))
+                {
+                    var parts = plateInfo.Split(new[] { '＊', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length >= 4)
+                    {
+                        checkedFields += 4;
+                        // 登録地域
+                        var isMatch1 = parts[0] == vehicle.LicensePlateLocation;
+                        if (isMatch1) matchedFields++;
+                        else mismatches.Add($"登録地域: JSON=\"{parts[0]}\" DB=\"{vehicle.LicensePlateLocation ?? "null"}\"");
+                        comparisons.Add(new { Field = "登録地域", JSON = parts[0], Database = vehicle.LicensePlateLocation, Match = isMatch1 ? "○" : "×" });
 
-                comparisons.Add(new { Field = "登録地域", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
-            }
+                        // 分類番号
+                        var isMatch2 = parts[1] == vehicle.LicensePlateClassification;
+                        if (isMatch2) matchedFields++;
+                        else mismatches.Add($"分類番号: JSON=\"{parts[1]}\" DB=\"{vehicle.LicensePlateClassification ?? "null"}\"");
+                        comparisons.Add(new { Field = "分類番号", JSON = parts[1], Database = vehicle.LicensePlateClassification, Match = isMatch2 ? "○" : "×" });
 
-            if (root.TryGetProperty("license_plate_classification", out var jsonClassification))
-            {
-                checkedFields++;
-                var jsonValue = jsonClassification.GetString();
-                var dbValue = vehicle.LicensePlateClassification;
-                var isMatch = jsonValue == dbValue;
-                if (isMatch) matchedFields++;
-                else mismatches.Add($"分類番号: JSON=\"{jsonValue}\" DB=\"{dbValue ?? "null"}\"");
+                        // ひらがな
+                        var isMatch3 = parts[2] == vehicle.LicensePlateHiragana;
+                        if (isMatch3) matchedFields++;
+                        else mismatches.Add($"ひらがな: JSON=\"{parts[2]}\" DB=\"{vehicle.LicensePlateHiragana ?? "null"}\"");
+                        comparisons.Add(new { Field = "ひらがな", JSON = parts[2], Database = vehicle.LicensePlateHiragana, Match = isMatch3 ? "○" : "×" });
 
-                comparisons.Add(new { Field = "分類番号", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
-            }
-
-            if (root.TryGetProperty("license_plate_hiragana", out var jsonHiragana))
-            {
-                checkedFields++;
-                var jsonValue = jsonHiragana.GetString();
-                var dbValue = vehicle.LicensePlateHiragana;
-                var isMatch = jsonValue == dbValue;
-                if (isMatch) matchedFields++;
-                else mismatches.Add($"ひらがな: JSON=\"{jsonValue}\" DB=\"{dbValue ?? "null"}\"");
-
-                comparisons.Add(new { Field = "ひらがな", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
-            }
-
-            if (root.TryGetProperty("license_plate_number", out var jsonNumber))
-            {
-                checkedFields++;
-                var jsonValue = jsonNumber.GetString();
-                var dbValue = vehicle.LicensePlateNumber;
-                var isMatch = jsonValue == dbValue;
-                if (isMatch) matchedFields++;
-                else mismatches.Add($"ナンバー: JSON=\"{jsonValue}\" DB=\"{dbValue ?? "null"}\"");
-
-                comparisons.Add(new { Field = "ナンバー", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
+                        // ナンバー
+                        var isMatch4 = parts[3] == vehicle.LicensePlateNumber;
+                        if (isMatch4) matchedFields++;
+                        else mismatches.Add($"ナンバー: JSON=\"{parts[3]}\" DB=\"{vehicle.LicensePlateNumber ?? "null"}\"");
+                        comparisons.Add(new { Field = "ナンバー", JSON = parts[3], Database = vehicle.LicensePlateNumber, Match = isMatch4 ? "○" : "×" });
+                    }
+                }
             }
 
             // 車両諸元
-            if (root.TryGetProperty("purpose", out var jsonPurpose))
+            // 用途 (Use)
+            if (certInfo.TryGetProperty("Use", out var jsonUse))
             {
                 checkedFields++;
-                var jsonValue = jsonPurpose.GetString();
+                var jsonValue = jsonUse.GetString();
                 var dbValue = vehicle.Purpose;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
@@ -461,10 +469,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "用途", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("personal_business_use", out var jsonPersonalUse))
+            // 自家用・事業用 (PrivateBusiness)
+            if (certInfo.TryGetProperty("PrivateBusiness", out var jsonPrivateBusiness))
             {
                 checkedFields++;
-                var jsonValue = jsonPersonalUse.GetString();
+                var jsonValue = jsonPrivateBusiness.GetString();
                 var dbValue = vehicle.PersonalBusinessUse;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
@@ -473,10 +482,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "自家用・事業用", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("body_shape", out var jsonBodyShape))
+            // 車体の形状 (CarShape)
+            if (certInfo.TryGetProperty("CarShape", out var jsonCarShape))
             {
                 checkedFields++;
-                var jsonValue = jsonBodyShape.GetString();
+                var jsonValue = jsonCarShape.GetString();
                 var dbValue = vehicle.BodyShape;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
@@ -486,10 +496,11 @@ namespace AutoDealerSphere.Client.Pages
             }
 
             // 数値フィールドの検証
-            if (root.TryGetProperty("seating_capacity", out var jsonSeating))
+            // 乗車定員 (Cap)
+            if (certInfo.TryGetProperty("Cap", out var jsonCap))
             {
                 checkedFields++;
-                var jsonValue = jsonSeating.ValueKind == JsonValueKind.Number ? jsonSeating.GetInt32().ToString() : jsonSeating.GetString();
+                var jsonValue = jsonCap.GetString();
                 var dbValue = vehicle.SeatingCapacity?.ToString();
                 var isMatch = jsonValue == dbValue || (int.TryParse(jsonValue, out var jv) && jv == vehicle.SeatingCapacity);
                 if (isMatch) matchedFields++;
@@ -498,22 +509,34 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "乗車定員", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("max_load_capacity", out var jsonMaxLoad))
+            // 最大積載量 (Maxloadage)
+            if (certInfo.TryGetProperty("Maxloadage", out var jsonMaxloadage))
             {
                 checkedFields++;
-                var jsonValue = jsonMaxLoad.ValueKind == JsonValueKind.Number ? jsonMaxLoad.GetInt32().ToString() : jsonMaxLoad.GetString();
-                var dbValue = vehicle.MaxLoadCapacity?.ToString();
-                var isMatch = jsonValue == dbValue || (int.TryParse(jsonValue, out var jv) && jv == vehicle.MaxLoadCapacity);
-                if (isMatch) matchedFields++;
-                else mismatches.Add($"最大積載量: JSON=\"{jsonValue}\" DB=\"{dbValue ?? "null"}\"");
-
-                comparisons.Add(new { Field = "最大積載量", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
+                var jsonValue = jsonMaxloadage.GetString();
+                if (jsonValue != "-")
+                {
+                    var dbValue = vehicle.MaxLoadCapacity?.ToString();
+                    var isMatch = jsonValue == dbValue || (int.TryParse(jsonValue, out var jv) && jv == vehicle.MaxLoadCapacity);
+                    if (isMatch) matchedFields++;
+                    else mismatches.Add($"最大積載量: JSON=\"{jsonValue}\" DB=\"{dbValue ?? "null"}\"");
+                    comparisons.Add(new { Field = "最大積載量", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
+                }
+                else
+                {
+                    // "-"の場合はnullまたは0と一致するか確認
+                    var isMatch = vehicle.MaxLoadCapacity == null || vehicle.MaxLoadCapacity == 0;
+                    if (isMatch) matchedFields++;
+                    else mismatches.Add($"最大積載量: JSON=\"-\" DB=\"{vehicle.MaxLoadCapacity?.ToString() ?? "null"}\"");
+                    comparisons.Add(new { Field = "最大積載量", JSON = "-", Database = vehicle.MaxLoadCapacity?.ToString(), Match = isMatch ? "○" : "×" });
+                }
             }
 
-            if (root.TryGetProperty("vehicle_weight", out var jsonWeight))
+            // 車両重量 (CarWgt)
+            if (certInfo.TryGetProperty("CarWgt", out var jsonCarWgt))
             {
                 checkedFields++;
-                var jsonValue = jsonWeight.ValueKind == JsonValueKind.Number ? jsonWeight.GetInt32().ToString() : jsonWeight.GetString();
+                var jsonValue = jsonCarWgt.GetString();
                 var dbValue = vehicle.VehicleWeight?.ToString();
                 var isMatch = jsonValue == dbValue || (int.TryParse(jsonValue, out var jv) && jv == vehicle.VehicleWeight);
                 if (isMatch) matchedFields++;
@@ -522,10 +545,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "車両重量", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("vehicle_total_weight", out var jsonTotalWeight))
+            // 車両総重量 (CarTotalWgt)
+            if (certInfo.TryGetProperty("CarTotalWgt", out var jsonCarTotalWgt))
             {
                 checkedFields++;
-                var jsonValue = jsonTotalWeight.ValueKind == JsonValueKind.Number ? jsonTotalWeight.GetInt32().ToString() : jsonTotalWeight.GetString();
+                var jsonValue = jsonCarTotalWgt.GetString();
                 var dbValue = vehicle.VehicleTotalWeight?.ToString();
                 var isMatch = jsonValue == dbValue || (int.TryParse(jsonValue, out var jv) && jv == vehicle.VehicleTotalWeight);
                 if (isMatch) matchedFields++;
@@ -535,10 +559,11 @@ namespace AutoDealerSphere.Client.Pages
             }
 
             // 寸法
-            if (root.TryGetProperty("vehicle_length", out var jsonLength))
+            // 長さ (Length)
+            if (certInfo.TryGetProperty("Length", out var jsonLength))
             {
                 checkedFields++;
-                var jsonValue = jsonLength.ValueKind == JsonValueKind.Number ? jsonLength.GetInt32().ToString() : jsonLength.GetString();
+                var jsonValue = jsonLength.GetString();
                 var dbValue = vehicle.VehicleLength?.ToString();
                 var isMatch = jsonValue == dbValue || (int.TryParse(jsonValue, out var jv) && jv == vehicle.VehicleLength);
                 if (isMatch) matchedFields++;
@@ -547,10 +572,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "長さ", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("vehicle_width", out var jsonWidth))
+            // 幅 (Width)
+            if (certInfo.TryGetProperty("Width", out var jsonWidth))
             {
                 checkedFields++;
-                var jsonValue = jsonWidth.ValueKind == JsonValueKind.Number ? jsonWidth.GetInt32().ToString() : jsonWidth.GetString();
+                var jsonValue = jsonWidth.GetString();
                 var dbValue = vehicle.VehicleWidth?.ToString();
                 var isMatch = jsonValue == dbValue || (int.TryParse(jsonValue, out var jv) && jv == vehicle.VehicleWidth);
                 if (isMatch) matchedFields++;
@@ -559,10 +585,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "幅", JSON = jsonValue, Database = dbValue, Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("vehicle_height", out var jsonHeight))
+            // 高さ (Height)
+            if (certInfo.TryGetProperty("Height", out var jsonHeight))
             {
                 checkedFields++;
-                var jsonValue = jsonHeight.ValueKind == JsonValueKind.Number ? jsonHeight.GetInt32().ToString() : jsonHeight.GetString();
+                var jsonValue = jsonHeight.GetString();
                 var dbValue = vehicle.VehicleHeight?.ToString();
                 var isMatch = jsonValue == dbValue || (int.TryParse(jsonValue, out var jv) && jv == vehicle.VehicleHeight);
                 if (isMatch) matchedFields++;
@@ -572,17 +599,15 @@ namespace AutoDealerSphere.Client.Pages
             }
 
             // エンジン関連
-            if (root.TryGetProperty("displacement", out var jsonDisplacement))
+            // 排気量 (Displacement) - 既にL単位
+            if (certInfo.TryGetProperty("Displacement", out var jsonDisplacement))
             {
                 checkedFields++;
+                var jsonStr = jsonDisplacement.GetString();
                 decimal? jsonDecimalValue = null;
-                if (jsonDisplacement.ValueKind == JsonValueKind.Number)
+                if (decimal.TryParse(jsonStr, out var parsed))
                 {
-                    jsonDecimalValue = jsonDisplacement.GetDecimal() / 1000m; // ccからLに変換
-                }
-                else if (decimal.TryParse(jsonDisplacement.GetString(), out var parsed))
-                {
-                    jsonDecimalValue = parsed / 1000m;
+                    jsonDecimalValue = parsed;
                 }
 
                 var isMatch = jsonDecimalValue.HasValue && Math.Abs((jsonDecimalValue.Value - (vehicle.Displacement ?? 0))) < 0.01m;
@@ -592,10 +617,11 @@ namespace AutoDealerSphere.Client.Pages
                 comparisons.Add(new { Field = "排気量", JSON = $"{jsonDecimalValue?.ToString("F2")}L", Database = $"{vehicle.Displacement?.ToString("F2")}L", Match = isMatch ? "○" : "×" });
             }
 
-            if (root.TryGetProperty("fuel_type", out var jsonFuel))
+            // 燃料の種類 (FuelClass)
+            if (certInfo.TryGetProperty("FuelClass", out var jsonFuelClass))
             {
                 checkedFields++;
-                var jsonValue = jsonFuel.GetString();
+                var jsonValue = jsonFuelClass.GetString();
                 var dbValue = vehicle.FuelType;
                 var isMatch = jsonValue == dbValue;
                 if (isMatch) matchedFields++;
