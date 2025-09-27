@@ -206,104 +206,219 @@ namespace AutoDealerSphere.Server.Controllers
                 vehicle.ImportSource = "JSON";
                 vehicle.ImportDate = DateTime.Now;
 
-                // 車検証番号
-                if (root.TryGetProperty("inspection_certificate_number", out var certNumber))
+                // CertInfoオブジェクトを取得
+                JsonElement certInfo;
+                if (root.TryGetProperty("CertInfo", out certInfo))
                 {
-                    var value = certNumber.GetString();
+                    Console.WriteLine($"[ImportJson] CertInfoオブジェクトを検出しました");
+                }
+                else
+                {
+                    // CertInfoがない場合はルートを使用（後方互換性）
+                    certInfo = root;
+                    Console.WriteLine($"[ImportJson] CertInfoが見つからないため、ルートオブジェクトを使用します");
+                }
+
+                // 車検証番号 (ElectCertMgNo)
+                if (certInfo.TryGetProperty("ElectCertMgNo", out var electCertMgNo))
+                {
+                    var value = electCertMgNo.GetString();
                     vehicle.InspectionCertificateNumber = value;
                     Console.WriteLine($"[ImportJson] 車検証番号をセット: {value}");
                     updatedFields.Add($"InspectionCertificateNumber = {value}");
                 }
-
-                // 車名
-                if (root.TryGetProperty("vehicle_name", out var vehicleName))
+                // 後方互換性
+                else if (certInfo.TryGetProperty("inspection_certificate_number", out var certNumber))
                 {
-                    var value = vehicleName.GetString();
+                    var value = certNumber.GetString();
+                    vehicle.InspectionCertificateNumber = value;
+                    Console.WriteLine($"[ImportJson] 車検証番号をセット(後方互換): {value}");
+                    updatedFields.Add($"InspectionCertificateNumber = {value}");
+                }
+
+                // 車名 (CarName)
+                if (certInfo.TryGetProperty("CarName", out var carName))
+                {
+                    var value = carName.GetString();
                     vehicle.VehicleName = value;
                     Console.WriteLine($"[ImportJson] 車名をセット: {value}");
                     updatedFields.Add($"VehicleName = {value}");
                 }
-
-                // 型式
-                if (root.TryGetProperty("vehicle_model", out var vehicleModel))
+                else if (certInfo.TryGetProperty("vehicle_name", out var vehicleName))
                 {
-                    var value = vehicleModel.GetString();
+                    var value = vehicleName.GetString();
+                    vehicle.VehicleName = value;
+                    Console.WriteLine($"[ImportJson] 車名をセット(後方互換): {value}");
+                    updatedFields.Add($"VehicleName = {value}");
+                }
+
+                // 型式 (Model)
+                if (certInfo.TryGetProperty("Model", out var model))
+                {
+                    var value = model.GetString();
                     vehicle.VehicleModel = value;
                     Console.WriteLine($"[ImportJson] 型式をセット: {value}");
                     updatedFields.Add($"VehicleModel = {value}");
                 }
-
-                // 車台番号
-                if (root.TryGetProperty("chassis_number", out var chassisNumber))
+                else if (certInfo.TryGetProperty("vehicle_model", out var vehicleModel))
                 {
-                    var value = chassisNumber.GetString();
+                    var value = vehicleModel.GetString();
+                    vehicle.VehicleModel = value;
+                    Console.WriteLine($"[ImportJson] 型式をセット(後方互換): {value}");
+                    updatedFields.Add($"VehicleModel = {value}");
+                }
+
+                // 車台番号 (CarNo)
+                if (certInfo.TryGetProperty("CarNo", out var carNo))
+                {
+                    var value = carNo.GetString();
                     vehicle.ChassisNumber = value;
                     Console.WriteLine($"[ImportJson] 車台番号をセット: {value}");
                     updatedFields.Add($"ChassisNumber = {value}");
                 }
-
-                // エンジン型式
-                if (root.TryGetProperty("engine_model", out var engineModel))
+                else if (certInfo.TryGetProperty("chassis_number", out var chassisNumber))
                 {
-                    var value = engineModel.GetString();
+                    var value = chassisNumber.GetString();
+                    vehicle.ChassisNumber = value;
+                    Console.WriteLine($"[ImportJson] 車台番号をセット(後方互換): {value}");
+                    updatedFields.Add($"ChassisNumber = {value}");
+                }
+
+                // エンジン型式 (EngineModel)
+                if (certInfo.TryGetProperty("EngineModel", out var engModel))
+                {
+                    var value = engModel.GetString();
                     vehicle.EngineModel = value;
                     Console.WriteLine($"[ImportJson] エンジン型式をセット: {value}");
                     updatedFields.Add($"EngineModel = {value}");
                 }
-
-                // 型式指定番号
-                if (root.TryGetProperty("type_certification_number", out var typeCertNumber))
+                else if (certInfo.TryGetProperty("engine_model", out var engineModel))
                 {
-                    var value = typeCertNumber.GetString();
+                    var value = engineModel.GetString();
+                    vehicle.EngineModel = value;
+                    Console.WriteLine($"[ImportJson] エンジン型式をセット(後方互換): {value}");
+                    updatedFields.Add($"EngineModel = {value}");
+                }
+
+                // 型式指定番号 (ModelSpecifyNo)
+                if (certInfo.TryGetProperty("ModelSpecifyNo", out var modelSpecifyNo))
+                {
+                    var value = modelSpecifyNo.GetString();
                     vehicle.TypeCertificationNumber = value;
                     Console.WriteLine($"[ImportJson] 型式指定番号をセット: {value}");
                     updatedFields.Add($"TypeCertificationNumber = {value}");
                 }
-
-                // 類別区分番号
-                if (root.TryGetProperty("category_number", out var categoryNum))
+                else if (certInfo.TryGetProperty("type_certification_number", out var typeCertNumber))
                 {
-                    var value = categoryNum.GetString();
+                    var value = typeCertNumber.GetString();
+                    vehicle.TypeCertificationNumber = value;
+                    Console.WriteLine($"[ImportJson] 型式指定番号をセット(後方互換): {value}");
+                    updatedFields.Add($"TypeCertificationNumber = {value}");
+                }
+
+                // 類別区分番号 (ClassifyAroundNo)
+                if (certInfo.TryGetProperty("ClassifyAroundNo", out var classifyAroundNo))
+                {
+                    var value = classifyAroundNo.GetString();
                     vehicle.CategoryNumber = value;
                     Console.WriteLine($"[ImportJson] 類別区分番号をセット: {value}");
                     updatedFields.Add($"CategoryNumber = {value}");
                 }
-
-                // ナンバープレート情報
-                if (root.TryGetProperty("license_plate_location", out var plateLocation))
+                else if (certInfo.TryGetProperty("category_number", out var categoryNum))
                 {
-                    var value = plateLocation.GetString();
-                    vehicle.LicensePlateLocation = value;
-                    Console.WriteLine($"[ImportJson] ナンバープレート地域をセット: {value}");
-                    updatedFields.Add($"LicensePlateLocation = {value}");
+                    var value = categoryNum.GetString();
+                    vehicle.CategoryNumber = value;
+                    Console.WriteLine($"[ImportJson] 類別区分番号をセット(後方互換): {value}");
+                    updatedFields.Add($"CategoryNumber = {value}");
                 }
 
-                if (root.TryGetProperty("license_plate_classification", out var plateClass))
+                // ナンバープレート情報 (EntryNoCarNoから解析)
+                if (certInfo.TryGetProperty("EntryNoCarNo", out var entryNoCarNo))
                 {
-                    var value = plateClass.GetString();
-                    vehicle.LicensePlateClassification = value;
-                    Console.WriteLine($"[ImportJson] 分類番号をセット: {value}");
-                    updatedFields.Add($"LicensePlateClassification = {value}");
+                    var plateInfo = entryNoCarNo.GetString();
+                    if (!string.IsNullOrWhiteSpace(plateInfo))
+                    {
+                        // "香川　５００　め　３９２４" のような形式を解析
+                        var parts = plateInfo.Split(new[] { '　', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length >= 4)
+                        {
+                            vehicle.LicensePlateLocation = parts[0];  // 香川
+                            vehicle.LicensePlateClassification = parts[1];  // ５００ or 500
+                            vehicle.LicensePlateHiragana = parts[2];  // め
+                            vehicle.LicensePlateNumber = parts[3];  // ３９２４
+                            Console.WriteLine($"[ImportJson] ナンバープレート情報をセット: {plateInfo}");
+                            updatedFields.Add($"LicensePlate = {plateInfo}");
+                        }
+                    }
+                }
+                // 後方互換性（個別フィールド）
+                else
+                {
+                    if (certInfo.TryGetProperty("license_plate_location", out var plateLocation))
+                    {
+                        var value = plateLocation.GetString();
+                        vehicle.LicensePlateLocation = value;
+                        Console.WriteLine($"[ImportJson] ナンバープレート地域をセット: {value}");
+                        updatedFields.Add($"LicensePlateLocation = {value}");
+                    }
+
+                    if (certInfo.TryGetProperty("license_plate_classification", out var plateClass))
+                    {
+                        var value = plateClass.GetString();
+                        vehicle.LicensePlateClassification = value;
+                        Console.WriteLine($"[ImportJson] 分類番号をセット: {value}");
+                        updatedFields.Add($"LicensePlateClassification = {value}");
+                    }
+
+                    if (certInfo.TryGetProperty("license_plate_hiragana", out var plateHiragana))
+                    {
+                        var value = plateHiragana.GetString();
+                        vehicle.LicensePlateHiragana = value;
+                        Console.WriteLine($"[ImportJson] ひらがなをセット: {value}");
+                        updatedFields.Add($"LicensePlateHiragana = {value}");
+                    }
+
+                    if (certInfo.TryGetProperty("license_plate_number", out var plateNumber))
+                    {
+                        var value = plateNumber.GetString();
+                        vehicle.LicensePlateNumber = value;
+                        Console.WriteLine($"[ImportJson] ナンバーをセット: {value}");
+                        updatedFields.Add($"LicensePlateNumber = {value}");
+                    }
                 }
 
-                if (root.TryGetProperty("license_plate_hiragana", out var plateHiragana))
+                // 初度登録年月 (FirstregistdateE/Y/M)
+                if (certInfo.TryGetProperty("FirstregistdateE", out var era) &&
+                    certInfo.TryGetProperty("FirstregistdateY", out var year) &&
+                    certInfo.TryGetProperty("FirstregistdateM", out var month))
                 {
-                    var value = plateHiragana.GetString();
-                    vehicle.LicensePlateHiragana = value;
-                    Console.WriteLine($"[ImportJson] ひらがなをセット: {value}");
-                    updatedFields.Add($"LicensePlateHiragana = {value}");
-                }
+                    var eraStr = era.GetString();
+                    var yearStr = year.GetString()?.Trim();
+                    var monthStr = month.GetString()?.Trim();
 
-                if (root.TryGetProperty("license_plate_number", out var plateNumber))
-                {
-                    var value = plateNumber.GetString();
-                    vehicle.LicensePlateNumber = value;
-                    Console.WriteLine($"[ImportJson] ナンバーをセット: {value}");
-                    updatedFields.Add($"LicensePlateNumber = {value}");
-                }
+                    // 平成/令和から西暦へ変換
+                    if (!string.IsNullOrEmpty(yearStr) && !string.IsNullOrEmpty(monthStr))
+                    {
+                        if (int.TryParse(yearStr, out var yearNum) && int.TryParse(monthStr, out var monthNum))
+                        {
+                            int actualYear = 0;
+                            if (eraStr == "令和")
+                                actualYear = 2018 + yearNum;
+                            else if (eraStr == "平成")
+                                actualYear = 1988 + yearNum;
 
-                // 初度登録年月
-                if (root.TryGetProperty("first_registration_date", out var firstRegDate))
+                            if (actualYear > 0)
+                            {
+                                var date = new DateTime(actualYear, monthNum, 1);
+                                vehicle.FirstRegistrationDate = date;
+                                Console.WriteLine($"[ImportJson] 初度登録年月をセット: {date:yyyy-MM}");
+                                updatedFields.Add($"FirstRegistrationDate = {date:yyyy-MM}");
+                            }
+                        }
+                    }
+                }
+                // 後方互換性
+                else if (certInfo.TryGetProperty("first_registration_date", out var firstRegDate))
                 {
                     var dateStr = firstRegDate.GetString();
                     if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParseExact(dateStr,
@@ -311,167 +426,245 @@ namespace AutoDealerSphere.Server.Controllers
                         CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                     {
                         vehicle.FirstRegistrationDate = date;
-                        Console.WriteLine($"[ImportJson] 初度登録年月をセット: {date:yyyy-MM-dd}");
+                        Console.WriteLine($"[ImportJson] 初度登録年月をセット(後方互換): {date:yyyy-MM-dd}");
                         updatedFields.Add($"FirstRegistrationDate = {date:yyyy-MM-dd}");
                     }
                 }
 
-                // 登録年月日
-                if (root.TryGetProperty("registration_date", out var regDate))
+                // 用途 (Use)
+                if (certInfo.TryGetProperty("Use", out var use))
                 {
-                    var dateStr = regDate.GetString();
-                    if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParseExact(dateStr,
-                        new[] { "yyyy-MM-dd", "yyyy/MM/dd", "yyyyMMdd" },
-                        CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
-                    {
-                        vehicle.RegistrationDate = date;
-                        Console.WriteLine($"[ImportJson] 登録年月日をセット: {date:yyyy-MM-dd}");
-                        updatedFields.Add($"RegistrationDate = {date:yyyy-MM-dd}");
-                    }
-                }
-
-                // 製造年月
-                if (root.TryGetProperty("manufacture_date", out var mfgDate))
-                {
-                    var dateStr = mfgDate.GetString();
-                    if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParseExact(dateStr,
-                        new[] { "yyyy-MM-dd", "yyyy/MM/dd", "yyyyMMdd", "yyyy-MM", "yyyy/MM" },
-                        CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
-                    {
-                        vehicle.ManufactureDate = date;
-                        Console.WriteLine($"[ImportJson] 製造年月をセット: {date:yyyy-MM}");
-                        updatedFields.Add($"ManufactureDate = {date:yyyy-MM}");
-                    }
-                }
-
-                // 用途
-                if (root.TryGetProperty("purpose", out var purpose))
-                {
-                    var value = purpose.GetString();
+                    var value = use.GetString();
                     vehicle.Purpose = value;
                     Console.WriteLine($"[ImportJson] 用途をセット: {value}");
                     updatedFields.Add($"Purpose = {value}");
                 }
-
-                // 自家用・事業用
-                if (root.TryGetProperty("personal_business_use", out var pbUse))
+                else if (certInfo.TryGetProperty("purpose", out var purpose))
                 {
-                    var value = pbUse.GetString();
+                    var value = purpose.GetString();
+                    vehicle.Purpose = value;
+                    Console.WriteLine($"[ImportJson] 用途をセット(後方互換): {value}");
+                    updatedFields.Add($"Purpose = {value}");
+                }
+
+                // 自家用・事業用 (PrivateBusiness)
+                if (certInfo.TryGetProperty("PrivateBusiness", out var privateBusiness))
+                {
+                    var value = privateBusiness.GetString();
                     vehicle.PersonalBusinessUse = value;
                     Console.WriteLine($"[ImportJson] 自家用・事業用をセット: {value}");
                     updatedFields.Add($"PersonalBusinessUse = {value}");
                 }
-
-                // 車体の形状
-                if (root.TryGetProperty("body_shape", out var bodyShape))
+                else if (certInfo.TryGetProperty("personal_business_use", out var pbUse))
                 {
-                    var value = bodyShape.GetString();
+                    var value = pbUse.GetString();
+                    vehicle.PersonalBusinessUse = value;
+                    Console.WriteLine($"[ImportJson] 自家用・事業用をセット(後方互換): {value}");
+                    updatedFields.Add($"PersonalBusinessUse = {value}");
+                }
+
+                // 車体の形状 (CarShape)
+                if (certInfo.TryGetProperty("CarShape", out var carShape))
+                {
+                    var value = carShape.GetString();
                     vehicle.BodyShape = value;
                     Console.WriteLine($"[ImportJson] 車体の形状をセット: {value}");
                     updatedFields.Add($"BodyShape = {value}");
                 }
-
-                // 車体の色
-                if (root.TryGetProperty("body_color", out var bodyColor))
+                else if (certInfo.TryGetProperty("body_shape", out var bodyShape))
                 {
-                    var value = bodyColor.GetString();
-                    vehicle.BodyColor = value;
-                    Console.WriteLine($"[ImportJson] 車体の色をセット: {value}");
-                    updatedFields.Add($"BodyColor = {value}");
+                    var value = bodyShape.GetString();
+                    vehicle.BodyShape = value;
+                    Console.WriteLine($"[ImportJson] 車体の形状をセット(後方互換): {value}");
+                    updatedFields.Add($"BodyShape = {value}");
                 }
 
-                // 乗車定員
-                if (root.TryGetProperty("seating_capacity", out var seatingCap) && seatingCap.TryGetInt32(out var seatValue))
+                // 乗車定員 (Cap)
+                if (certInfo.TryGetProperty("Cap", out var cap))
+                {
+                    var capStr = cap.GetString();
+                    if (int.TryParse(capStr, out var capValue))
+                    {
+                        vehicle.SeatingCapacity = capValue;
+                        vehicle.PassengerCapacity = capValue;
+                        Console.WriteLine($"[ImportJson] 乗車定員をセット: {capValue}");
+                        updatedFields.Add($"SeatingCapacity = {capValue}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("seating_capacity", out var seatingCap) && seatingCap.TryGetInt32(out var seatValue))
                 {
                     vehicle.SeatingCapacity = seatValue;
                     vehicle.PassengerCapacity = seatValue;
-                    Console.WriteLine($"[ImportJson] 乗車定員をセット: {seatValue}");
+                    Console.WriteLine($"[ImportJson] 乗車定員をセット(後方互換): {seatValue}");
                     updatedFields.Add($"SeatingCapacity = {seatValue}");
                 }
 
-                // 最大積載量
-                if (root.TryGetProperty("max_load_capacity", out var maxLoad) && maxLoad.TryGetInt32(out var loadValue))
+                // 最大積載量 (Maxloadage)
+                if (certInfo.TryGetProperty("Maxloadage", out var maxloadage))
                 {
-                    vehicle.MaxLoadCapacity = loadValue;
-                    Console.WriteLine($"[ImportJson] 最大積載量をセット: {loadValue}");
-                    updatedFields.Add($"MaxLoadCapacity = {loadValue}");
+                    var loadStr = maxloadage.GetString();
+                    if (loadStr != "-" && int.TryParse(loadStr, out var loadValue))
+                    {
+                        vehicle.MaxLoadCapacity = loadValue;
+                        Console.WriteLine($"[ImportJson] 最大積載量をセット: {loadValue}");
+                        updatedFields.Add($"MaxLoadCapacity = {loadValue}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("max_load_capacity", out var maxLoad) && maxLoad.TryGetInt32(out var loadValue2))
+                {
+                    vehicle.MaxLoadCapacity = loadValue2;
+                    Console.WriteLine($"[ImportJson] 最大積載量をセット(後方互換): {loadValue2}");
+                    updatedFields.Add($"MaxLoadCapacity = {loadValue2}");
                 }
 
-                // 車両重量
-                if (root.TryGetProperty("vehicle_weight", out var vWeight) && vWeight.TryGetInt32(out var weightValue))
+                // 車両重量 (CarWgt)
+                if (certInfo.TryGetProperty("CarWgt", out var carWgt))
+                {
+                    var wgtStr = carWgt.GetString();
+                    if (int.TryParse(wgtStr, out var wgtValue))
+                    {
+                        vehicle.VehicleWeight = wgtValue;
+                        Console.WriteLine($"[ImportJson] 車両重量をセット: {wgtValue}");
+                        updatedFields.Add($"VehicleWeight = {wgtValue}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("vehicle_weight", out var vWeight) && vWeight.TryGetInt32(out var weightValue))
                 {
                     vehicle.VehicleWeight = weightValue;
-                    Console.WriteLine($"[ImportJson] 車両重量をセット: {weightValue}");
+                    Console.WriteLine($"[ImportJson] 車両重量をセット(後方互換): {weightValue}");
                     updatedFields.Add($"VehicleWeight = {weightValue}");
                 }
 
-                // 車両総重量
-                if (root.TryGetProperty("vehicle_total_weight", out var vTotalWeight) && vTotalWeight.TryGetInt32(out var totalWeightValue))
+                // 車両総重量 (CarTotalWgt)
+                if (certInfo.TryGetProperty("CarTotalWgt", out var carTotalWgt))
+                {
+                    var totalWgtStr = carTotalWgt.GetString();
+                    if (int.TryParse(totalWgtStr, out var totalWgtValue))
+                    {
+                        vehicle.VehicleTotalWeight = totalWgtValue;
+                        Console.WriteLine($"[ImportJson] 車両総重量をセット: {totalWgtValue}");
+                        updatedFields.Add($"VehicleTotalWeight = {totalWgtValue}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("vehicle_total_weight", out var vTotalWeight) && vTotalWeight.TryGetInt32(out var totalWeightValue))
                 {
                     vehicle.VehicleTotalWeight = totalWeightValue;
-                    Console.WriteLine($"[ImportJson] 車両総重量をセット: {totalWeightValue}");
+                    Console.WriteLine($"[ImportJson] 車両総重量をセット(後方互換): {totalWeightValue}");
                     updatedFields.Add($"VehicleTotalWeight = {totalWeightValue}");
                 }
 
-                // 長さ
-                if (root.TryGetProperty("vehicle_length", out var vLength) && vLength.TryGetInt32(out var lengthValue))
+                // 長さ (Length)
+                if (certInfo.TryGetProperty("Length", out var length))
                 {
-                    vehicle.VehicleLength = lengthValue;
-                    Console.WriteLine($"[ImportJson] 長さをセット: {lengthValue}");
-                    updatedFields.Add($"VehicleLength = {lengthValue}");
+                    var lengthStr = length.GetString();
+                    if (int.TryParse(lengthStr, out var lengthValue))
+                    {
+                        vehicle.VehicleLength = lengthValue;
+                        Console.WriteLine($"[ImportJson] 長さをセット: {lengthValue}");
+                        updatedFields.Add($"VehicleLength = {lengthValue}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("vehicle_length", out var vLength) && vLength.TryGetInt32(out var lengthValue2))
+                {
+                    vehicle.VehicleLength = lengthValue2;
+                    Console.WriteLine($"[ImportJson] 長さをセット(後方互換): {lengthValue2}");
+                    updatedFields.Add($"VehicleLength = {lengthValue2}");
                 }
 
-                // 幅
-                if (root.TryGetProperty("vehicle_width", out var vWidth) && vWidth.TryGetInt32(out var widthValue))
+                // 幅 (Width)
+                if (certInfo.TryGetProperty("Width", out var width))
                 {
-                    vehicle.VehicleWidth = widthValue;
-                    Console.WriteLine($"[ImportJson] 幅をセット: {widthValue}");
-                    updatedFields.Add($"VehicleWidth = {widthValue}");
+                    var widthStr = width.GetString();
+                    if (int.TryParse(widthStr, out var widthValue))
+                    {
+                        vehicle.VehicleWidth = widthValue;
+                        Console.WriteLine($"[ImportJson] 幅をセット: {widthValue}");
+                        updatedFields.Add($"VehicleWidth = {widthValue}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("vehicle_width", out var vWidth) && vWidth.TryGetInt32(out var widthValue2))
+                {
+                    vehicle.VehicleWidth = widthValue2;
+                    Console.WriteLine($"[ImportJson] 幅をセット(後方互換): {widthValue2}");
+                    updatedFields.Add($"VehicleWidth = {widthValue2}");
                 }
 
-                // 高さ
-                if (root.TryGetProperty("vehicle_height", out var vHeight) && vHeight.TryGetInt32(out var heightValue))
+                // 高さ (Height)
+                if (certInfo.TryGetProperty("Height", out var height))
                 {
-                    vehicle.VehicleHeight = heightValue;
-                    Console.WriteLine($"[ImportJson] 高さをセット: {heightValue}");
-                    updatedFields.Add($"VehicleHeight = {heightValue}");
+                    var heightStr = height.GetString();
+                    if (int.TryParse(heightStr, out var heightValue))
+                    {
+                        vehicle.VehicleHeight = heightValue;
+                        Console.WriteLine($"[ImportJson] 高さをセット: {heightValue}");
+                        updatedFields.Add($"VehicleHeight = {heightValue}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("vehicle_height", out var vHeight) && vHeight.TryGetInt32(out var heightValue2))
+                {
+                    vehicle.VehicleHeight = heightValue2;
+                    Console.WriteLine($"[ImportJson] 高さをセット(後方互換): {heightValue2}");
+                    updatedFields.Add($"VehicleHeight = {heightValue2}");
                 }
 
-                // 前前軸重
-                if (root.TryGetProperty("front_overhang", out var frontOh) && frontOh.TryGetInt32(out var frontValue))
+                // 前前軸重 (FfAxWgt)
+                if (certInfo.TryGetProperty("FfAxWgt", out var ffAxWgt))
                 {
-                    vehicle.FrontOverhang = frontValue;
-                    vehicle.FrontAxleWeight = frontValue;
-                    Console.WriteLine($"[ImportJson] 前前軸重をセット: {frontValue}");
-                    updatedFields.Add($"FrontOverhang = {frontValue}");
+                    var wgtStr = ffAxWgt.GetString();
+                    if (int.TryParse(wgtStr, out var frontValue))
+                    {
+                        vehicle.FrontOverhang = frontValue;
+                        vehicle.FrontAxleWeight = frontValue;
+                        Console.WriteLine($"[ImportJson] 前前軸重をセット: {frontValue}");
+                        updatedFields.Add($"FrontOverhang = {frontValue}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("front_overhang", out var frontOh) && frontOh.TryGetInt32(out var frontValue2))
+                {
+                    vehicle.FrontOverhang = frontValue2;
+                    vehicle.FrontAxleWeight = frontValue2;
+                    Console.WriteLine($"[ImportJson] 前前軸重をセット(後方互換): {frontValue2}");
+                    updatedFields.Add($"FrontOverhang = {frontValue2}");
                 }
 
-                // 後後軸重
-                if (root.TryGetProperty("rear_overhang", out var rearOh) && rearOh.TryGetInt32(out var rearValue))
+                // 後後軸重 (RrAxWgt)
+                if (certInfo.TryGetProperty("RrAxWgt", out var rrAxWgt))
                 {
-                    vehicle.RearOverhang = rearValue;
-                    vehicle.RearAxleWeight = rearValue;
-                    Console.WriteLine($"[ImportJson] 後後軸重をセット: {rearValue}");
-                    updatedFields.Add($"RearOverhang = {rearValue}");
+                    var wgtStr = rrAxWgt.GetString();
+                    if (wgtStr != "-" && int.TryParse(wgtStr, out var rearValue))
+                    {
+                        vehicle.RearOverhang = rearValue;
+                        vehicle.RearAxleWeight = rearValue;
+                        Console.WriteLine($"[ImportJson] 後後軸重をセット: {rearValue}");
+                        updatedFields.Add($"RearOverhang = {rearValue}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("rear_overhang", out var rearOh) && rearOh.TryGetInt32(out var rearValue2))
+                {
+                    vehicle.RearOverhang = rearValue2;
+                    vehicle.RearAxleWeight = rearValue2;
+                    Console.WriteLine($"[ImportJson] 後後軸重をセット(後方互換): {rearValue2}");
+                    updatedFields.Add($"RearOverhang = {rearValue2}");
                 }
 
-                // 型式コード
-                if (root.TryGetProperty("model_code", out var modelCode))
+                // 排気量 (Displacement) - 既にL単位
+                if (certInfo.TryGetProperty("Displacement", out var disp))
                 {
-                    var value = modelCode.GetString();
-                    vehicle.ModelCode = value;
-                    Console.WriteLine($"[ImportJson] 型式コードをセット: {value}");
-                    updatedFields.Add($"ModelCode = {value}");
+                    var dispStr = disp.GetString();
+                    if (decimal.TryParse(dispStr, out var dispValue))
+                    {
+                        vehicle.Displacement = dispValue;
+                        Console.WriteLine($"[ImportJson] 排気量をセット: {dispValue}L");
+                        updatedFields.Add($"Displacement = {dispValue}L");
+                    }
                 }
-
-                // 排気量（ccからLに変換）
-                if (root.TryGetProperty("displacement", out var displacement))
+                else if (certInfo.TryGetProperty("displacement", out var displacement))
                 {
                     if (displacement.TryGetInt32(out var ccValue))
                     {
                         var literValue = ccValue / 1000m;
                         vehicle.Displacement = literValue;
-                        Console.WriteLine($"[ImportJson] 排気量をセット: {ccValue}cc → {literValue}L");
+                        Console.WriteLine($"[ImportJson] 排気量をセット(後方互換): {ccValue}cc → {literValue}L");
                         updatedFields.Add($"Displacement = {literValue}L");
                     }
                     else if (displacement.TryGetDecimal(out var decValue))
@@ -490,17 +683,57 @@ namespace AutoDealerSphere.Server.Controllers
                     updatedFields.Add($"RatedOutput = {outputValue}kW");
                 }
 
-                // 燃料の種類
-                if (root.TryGetProperty("fuel_type", out var fuelType))
+                // 燃料の種類 (FuelClass)
+                if (certInfo.TryGetProperty("FuelClass", out var fuelClass))
                 {
-                    var value = fuelType.GetString();
+                    var value = fuelClass.GetString();
                     vehicle.FuelType = value;
                     Console.WriteLine($"[ImportJson] 燃料の種類をセット: {value}");
                     updatedFields.Add($"FuelType = {value}");
                 }
+                else if (certInfo.TryGetProperty("fuel_type", out var fuelType))
+                {
+                    var value = fuelType.GetString();
+                    vehicle.FuelType = value;
+                    Console.WriteLine($"[ImportJson] 燃料の種類をセット(後方互換): {value}");
+                    updatedFields.Add($"FuelType = {value}");
+                }
 
-                // 車検満了日
-                if (root.TryGetProperty("inspection_expiry_date", out var expiry))
+                // 車検満了日 (ValidPeriodExpirdateE/Y/M/D)
+                if (certInfo.TryGetProperty("ValidPeriodExpirdateE", out var validEra) &&
+                    certInfo.TryGetProperty("ValidPeriodExpirdateY", out var validYear) &&
+                    certInfo.TryGetProperty("ValidPeriodExpirdateM", out var validMonth) &&
+                    certInfo.TryGetProperty("ValidPeriodExpirdateD", out var validDay))
+                {
+                    var eraStr = validEra.GetString();
+                    var yearStr = validYear.GetString()?.Trim();
+                    var monthStr = validMonth.GetString()?.Trim();
+                    var dayStr = validDay.GetString()?.Trim();
+
+                    if (!string.IsNullOrEmpty(yearStr) && !string.IsNullOrEmpty(monthStr) && !string.IsNullOrEmpty(dayStr))
+                    {
+                        if (int.TryParse(yearStr, out var yearNum) &&
+                            int.TryParse(monthStr, out var monthNum) &&
+                            int.TryParse(dayStr, out var dayNum))
+                        {
+                            int actualYear = 0;
+                            if (eraStr == "令和")
+                                actualYear = 2018 + yearNum;
+                            else if (eraStr == "平成")
+                                actualYear = 1988 + yearNum;
+
+                            if (actualYear > 0)
+                            {
+                                var date = new DateTime(actualYear, monthNum, dayNum);
+                                vehicle.InspectionExpiryDate = date;
+                                Console.WriteLine($"[ImportJson] 車検満了日をセット: {date:yyyy-MM-dd}");
+                                updatedFields.Add($"InspectionExpiryDate = {date:yyyy-MM-dd}");
+                            }
+                        }
+                    }
+                }
+                // 後方互換性
+                else if (certInfo.TryGetProperty("inspection_expiry_date", out var expiry))
                 {
                     var dateStr = expiry.GetString();
                     if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParseExact(dateStr,
@@ -508,94 +741,118 @@ namespace AutoDealerSphere.Server.Controllers
                         CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                     {
                         vehicle.InspectionExpiryDate = date;
-                        Console.WriteLine($"[ImportJson] 車検満了日をセット: {date:yyyy-MM-dd}");
+                        Console.WriteLine($"[ImportJson] 車検満了日をセット(後方互換): {date:yyyy-MM-dd}");
                         updatedFields.Add($"InspectionExpiryDate = {date:yyyy-MM-dd}");
                     }
                 }
 
-                // 検査種別
-                if (root.TryGetProperty("inspection_type", out var inspType))
+                // 使用者の氏名又は名称 (UsernameLowLevelChar/UsernameHighLevelChar)
+                if (certInfo.TryGetProperty("UsernameLowLevelChar", out var userLowLevel))
                 {
-                    var value = inspType.GetString();
-                    vehicle.InspectionType = value;
-                    Console.WriteLine($"[ImportJson] 検査種別をセット: {value}");
-                    updatedFields.Add($"InspectionType = {value}");
-                }
-
-                // 検査実施日
-                if (root.TryGetProperty("inspection_date", out var inspDate))
-                {
-                    var dateStr = inspDate.GetString();
-                    if (!string.IsNullOrEmpty(dateStr) && DateTime.TryParseExact(dateStr,
-                        new[] { "yyyy-MM-dd", "yyyy/MM/dd", "yyyyMMdd" },
-                        CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+                    var value = userLowLevel.GetString();
+                    // "＊＊＊"の場合はスキップ
+                    if (value != null && value != "＊＊＊" && value != "***")
                     {
-                        vehicle.InspectionDate = date;
-                        Console.WriteLine($"[ImportJson] 検査実施日をセット: {date:yyyy-MM-dd}");
-                        updatedFields.Add($"InspectionDate = {date:yyyy-MM-dd}");
+                        vehicle.UserNameOrCompany = value;
+                        Console.WriteLine($"[ImportJson] 使用者名をセット: {value}");
+                        updatedFields.Add($"UserNameOrCompany = {value}");
                     }
                 }
-
-                // 使用者の氏名又は名称
-                if (root.TryGetProperty("user_name_or_company", out var userName))
+                else if (certInfo.TryGetProperty("user_name_or_company", out var userName))
                 {
                     var value = userName.GetString();
                     vehicle.UserNameOrCompany = value;
-                    Console.WriteLine($"[ImportJson] 使用者名をセット: {value}");
+                    Console.WriteLine($"[ImportJson] 使用者名をセット(後方互換): {value}");
                     updatedFields.Add($"UserNameOrCompany = {value}");
                 }
 
-                // 使用者の住所
-                if (root.TryGetProperty("user_address", out var userAddr))
+                // 使用者の住所 (UserAddressChar + UserAddressNumValue)
+                if (certInfo.TryGetProperty("UserAddressChar", out var userAddrChar))
+                {
+                    var addrChar = userAddrChar.GetString();
+                    var addrNum = "";
+                    if (certInfo.TryGetProperty("UserAddressNumValue", out var userAddrNum))
+                    {
+                        addrNum = userAddrNum.GetString();
+                    }
+
+                    if (addrChar != null && addrChar != "＊＊＊" && addrChar != "***")
+                    {
+                        var fullAddr = addrChar + addrNum;
+                        vehicle.UserAddress = fullAddr;
+                        Console.WriteLine($"[ImportJson] 使用者住所をセット: {fullAddr}");
+                        updatedFields.Add($"UserAddress = {fullAddr}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("user_address", out var userAddr))
                 {
                     var value = userAddr.GetString();
                     vehicle.UserAddress = value;
-                    Console.WriteLine($"[ImportJson] 使用者住所をセット: {value}");
+                    Console.WriteLine($"[ImportJson] 使用者住所をセット(後方互換): {value}");
                     updatedFields.Add($"UserAddress = {value}");
                 }
 
-                // 使用者郵便番号
-                if (root.TryGetProperty("user_postal_code", out var userPostal))
+                // 所有者の氏名又は名称 (OwnernameLowLevelChar/OwnernameHighLevelChar)
+                if (certInfo.TryGetProperty("OwnernameLowLevelChar", out var ownerLowLevel))
                 {
-                    var value = userPostal.GetString();
-                    vehicle.UserPostalCode = value;
-                    Console.WriteLine($"[ImportJson] 使用者郵便番号をセット: {value}");
-                    updatedFields.Add($"UserPostalCode = {value}");
-                }
-
-                // 所有者の氏名又は名称
-                if (root.TryGetProperty("owner_name_or_company", out var ownerName))
-                {
-                    var value = ownerName.GetString();
+                    var value = ownerLowLevel.GetString();
                     vehicle.OwnerNameOrCompany = value;
                     Console.WriteLine($"[ImportJson] 所有者名をセット: {value}");
                     updatedFields.Add($"OwnerNameOrCompany = {value}");
                 }
+                else if (certInfo.TryGetProperty("owner_name_or_company", out var ownerName))
+                {
+                    var value = ownerName.GetString();
+                    vehicle.OwnerNameOrCompany = value;
+                    Console.WriteLine($"[ImportJson] 所有者名をセット(後方互換): {value}");
+                    updatedFields.Add($"OwnerNameOrCompany = {value}");
+                }
 
-                // 所有者の住所
-                if (root.TryGetProperty("owner_address", out var ownerAddr))
+                // 所有者の住所 (OwnerAddressChar + OwnerAddressNumValue)
+                if (certInfo.TryGetProperty("OwnerAddressChar", out var ownerAddrChar))
+                {
+                    var addrChar = ownerAddrChar.GetString();
+                    var addrNum = "";
+                    if (certInfo.TryGetProperty("OwnerAddressNumValue", out var ownerAddrNum))
+                    {
+                        addrNum = ownerAddrNum.GetString();
+                    }
+                    var fullAddr = addrChar + addrNum;
+                    vehicle.OwnerAddress = fullAddr;
+                    Console.WriteLine($"[ImportJson] 所有者住所をセット: {fullAddr}");
+                    updatedFields.Add($"OwnerAddress = {fullAddr}");
+                }
+                else if (certInfo.TryGetProperty("owner_address", out var ownerAddr))
                 {
                     var value = ownerAddr.GetString();
                     vehicle.OwnerAddress = value;
-                    Console.WriteLine($"[ImportJson] 所有者住所をセット: {value}");
+                    Console.WriteLine($"[ImportJson] 所有者住所をセット(後方互換): {value}");
                     updatedFields.Add($"OwnerAddress = {value}");
                 }
 
-                // 所有者郵便番号
-                if (root.TryGetProperty("owner_postal_code", out var ownerPostal))
+                // 使用の本拠の位置 (UseheadqrterChar + UseheadqrterNumValue)
+                if (certInfo.TryGetProperty("UseheadqrterChar", out var headqrterChar))
                 {
-                    var value = ownerPostal.GetString();
-                    vehicle.OwnerPostalCode = value;
-                    Console.WriteLine($"[ImportJson] 所有者郵便番号をセット: {value}");
-                    updatedFields.Add($"OwnerPostalCode = {value}");
-                }
+                    var hqChar = headqrterChar.GetString();
+                    var hqNum = "";
+                    if (certInfo.TryGetProperty("UseheadqrterNumValue", out var headqrterNum))
+                    {
+                        hqNum = headqrterNum.GetString();
+                    }
 
-                // 使用の本拠の位置
-                if (root.TryGetProperty("base_location", out var baseLoc))
+                    if (hqChar != null && hqChar != "＊＊＊" && hqChar != "***")
+                    {
+                        var fullHq = hqChar + hqNum;
+                        vehicle.BaseLocation = fullHq;
+                        Console.WriteLine($"[ImportJson] 使用の本拠の位置をセット: {fullHq}");
+                        updatedFields.Add($"BaseLocation = {fullHq}");
+                    }
+                }
+                else if (certInfo.TryGetProperty("base_location", out var baseLoc))
                 {
                     var value = baseLoc.GetString();
                     vehicle.BaseLocation = value;
-                    Console.WriteLine($"[ImportJson] 使用の本拠の位置をセット: {value}");
+                    Console.WriteLine($"[ImportJson] 使用の本拠の位置をセット(後方互換): {value}");
                     updatedFields.Add($"BaseLocation = {value}");
                 }
 
