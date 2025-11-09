@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoDealerSphere.Shared.Models;
+using AutoDealerSphere.Shared.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -125,10 +126,10 @@ namespace AutoDealerSphere.Server.Services
                             client = new AutoDealerSphere.Shared.Models.Client
                             {
                                 // IDは自動採番されるため指定しない
-                                Name = name,
+                                Name = CharacterConverter.NormalizeVehicleData(name) ?? name,
                                 Email = "", // 必須フィールドのため空文字列
-                                Zip = !string.IsNullOrWhiteSpace(zip) ? zip.Replace("-", "") : "",
-                                Address = !string.IsNullOrWhiteSpace(addressWithoutPrefecture) ? addressWithoutPrefecture : "",
+                                Zip = !string.IsNullOrWhiteSpace(zip) ? CharacterConverter.NormalizeVehicleData(zip.Replace("-", "")) : "",
+                                Address = !string.IsNullOrWhiteSpace(addressWithoutPrefecture) ? CharacterConverter.NormalizeVehicleData(addressWithoutPrefecture) : "",
                                 Prefecture = prefectureCode // 住所から都道府県コードを判定
                             };
                             
@@ -197,26 +198,26 @@ namespace AutoDealerSphere.Server.Services
                         var vehicle = new Vehicle
                         {
                             ClientId = client.Id, // 保存後のIDを使用
-                            LicensePlateLocation = plateLocation ?? GetValue(values, columnIndexes.LicensePlateLocation),
-                            LicensePlateClassification = plateClassification ?? GetValue(values, columnIndexes.LicensePlateClassification),
-                            LicensePlateHiragana = plateHiragana ?? GetValue(values, columnIndexes.LicensePlateHiragana),
-                            LicensePlateNumber = plateNumber ?? GetValue(values, columnIndexes.LicensePlateNumber),
-                            KeyNumber = GetValue(values, columnIndexes.KeyNumber),
-                            ChassisNumber = GetValue(values, columnIndexes.ChassisNumber),
-                            TypeCertificationNumber = GetValue(values, columnIndexes.TypeCertificationNumber),
-                            CategoryNumber = GetValue(values, columnIndexes.CategoryNumber),
-                            VehicleName = GetValue(values, columnIndexes.VehicleName),
-                            VehicleModel = GetValue(values, columnIndexes.VehicleModel),
-                            Purpose = GetValue(values, columnIndexes.Purpose),
-                            PersonalBusinessUse = GetValue(values, columnIndexes.PersonalBusinessUse),
-                            BodyShape = GetValue(values, columnIndexes.BodyShape),
-                            ModelCode = GetValue(values, columnIndexes.ModelCode),
-                            EngineModel = GetValue(values, columnIndexes.EngineModel),
-                            FuelType = GetValue(values, columnIndexes.FuelType),
-                            InspectionCertificateNumber = GetValue(values, columnIndexes.InspectionCertificateNumber),
-                            UserNameOrCompany = GetValue(values, columnIndexes.UserNameOrCompany),
-                            UserAddress = GetValue(values, columnIndexes.UserAddress),
-                            BaseLocation = GetValue(values, columnIndexes.BaseLocation),
+                            LicensePlateLocation = CharacterConverter.NormalizeVehicleData(plateLocation ?? GetValue(values, columnIndexes.LicensePlateLocation)),
+                            LicensePlateClassification = CharacterConverter.NormalizeVehicleData(plateClassification ?? GetValue(values, columnIndexes.LicensePlateClassification)),
+                            LicensePlateHiragana = CharacterConverter.NormalizeVehicleData(plateHiragana ?? GetValue(values, columnIndexes.LicensePlateHiragana)),
+                            LicensePlateNumber = CharacterConverter.NormalizeVehicleData(plateNumber ?? GetValue(values, columnIndexes.LicensePlateNumber)),
+                            KeyNumber = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.KeyNumber)),
+                            ChassisNumber = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.ChassisNumber)),
+                            TypeCertificationNumber = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.TypeCertificationNumber)),
+                            CategoryNumber = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.CategoryNumber)),
+                            VehicleName = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.VehicleName)),
+                            VehicleModel = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.VehicleModel)),
+                            Purpose = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.Purpose)),
+                            PersonalBusinessUse = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.PersonalBusinessUse)),
+                            BodyShape = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.BodyShape)),
+                            ModelCode = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.ModelCode)),
+                            EngineModel = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.EngineModel)),
+                            FuelType = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.FuelType)),
+                            InspectionCertificateNumber = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.InspectionCertificateNumber)),
+                            UserNameOrCompany = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.UserNameOrCompany)),
+                            UserAddress = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.UserAddress)),
+                            BaseLocation = CharacterConverter.NormalizeVehicleData(GetValue(values, columnIndexes.BaseLocation)),
                             // 所有者情報（T_顧客情報.txtでは顧客が所有者）
                             OwnerNameOrCompany = client.Name,
                             OwnerAddress = client.Address,
