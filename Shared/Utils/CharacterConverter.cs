@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace AutoDealerSphere.Server.Utils
+namespace AutoDealerSphere.Shared.Utils
 {
     /// <summary>
     /// 文字種変換ユーティリティクラス

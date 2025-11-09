@@ -4,7 +4,7 @@ using AutoDealerSphere.Server.Services;
 using AutoDealerSphere.Shared.Models;
 using System.Text.Json;
 using System.Globalization;
-using AutoDealerSphere.Server.Utils;
+using AutoDealerSphere.Shared.Utils;
 
 namespace AutoDealerSphere.Server.Controllers
 {
