@@ -1,0 +1,224 @@
+@page "/data-backup"
+@layout MainLayout
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Cards
+@using System.Text
+@using System.Text.Json
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<SfBreadcrumb>
+    <BreadcrumbItems>
+        <BreadcrumbItem IconCss="e-icons e-home" Url="/" />
+        <BreadcrumbItem Text="データ管理" />
+        <BreadcrumbItem Text="バックアップ" Url="/data-backup" />
+    </BreadcrumbItems>
+</SfBreadcrumb>
+
+<h2>データバックアップ</h2>
+<h3>全データのバックアップ</h3>
+
+<div class="row">
+    <div class="col-md-8">
+        <SfCard>
+            <CardHeader Title="バックアップ" />
+            <CardContent>
+                <p>データベースの全データをJSONファイルとしてバックアップします。</p>
+
+                <div class="alert alert-info">
+                    <span class="e-icons e-circle-info me-2"></span>
+                    <strong>バックアップ対象:</strong> ユーザー、顧客、車両、部品、請求書など全てのデータが含まれます。
+                </div>
+
+                @if (!string.IsNullOrEmpty(backupFileName))
+                {
+                    <div class="alert alert-success d-flex align-items-center">
+                        <span class="e-icons e-check me-2"></span>
+                        <span>バックアップファイル: <strong>@backupFileName</strong></span>
+                    </div>
+                }
+
+                <br />
+
+                <div style="text-align: center;">
+                    <SfButton IsPrimary="true" IconCss="e-icons e-download"
+                             Disabled="@isBackingUp"
+                             OnClick="CreateBackup">
+                        @if (isBackingUp)
+                        {
+                            <span>バックアップ中...</span>
+                        }
+                        else
+                        {
+                            <span>バックアップ開始</span>
+                        }
+                    </SfButton>
+                    <SfButton CssClass="ms-2" OnClick="Cancel">キャンセル</SfButton>
+                </div>
+            </CardContent>
+        </SfCard>
+
+        @if (backupResult != null)
+        {
+            <SfCard CssClass="mt-4">
+                <CardHeader Title="バックアップ結果" />
+                <CardContent>
+                    <div class="@(backupResult.Success ? "text-success" : "text-danger")">
+                        <h5 class="mb-3">
+                            <span class="e-icons @(backupResult.Success ? "e-check" : "e-close") me-2"></span>
+                            @backupResult.Message
+                        </h5>
+                    </div>
+
+                    @if (backupResult.Success && backupResult.Statistics != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2">
+                                <div class="p-3 border rounded bg-light">
+                                    <h6 class="text-primary">ユーザー</h6>
+                                    <h3 class="mb-0">@backupResult.Statistics.UsersCount 件</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="p-3 border rounded bg-light">
+                                    <h6 class="text-success">顧客</h6>
+                                    <h3 class="mb-0">@backupResult.Statistics.ClientsCount 件</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="p-3 border rounded bg-light">
+                                    <h6 class="text-info">車両</h6>
+                                    <h3 class="mb-0">@backupResult.Statistics.VehiclesCount 件</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="p-3 border rounded bg-light">
+                                    <h6 class="text-warning">請求書</h6>
+                                    <h3 class="mb-0">@backupResult.Statistics.InvoicesCount 件</h3>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(backupResult.Error))
+                    {
+                        <div class="alert alert-danger">
+                            <h6 class="alert-heading">エラー:</h6>
+                            <p class="mb-0">@backupResult.Error</p>
+                        </div>
+                    }
+                </CardContent>
+            </SfCard>
+        }
+    </div>
+
+    <div class="col-md-4">
+        <SfCard>
+            <CardHeader Title="バックアップについて" />
+            <CardContent>
+                <p class="text-muted">バックアップファイルには以下のテーブルのデータが含まれます：</p>
+                <ul class="list-unstyled">
+                    <li><span class="e-icons e-check text-success me-2"></span>ユーザー情報</li>
+                    <li><span class="e-icons e-check text-success me-2"></span>顧客情報</li>
+                    <li><span class="e-icons e-check text-success me-2"></span>車両情報</li>
+                    <li><span class="e-icons e-check text-success me-2"></span>車両カテゴリ</li>
+                    <li><span class="e-icons e-check text-success me-2"></span>部品情報</li>
+                    <li><span class="e-icons e-check text-success me-2"></span>法定費用</li>
+                    <li><span class="e-icons e-check text-success me-2"></span>請求書</li>
+                    <li><span class="e-icons e-check text-success me-2"></span>請求明細</li>
+                    <li><span class="e-icons e-check text-success me-2"></span>発行者情報</li>
+                </ul>
+                <hr />
+                <p class="text-muted"><small>バックアップファイルはJSON形式で保存されます。</small></p>
+            </CardContent>
+        </SfCard>
+    </div>
+</div>
+
+@code {
+    private bool isBackingUp = false;
+    private string backupFileName = string.Empty;
+    private BackupResult? backupResult;
+
+    private async Task CreateBackup()
+    {
+        isBackingUp = true;
+        backupResult = null;
+        backupFileName = string.Empty;
+
+        try
+        {
+            var response = await Http.GetAsync("api/DataManagement/backup");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var backupData = await response.Content.ReadAsStringAsync();
+                backupResult = JsonSerializer.Deserialize<BackupResult>(backupData);
+
+                if (backupResult?.Success == true && !string.IsNullOrEmpty(backupResult.BackupJson))
+                {
+                    // Generate filename with timestamp
+                    var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                    backupFileName = $"backup_{timestamp}.json";
+
+                    // Download file
+                    var bytes = Encoding.UTF8.GetBytes(backupResult.BackupJson);
+                    var base64 = Convert.ToBase64String(bytes);
+                    await JSRuntime.InvokeVoidAsync("downloadFile", backupFileName, base64);
+                }
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                backupResult = new BackupResult
+                {
+                    Success = false,
+                    Message = $"バックアップに失敗しました: {response.StatusCode}",
+                    Error = errorContent
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            backupResult = new BackupResult
+            {
+                Success = false,
+                Message = "バックアップ中にエラーが発生しました",
+                Error = ex.Message
+            };
+        }
+        finally
+        {
+            isBackingUp = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private class BackupResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string? BackupJson { get; set; }
+        public BackupStatistics? Statistics { get; set; }
+        public string? Error { get; set; }
+    }
+
+    private class BackupStatistics
+    {
+        public int UsersCount { get; set; }
+        public int ClientsCount { get; set; }
+        public int VehiclesCount { get; set; }
+        public int PartsCount { get; set; }
+        public int InvoicesCount { get; set; }
+        public int VehicleCategoriesCount { get; set; }
+        public int StatutoryFeesCount { get; set; }
+        public int InvoiceDetailsCount { get; set; }
+        public int IssuerInfosCount { get; set; }
+    }
+}

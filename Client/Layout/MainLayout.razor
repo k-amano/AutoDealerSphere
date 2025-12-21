@@ -12,7 +12,7 @@
         {
             <div class="sidebar">
                 <SfMenu Items="MenuItems" Orientation="Orientation.Vertical">
-                    <MenuFieldSettings Text="Text" Url="Url" IconCss="IconCss"></MenuFieldSettings>
+                    <MenuFieldSettings Text="Text" Url="Url" IconCss="IconCss" Children="Items"></MenuFieldSettings>
                 </SfMenu>
             </div>
         }
@@ -45,9 +45,29 @@
         },
         new AutoDealerSphere.Client.Shared.MenuItems()
         {
-            Text = "車両データインポート",
-            Url = "/vehicle-import",
-            IconCss = "e-icons e-arrow-up"
+            Text = "データ管理",
+            IconCss = "e-icons e-database",
+            Items = new List<AutoDealerSphere.Client.Shared.MenuItems>()
+            {
+                new AutoDealerSphere.Client.Shared.MenuItems()
+                {
+                    Text = "データインポート",
+                    Url = "/vehicle-import",
+                    IconCss = "e-icons e-arrow-up"
+                },
+                new AutoDealerSphere.Client.Shared.MenuItems()
+                {
+                    Text = "バックアップ",
+                    Url = "/data-backup",
+                    IconCss = "e-icons e-download"
+                },
+                new AutoDealerSphere.Client.Shared.MenuItems()
+                {
+                    Text = "レストア",
+                    Url = "/data-restore",
+                    IconCss = "e-icons e-upload"
+                }
+            }
         },
         new AutoDealerSphere.Client.Shared.MenuItems()
         {
