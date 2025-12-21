@@ -1,6 +1,5 @@
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
-@using Syncfusion.Blazor.Navigations
 @using AutoDealerSphere.Client.Shared
 
 <div class="layout-container">
@@ -11,9 +10,51 @@
         @if (!IsLoginPage())
         {
             <div class="sidebar">
-                <SfMenu Items="MenuItems" Orientation="Orientation.Vertical" ShowItemOnClick="true">
-                    <MenuFieldSettings Text="Text" Url="Url" IconCss="IconCss" Children="Items"></MenuFieldSettings>
-                </SfMenu>
+                <nav class="custom-menu">
+                    @foreach (var item in MenuItems)
+                    {
+                        if (item.Items != null && item.Items.Count > 0)
+                        {
+                            <!-- Parent menu item with children -->
+                            <div class="menu-item-group">
+                                <div class="menu-item parent" @onclick="() => ToggleSubmenu(item)">
+                                    @if (!string.IsNullOrEmpty(item.IconCss))
+                                    {
+                                        <i class="@item.IconCss"></i>
+                                    }
+                                    <span>@item.Text</span>
+                                    <i class="e-icons @(expandedMenus.Contains(item.Text) ? "e-chevron-down" : "e-chevron-right") expand-icon"></i>
+                                </div>
+                                @if (expandedMenus.Contains(item.Text))
+                                {
+                                    <div class="submenu">
+                                        @foreach (var subItem in item.Items)
+                                        {
+                                            <a href="@subItem.Url" class="menu-item submenu-item">
+                                                @if (!string.IsNullOrEmpty(subItem.IconCss))
+                                                {
+                                                    <i class="@subItem.IconCss"></i>
+                                                }
+                                                <span>@subItem.Text</span>
+                                            </a>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Regular menu item -->
+                            <a href="@item.Url" class="menu-item">
+                                @if (!string.IsNullOrEmpty(item.IconCss))
+                                {
+                                    <i class="@item.IconCss"></i>
+                                }
+                                <span>@item.Text</span>
+                            </a>
+                        }
+                    }
+                </nav>
             </div>
         }
         <div class="main-content @(IsLoginPage() ? "full-width" : "")">
@@ -23,10 +64,24 @@
 </div>
 
 @code {
+    private HashSet<string> expandedMenus = new HashSet<string>();
+
     private bool IsLoginPage()
     {
         var uri = NavigationManager.Uri;
         return uri.EndsWith("/") || uri.EndsWith("/index");
+    }
+
+    private void ToggleSubmenu(AutoDealerSphere.Client.Shared.MenuItems item)
+    {
+        if (expandedMenus.Contains(item.Text))
+        {
+            expandedMenus.Remove(item.Text);
+        }
+        else
+        {
+            expandedMenus.Add(item.Text);
+        }
     }
 
     private List<AutoDealerSphere.Client.Shared.MenuItems> MenuItems = new()
@@ -143,17 +198,67 @@
     margin: 0;
 }
 
-/* SfMenuの縦型表示用スタイル */
-.sidebar .e-menu-wrapper {
-    width: 100%;
+/* Custom menu styles */
+.custom-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.sidebar .e-menu {
-    width: 100%;
+.menu-item-group {
+    display: flex;
+    flex-direction: column;
 }
 
-.sidebar .e-menu-item {
-    width: 100%;
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.menu-item:hover {
+    background-color: #e0e0e0;
+}
+
+.menu-item.parent {
+    font-weight: 500;
+    position: relative;
+}
+
+.menu-item i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.menu-item .expand-icon {
+    margin-left: auto;
+    font-size: 14px;
+}
+
+.submenu {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 0;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.menu-item.submenu-item {
+    padding: 10px 16px 10px 46px;
+    font-size: 13px;
+}
+
+.menu-item.submenu-item:hover {
+    background-color: #d5d5d5;
 }
 
 </style>
