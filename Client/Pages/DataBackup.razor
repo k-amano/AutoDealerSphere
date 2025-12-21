@@ -150,12 +150,21 @@
 
         try
         {
+            Console.WriteLine("バックアップ開始...");
             var response = await Http.GetAsync("api/DataManagement/backup");
+            Console.WriteLine($"API応答: {response.StatusCode}");
 
             if (response.IsSuccessStatusCode)
             {
                 var backupData = await response.Content.ReadAsStringAsync();
-                backupResult = JsonSerializer.Deserialize<BackupResult>(backupData);
+                Console.WriteLine($"バックアップデータ受信: {backupData.Length} bytes");
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                backupResult = JsonSerializer.Deserialize<BackupResult>(backupData, options);
+                Console.WriteLine($"デシリアライズ結果: Success={backupResult?.Success}, HasJson={!string.IsNullOrEmpty(backupResult?.BackupJson)}");
 
                 if (backupResult?.Success == true && !string.IsNullOrEmpty(backupResult.BackupJson))
                 {
@@ -163,15 +172,26 @@
                     var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                     backupFileName = $"backup_{timestamp}.json";
 
+                    Console.WriteLine($"ファイル名: {backupFileName}");
+                    Console.WriteLine($"JSONサイズ: {backupResult.BackupJson.Length} characters");
+
                     // Download file
                     var bytes = Encoding.UTF8.GetBytes(backupResult.BackupJson);
                     var base64 = Convert.ToBase64String(bytes);
+                    Console.WriteLine($"Base64サイズ: {base64.Length} characters");
+
                     await JSRuntime.InvokeVoidAsync("downloadFile", backupFileName, base64);
+                    Console.WriteLine("ダウンロード関数呼び出し完了");
+                }
+                else
+                {
+                    Console.WriteLine($"バックアップ失敗: {backupResult?.Message}");
                 }
             }
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API エラー: {errorContent}");
                 backupResult = new BackupResult
                 {
                     Success = false,
@@ -182,6 +202,8 @@
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"例外発生: {ex.Message}");
+            Console.WriteLine($"スタックトレース: {ex.StackTrace}");
             backupResult = new BackupResult
             {
                 Success = false,
