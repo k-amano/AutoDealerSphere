@@ -197,20 +197,42 @@
 
         // Base64からファイルダウンロード
         window.downloadFile = (fileName, base64String) => {
-            const byteCharacters = atob(base64String);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            try {
+                console.log('downloadFile called:', fileName, 'base64 length:', base64String?.length);
+
+                if (!base64String) {
+                    console.error('base64String is null or undefined');
+                    return;
+                }
+
+                const byteCharacters = atob(base64String);
+                console.log('Decoded base64, byte length:', byteCharacters.length);
+
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                console.log('Created byte array, length:', byteArray.length);
+
+                const blob = new Blob([byteArray], { type: 'application/json' });
+                console.log('Created blob, size:', blob.size);
+
+                const url = URL.createObjectURL(blob);
+                console.log('Created object URL:', url);
+
+                const anchorElement = document.createElement('a');
+                anchorElement.href = url;
+                anchorElement.download = fileName;
+                anchorElement.click();
+                console.log('Download triggered for:', fileName);
+
+                anchorElement.remove();
+                URL.revokeObjectURL(url);
+                console.log('Cleanup completed');
+            } catch (error) {
+                console.error('Error in downloadFile:', error);
             }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const anchorElement = document.createElement('a');
-            anchorElement.href = url;
-            anchorElement.download = fileName;
-            anchorElement.click();
-            anchorElement.remove();
-            URL.revokeObjectURL(url);
         };
     </script>
 </body>
