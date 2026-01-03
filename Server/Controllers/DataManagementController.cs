@@ -44,9 +44,10 @@ namespace AutoDealerSphere.Server.Controllers
                 return BadRequest(new { error = "ファイルが選択されていません。" });
             }
 
-            if (!file.FileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            if (!file.FileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase) &&
+                !file.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
             {
-                return BadRequest(new { error = "JSONファイルを選択してください。" });
+                return BadRequest(new { error = "バックアップファイル（.jsonまたは.zip）を選択してください。" });
             }
 
             try

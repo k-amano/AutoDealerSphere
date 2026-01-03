@@ -13,7 +13,7 @@ namespace AutoDealerSphere.Server.Services
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
-        public string? BackupJson { get; set; }
+        public string? BackupData { get; set; }  // Base64-encoded ZIP file
         public BackupStatistics? Statistics { get; set; }
         public string? Error { get; set; }
     }
