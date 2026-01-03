@@ -25,7 +25,7 @@
         <SfCard>
             <CardHeader Title="バックアップ" />
             <CardContent>
-                <p>データベースの全データをJSONファイルとしてバックアップします。</p>
+                <p>データベースの全データをCSV形式（ZIP圧縮）でバックアップします。</p>
 
                 <div class="alert alert-info">
                     <span class="e-icons e-circle-info me-2"></span>
@@ -131,7 +131,7 @@
                     <li><span class="e-icons e-check text-success me-2"></span>発行者情報</li>
                 </ul>
                 <hr />
-                <p class="text-muted"><small>バックアップファイルはJSON形式で保存されます。</small></p>
+                <p class="text-muted"><small>バックアップファイルはCSV形式（ZIP圧縮）で保存されます。従来のJSON形式のバックアップも引き続きレストア可能です。</small></p>
             </CardContent>
         </SfCard>
     </div>
@@ -164,23 +164,19 @@
                     PropertyNameCaseInsensitive = true
                 };
                 backupResult = JsonSerializer.Deserialize<BackupResult>(backupData, options);
-                Console.WriteLine($"デシリアライズ結果: Success={backupResult?.Success}, HasJson={!string.IsNullOrEmpty(backupResult?.BackupJson)}");
+                Console.WriteLine($"デシリアライズ結果: Success={backupResult?.Success}, HasData={!string.IsNullOrEmpty(backupResult?.BackupData)}");
 
-                if (backupResult?.Success == true && !string.IsNullOrEmpty(backupResult.BackupJson))
+                if (backupResult?.Success == true && !string.IsNullOrEmpty(backupResult.BackupData))
                 {
-                    // Generate filename with timestamp
-                    var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                    backupFileName = $"backup_{timestamp}.json";
+                    // Generate filename with timestamp (short format: bkYYYYMMDD-HHMM.zip)
+                    var now = DateTime.Now;
+                    backupFileName = $"bk{now:yyyyMMdd-HHmm}.zip";
 
                     Console.WriteLine($"ファイル名: {backupFileName}");
-                    Console.WriteLine($"JSONサイズ: {backupResult.BackupJson.Length} characters");
+                    Console.WriteLine($"ZIPサイズ（Base64）: {backupResult.BackupData.Length} characters");
 
-                    // Download file
-                    var bytes = Encoding.UTF8.GetBytes(backupResult.BackupJson);
-                    var base64 = Convert.ToBase64String(bytes);
-                    Console.WriteLine($"Base64サイズ: {base64.Length} characters");
-
-                    await JSRuntime.InvokeVoidAsync("downloadFile", backupFileName, base64);
+                    // Download file (BackupData is already Base64-encoded ZIP)
+                    await JSRuntime.InvokeVoidAsync("downloadFile", backupFileName, backupResult.BackupData);
                     Console.WriteLine("ダウンロード関数呼び出し完了");
                 }
                 else
@@ -226,7 +222,7 @@
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
-        public string? BackupJson { get; set; }
+        public string? BackupData { get; set; }  // Base64-encoded ZIP file
         public BackupStatistics? Statistics { get; set; }
         public string? Error { get; set; }
     }
