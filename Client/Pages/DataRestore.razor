@@ -23,7 +23,7 @@
         <SfCard>
             <CardHeader Title="ファイル選択" />
             <CardContent>
-                <p>バックアップファイル(JSON形式)からデータを復元します。</p>
+                <p>バックアップファイル（ZIP形式またはJSON形式）からデータを復元します。</p>
 
                 <div class="alert alert-danger">
                     <span class="e-icons e-warning me-2"></span>
@@ -32,7 +32,7 @@
 
                 <div class="mb-4">
                     <label class="form-label fw-bold">バックアップファイルを選択してください</label>
-                    <InputFile OnChange="@OnFileSelected" accept=".json" class="form-control" />
+                    <InputFile OnChange="@OnFileSelected" accept=".json,.zip" class="form-control" />
                 </div>
 
                 @if (!string.IsNullOrEmpty(selectedFileName))
@@ -177,7 +177,17 @@
         {
             var content = new MultipartFormDataContent();
             var fileContent = new StreamContent(selectedFile.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024)); // 50MB max
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            // Set content type based on file extension
+            if (selectedFile.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/zip");
+            }
+            else
+            {
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            }
+
             content.Add(fileContent, "file", selectedFile.Name);
 
             var response = await Http.PostAsync("api/DataManagement/restore", content);
