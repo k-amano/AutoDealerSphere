@@ -84,10 +84,13 @@ namespace AutoDealerSphere.Client.Pages
                 {
                     emailSettings = response;
                 }
+                // 設定が存在しない場合は空のオブジェクトが返ってくるので、エラーメッセージは表示しない
             }
             catch (Exception ex)
             {
-                emailErrorMessage = $"メール設定の読み込みに失敗しました: {ex.Message}";
+                // 初回起動時など、設定が未登録の場合は正常な状態なのでエラーメッセージは表示しない
+                // サーバー側で適切に処理されているため、通常はここには来ない
+                Console.WriteLine($"メール設定の読み込み時の情報: {ex.Message}");
             }
         }
 

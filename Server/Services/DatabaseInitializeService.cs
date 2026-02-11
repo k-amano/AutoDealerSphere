@@ -37,6 +37,8 @@ namespace AutoDealerSphere.Server.Services
                 CreateInvoicesTableIfNotExists();
                 CreateInvoiceDetailsTableIfNotExists();
                 CreateIssuerInfoTableIfNotExists();
+                CreateEmailSettingsTableIfNotExists();
+                CreatePasswordResetTokensTableIfNotExists();
 
                 // 初期データの作成
                 CreateInitialAdminUser();
@@ -569,6 +571,52 @@ namespace AutoDealerSphere.Server.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Warning: Could not create IssuerInfos table: {ex.Message}");
+            }
+        }
+
+        private void CreateEmailSettingsTableIfNotExists()
+        {
+            try
+            {
+                _context.Database.ExecuteSqlRaw(@"
+                        CREATE TABLE IF NOT EXISTS EmailSettings (
+                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            SmtpHost TEXT NOT NULL,
+                            SmtpPort INTEGER NOT NULL,
+                            EnableSsl INTEGER NOT NULL DEFAULT 1,
+                            SenderEmail TEXT NOT NULL,
+                            SenderName TEXT NOT NULL,
+                            Username TEXT NOT NULL,
+                            EncryptedPassword TEXT NOT NULL,
+                            UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))
+                        )
+                    ");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Could not create EmailSettings table: {ex.Message}");
+            }
+        }
+
+        private void CreatePasswordResetTokensTableIfNotExists()
+        {
+            try
+            {
+                _context.Database.ExecuteSqlRaw(@"
+                        CREATE TABLE IF NOT EXISTS PasswordResetTokens (
+                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            UserId INTEGER NOT NULL,
+                            Token TEXT NOT NULL,
+                            CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
+                            ExpiresAt TEXT NOT NULL,
+                            IsUsed INTEGER NOT NULL DEFAULT 0,
+                            FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+                        )
+                    ");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Could not create PasswordResetTokens table: {ex.Message}");
             }
         }
 
