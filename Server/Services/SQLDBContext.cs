@@ -22,6 +22,8 @@ namespace AutoDealerSphere.Server.Services
 		public virtual DbSet<Invoice> Invoices { get; set; }
 		public virtual DbSet<InvoiceDetail> InvoiceDetails { get; set; }
 		public virtual DbSet<IssuerInfo> IssuerInfos { get; set; }
+		public virtual DbSet<EmailSettings> EmailSettings { get; set; }
+		public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			if (!optionsBuilder.IsConfigured)
@@ -124,6 +126,23 @@ namespace AutoDealerSphere.Server.Services
 			{
 				b.HasKey(e => e.Id);
 				b.Property(e => e.Id).UseIdentityColumn();
+			});
+
+			modelBuilder.Entity<EmailSettings>(b =>
+			{
+				b.HasKey(e => e.Id);
+				b.Property(e => e.Id).UseIdentityColumn();
+			});
+
+			modelBuilder.Entity<PasswordResetToken>(b =>
+			{
+				b.HasKey(e => e.Id);
+				b.Property(e => e.Id).UseIdentityColumn();
+
+				b.HasOne(p => p.User)
+					.WithMany()
+					.HasForeignKey(p => p.UserId)
+					.OnDelete(DeleteBehavior.Cascade);
 			});
 		}
 	}
