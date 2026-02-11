@@ -16,6 +16,7 @@ builder.Services.AddControllersWithViews()
     });
 builder.Services.AddRazorPages();
 builder.Services.AddDbContextFactory<SQLDBContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddDataProtection();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IVehicleImportService, VehicleImportService>();
 builder.Services.AddScoped<IPartService, PartService>();
@@ -24,6 +25,8 @@ builder.Services.AddScoped<IExcelExportService, ExcelExportService>();
 builder.Services.AddScoped<IStatutoryFeeService, StatutoryFeeService>();
 builder.Services.AddScoped<IIssuerInfoService, IssuerInfoService>();
 builder.Services.AddScoped<IDataManagementService, DataManagementService>();
+builder.Services.AddScoped<IEmailSettingsService, EmailSettingsService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<JwtService>();
 
 var app = builder.Build();
