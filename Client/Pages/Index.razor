@@ -32,9 +32,13 @@
         {
             <div class="error-message">@errorMessage</div>
         }
-        
+
         <div class="form-buttons">
             <SfButton CssClass="e-primary" OnClick="HandleLogin">ログイン</SfButton>
+        </div>
+
+        <div class="forgot-password-link">
+            <a href="/forgot-password">パスワードを忘れた場合</a>
         </div>
     </div>
 </div>
@@ -110,6 +114,21 @@
         text-align: center;
         margin-top: 10px;
         font-size: 14px;
+    }
+
+    .forgot-password-link {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .forgot-password-link a {
+        color: #1976d2;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .forgot-password-link a:hover {
+        text-decoration: underline;
     }
 </style>
 
