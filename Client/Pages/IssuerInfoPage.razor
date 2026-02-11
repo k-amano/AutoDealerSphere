@@ -1,6 +1,8 @@
 @page "/issuerinfo"
 @using AutoDealerSphere.Client.Shared
 @using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
 
 <SfBreadcrumb>
     <BreadcrumbItems>
@@ -12,3 +14,65 @@
 <h2>発行者情報管理</h2>
 
 <IssuerInfoForm Item="@issuerInfo" OnClickOK="SaveIssuerInfo" />
+
+<hr style="margin: 40px 0;" />
+
+<h3>メール設定</h3>
+
+@if (!string.IsNullOrEmpty(emailErrorMessage))
+{
+    <div class="alert alert-danger">@emailErrorMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(emailSuccessMessage))
+{
+    <div class="alert alert-success">@emailSuccessMessage</div>
+}
+
+<div class="form-group">
+    <label>SMTPホスト</label>
+    <SfTextBox @bind-Value="@emailSettings.SmtpHost" Placeholder="例: smtp.gmail.com"></SfTextBox>
+</div>
+
+<div class="form-group">
+    <label>SMTPポート</label>
+    <SfNumericTextBox @bind-Value="@emailSettings.SmtpPort" Min="1" Max="65535" Format="n0"></SfNumericTextBox>
+</div>
+
+<div class="form-group">
+    <label>
+        <SfCheckBox @bind-Checked="@emailSettings.EnableSsl"></SfCheckBox>
+        SSL/TLS使用
+    </label>
+</div>
+
+<div class="form-group">
+    <label>送信者メールアドレス</label>
+    <SfTextBox @bind-Value="@emailSettings.SenderEmail" Placeholder="例: noreply@example.com"></SfTextBox>
+</div>
+
+<div class="form-group">
+    <label>送信者名</label>
+    <SfTextBox @bind-Value="@emailSettings.SenderName" Placeholder="例: AutoDealerSphere"></SfTextBox>
+</div>
+
+<div class="form-group">
+    <label>SMTP認証ユーザー名</label>
+    <SfTextBox @bind-Value="@emailSettings.Username" Placeholder="SMTP認証用のユーザー名"></SfTextBox>
+</div>
+
+<div class="form-group">
+    <label>SMTP認証パスワード</label>
+    <SfTextBox @bind-Value="@password" Type="InputType.Password" Placeholder="SMTP認証用のパスワード"></SfTextBox>
+</div>
+
+<div class="form-group">
+    <label>テストメール送信先</label>
+    <SfTextBox @bind-Value="@testEmailAddress" Placeholder="テストメールの送信先アドレス"></SfTextBox>
+</div>
+
+<div class="button-group">
+    <SfButton CssClass="e-primary" OnClick="SaveEmailSettings" Disabled="@isEmailProcessing">メール設定を保存</SfButton>
+    <SfButton CssClass="e-info" OnClick="TestConnection" Disabled="@isEmailProcessing">接続テスト</SfButton>
+    <SfButton CssClass="e-success" OnClick="SendTestEmail" Disabled="@isEmailProcessing">テストメール送信</SfButton>
+</div>
