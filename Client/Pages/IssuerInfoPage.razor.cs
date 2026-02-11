@@ -15,7 +15,7 @@ namespace AutoDealerSphere.Client.Pages
         private IssuerInfo issuerInfo = new IssuerInfo();
 
         // Email settings properties
-        private EmailSettingsModel emailSettings = new EmailSettingsModel();
+        private AutoDealerSphere.Shared.Models.EmailSettings emailSettings = new AutoDealerSphere.Shared.Models.EmailSettings();
         private string password = "";
         private string testEmailAddress = "";
         private string emailErrorMessage = "";
@@ -79,7 +79,7 @@ namespace AutoDealerSphere.Client.Pages
         {
             try
             {
-                var response = await Http.GetFromJsonAsync<EmailSettingsModel>("api/EmailSettings");
+                var response = await Http.GetFromJsonAsync<AutoDealerSphere.Shared.Models.EmailSettings>("api/EmailSettings");
                 if (response != null)
                 {
                     emailSettings = response;
@@ -228,23 +228,9 @@ namespace AutoDealerSphere.Client.Pages
         }
     }
 
-    // クライアント側のモデル（Shared/Modelsと同じ構造）
-    public class EmailSettingsModel
-    {
-        public int Id { get; set; }
-        public string SmtpHost { get; set; } = "";
-        public int SmtpPort { get; set; } = 587;
-        public bool EnableSsl { get; set; } = true;
-        public string SenderEmail { get; set; } = "";
-        public string SenderName { get; set; } = "";
-        public string Username { get; set; } = "";
-        public string EncryptedPassword { get; set; } = "";
-        public DateTime UpdatedAt { get; set; }
-    }
-
     public class EmailSettingsRequestModel
     {
-        public EmailSettingsModel Settings { get; set; } = new EmailSettingsModel();
+        public AutoDealerSphere.Shared.Models.EmailSettings Settings { get; set; } = new AutoDealerSphere.Shared.Models.EmailSettings();
         public string PlainPassword { get; set; } = "";
     }
 }

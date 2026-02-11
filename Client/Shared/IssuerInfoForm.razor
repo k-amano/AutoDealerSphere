@@ -132,4 +132,62 @@
 			</div>
 		</div>
 	</EditForm>
+
+	@if (EmailSettings != null)
+	{
+		<div class="form">
+			<h4>メール設定</h4>
+
+			@if (!string.IsNullOrEmpty(EmailErrorMessage))
+			{
+				<div class="alert alert-danger">@EmailErrorMessage</div>
+			}
+
+			@if (!string.IsNullOrEmpty(EmailSuccessMessage))
+			{
+				<div class="alert alert-success">@EmailSuccessMessage</div>
+			}
+
+			<div class="form-section">
+				<div class="form-row">
+					<label class="required">SMTPホスト</label>
+					<SfTextBox @bind-Value="@EmailSettings.SmtpHost" Placeholder="例: smtp.gmail.com"></SfTextBox>
+				</div>
+				<div class="form-row">
+					<label class="required">SMTPポート</label>
+					<SfNumericTextBox @bind-Value="@EmailSettings.SmtpPort" Min="1" Max="65535" Format="n0"></SfNumericTextBox>
+				</div>
+				<div class="form-row">
+					<label>SSL/TLS使用</label>
+					<SfCheckBox @bind-Checked="@EmailSettings.EnableSsl"></SfCheckBox>
+				</div>
+				<div class="form-row">
+					<label class="required">送信者メールアドレス</label>
+					<SfTextBox @bind-Value="@EmailSettings.SenderEmail" Placeholder="例: noreply@example.com"></SfTextBox>
+				</div>
+				<div class="form-row">
+					<label>送信者名</label>
+					<SfTextBox @bind-Value="@EmailSettings.SenderName" Placeholder="例: AutoDealerSphere"></SfTextBox>
+				</div>
+				<div class="form-row">
+					<label class="required">SMTP認証ユーザー名</label>
+					<SfTextBox @bind-Value="@EmailSettings.Username" Placeholder="SMTP認証用のユーザー名"></SfTextBox>
+				</div>
+				<div class="form-row">
+					<label class="required">SMTP認証パスワード</label>
+					<SfTextBox @bind-Value="@Password" Type="InputType.Password" Placeholder="SMTP認証用のパスワード"></SfTextBox>
+				</div>
+				<div class="form-row">
+					<label>テストメール送信先</label>
+					<SfTextBox @bind-Value="@TestEmailAddress" Placeholder="テストメールの送信先アドレス"></SfTextBox>
+				</div>
+			</div>
+
+			<div class="form-buttons">
+				<SfButton OnClick="OnSaveEmailSettings" IsPrimary="true" Disabled="@IsEmailProcessing">メール設定を保存</SfButton>
+				<SfButton OnClick="OnTestConnection" Disabled="@IsEmailProcessing">接続テスト</SfButton>
+				<SfButton OnClick="OnSendTestEmail" Disabled="@IsEmailProcessing">テストメール送信</SfButton>
+			</div>
+		</div>
+	}
 </div>

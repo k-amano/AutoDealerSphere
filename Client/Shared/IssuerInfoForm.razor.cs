@@ -10,7 +10,27 @@ namespace AutoDealerSphere.Client.Shared
         public IssuerInfo Item { get; set; } = new();
         [Parameter]
         public EventCallback<IssuerInfo> OnClickOK { get; set; }
-        
+
+        // Email settings parameters
+        [Parameter]
+        public AutoDealerSphere.Shared.Models.EmailSettings EmailSettings { get; set; }
+        [Parameter]
+        public string Password { get; set; }
+        [Parameter]
+        public string TestEmailAddress { get; set; }
+        [Parameter]
+        public string EmailErrorMessage { get; set; }
+        [Parameter]
+        public string EmailSuccessMessage { get; set; }
+        [Parameter]
+        public bool IsEmailProcessing { get; set; }
+        [Parameter]
+        public EventCallback OnSaveEmailSettings { get; set; }
+        [Parameter]
+        public EventCallback OnTestConnection { get; set; }
+        [Parameter]
+        public EventCallback OnSendTestEmail { get; set; }
+
         private bool _submitted = false;
 
         private class AccountType
