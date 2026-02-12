@@ -17,9 +17,6 @@ namespace AutoDealerSphere.Client.Pages
         // Email settings properties
         private AutoDealerSphere.Shared.Models.EmailSettings emailSettings = new AutoDealerSphere.Shared.Models.EmailSettings();
         private string password = "";
-        private string testEmailAddress = "";
-        private string emailErrorMessage = "";
-        private string emailSuccessMessage = "";
         private bool isEmailProcessing = false;
 
         protected override async Task OnInitializedAsync()
@@ -49,24 +46,47 @@ namespace AutoDealerSphere.Client.Pages
         {
             try
             {
-                var response = await Http.PostAsJsonAsync("api/IssuerInfo", issuer);
+                // 発行者情報を保存
+                var issuerResponse = await Http.PostAsJsonAsync("api/IssuerInfo", issuer);
 
-                if (response.IsSuccessStatusCode)
+                if (issuerResponse.IsSuccessStatusCode)
                 {
-                    var savedInfo = await response.Content.ReadFromJsonAsync<IssuerInfo>();
+                    var savedInfo = await issuerResponse.Content.ReadFromJsonAsync<IssuerInfo>();
                     if (savedInfo != null)
                     {
                         issuerInfo = savedInfo;
                     }
-
-                    // 保存成功のメッセージを表示するか、別のページにリダイレクト
-                    StateHasChanged();
                 }
                 else
                 {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"保存に失敗しました: {errorContent}");
+                    var errorContent = await issuerResponse.Content.ReadAsStringAsync();
+                    Console.WriteLine($"発行者情報の保存に失敗しました: {errorContent}");
+                    return;
                 }
+
+                // メール設定を保存（パスワードが入力されている場合のみ）
+                if (!string.IsNullOrEmpty(password))
+                {
+                    var emailRequest = new EmailSettingsRequestModel
+                    {
+                        Settings = emailSettings,
+                        PlainPassword = password
+                    };
+
+                    var emailResponse = await Http.PostAsJsonAsync("api/EmailSettings", emailRequest);
+
+                    if (emailResponse.IsSuccessStatusCode)
+                    {
+                        password = ""; // セキュリティのためクリア
+                    }
+                    else
+                    {
+                        var errorContent = await emailResponse.Content.ReadAsStringAsync();
+                        Console.WriteLine($"メール設定の保存に失敗しました: {errorContent}");
+                    }
+                }
+
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -94,60 +114,15 @@ namespace AutoDealerSphere.Client.Pages
             }
         }
 
-        private async Task SaveEmailSettings()
-        {
-            if (string.IsNullOrEmpty(password))
-            {
-                emailErrorMessage = "パスワードを入力してください。";
-                return;
-            }
-
-            isEmailProcessing = true;
-            emailErrorMessage = "";
-            emailSuccessMessage = "";
-
-            try
-            {
-                var request = new EmailSettingsRequestModel
-                {
-                    Settings = emailSettings,
-                    PlainPassword = password
-                };
-
-                var response = await Http.PostAsJsonAsync("api/EmailSettings", request);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    emailSuccessMessage = "メール設定を保存しました。";
-                    password = ""; // セキュリティのためクリア
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    emailErrorMessage = $"保存に失敗しました: {errorContent}";
-                }
-            }
-            catch (Exception ex)
-            {
-                emailErrorMessage = $"保存中にエラーが発生しました: {ex.Message}";
-            }
-            finally
-            {
-                isEmailProcessing = false;
-            }
-        }
-
         private async Task TestConnection()
         {
             if (string.IsNullOrEmpty(password))
             {
-                emailErrorMessage = "パスワードを入力してください。";
+                Console.WriteLine("パスワードを入力してください。");
                 return;
             }
 
             isEmailProcessing = true;
-            emailErrorMessage = "";
-            emailSuccessMessage = "";
 
             try
             {
@@ -164,65 +139,21 @@ namespace AutoDealerSphere.Client.Pages
                     var result = await response.Content.ReadFromJsonAsync<bool>();
                     if (result)
                     {
-                        emailSuccessMessage = "接続テストに成功しました。";
+                        Console.WriteLine("接続テストに成功しました。");
                     }
                     else
                     {
-                        emailErrorMessage = "接続テストに失敗しました。設定を確認してください。";
+                        Console.WriteLine("接続テストに失敗しました。設定を確認してください。");
                     }
                 }
                 else
                 {
-                    emailErrorMessage = "接続テストに失敗しました。";
+                    Console.WriteLine("接続テストに失敗しました。");
                 }
             }
             catch (Exception ex)
             {
-                emailErrorMessage = $"接続テスト中にエラーが発生しました: {ex.Message}";
-            }
-            finally
-            {
-                isEmailProcessing = false;
-            }
-        }
-
-        private async Task SendTestEmail()
-        {
-            if (string.IsNullOrEmpty(testEmailAddress))
-            {
-                emailErrorMessage = "テストメール送信先を入力してください。";
-                return;
-            }
-
-            isEmailProcessing = true;
-            emailErrorMessage = "";
-            emailSuccessMessage = "";
-
-            try
-            {
-                var response = await Http.PostAsJsonAsync("api/EmailSettings/send-test-email", testEmailAddress);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadFromJsonAsync<bool>();
-                    if (result)
-                    {
-                        emailSuccessMessage = $"テストメールを送信しました: {testEmailAddress}";
-                    }
-                    else
-                    {
-                        emailErrorMessage = "テストメール送信に失敗しました。";
-                    }
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    emailErrorMessage = $"テストメール送信に失敗しました: {errorContent}";
-                }
-            }
-            catch (Exception ex)
-            {
-                emailErrorMessage = $"テストメール送信中にエラーが発生しました: {ex.Message}";
+                Console.WriteLine($"接続テスト中にエラーが発生しました: {ex.Message}");
             }
             finally
             {
