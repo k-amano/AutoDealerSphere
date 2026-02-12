@@ -17,25 +17,21 @@ namespace AutoDealerSphere.Client.Shared
         [Parameter]
         public string Password { get; set; }
         [Parameter]
-        public string TestEmailAddress { get; set; }
-        [Parameter]
-        public string EmailErrorMessage { get; set; }
-        [Parameter]
-        public string EmailSuccessMessage { get; set; }
-        [Parameter]
         public bool IsEmailProcessing { get; set; }
         [Parameter]
-        public EventCallback OnSaveEmailSettings { get; set; }
-        [Parameter]
         public EventCallback OnTestConnection { get; set; }
-        [Parameter]
-        public EventCallback OnSendTestEmail { get; set; }
 
         private bool _submitted = false;
 
         private class AccountType
         {
             public string Value { get; set; }
+            public string Text { get; set; }
+        }
+
+        private class SmtpPortOption
+        {
+            public int Value { get; set; }
             public string Text { get; set; }
         }
 
@@ -50,11 +46,23 @@ namespace AutoDealerSphere.Client.Shared
         protected override void OnInitialized()
         {
             base.OnInitialized();
-            
+
             // Itemが初期化されていない場合は新規作成
             if (Item == null)
             {
                 Item = new IssuerInfo();
+            }
+
+            // EmailSettingsが初期化されていない場合は新規作成
+            if (EmailSettings == null)
+            {
+                EmailSettings = new AutoDealerSphere.Shared.Models.EmailSettings();
+            }
+
+            // 初期ポート設定（デフォルトはSSL/TLS使用のポート）
+            if (EmailSettings.SmtpPort == 0)
+            {
+                EmailSettings.SmtpPort = EmailSettings.EnableSsl ? 587 : 25;
             }
         }
 
@@ -62,6 +70,52 @@ namespace AutoDealerSphere.Client.Shared
         {
             await base.OnParametersSetAsync();
             // DropDownListの初期値を確実にセットするため
+            StateHasChanged();
+        }
+
+        private List<SmtpPortOption> GetSmtpPortOptions()
+        {
+            if (EmailSettings?.EnableSsl == true)
+            {
+                // SSL/TLS使用時のポート
+                return new List<SmtpPortOption>
+                {
+                    new SmtpPortOption { Value = 465, Text = "465 (SMTPS)" },
+                    new SmtpPortOption { Value = 587, Text = "587 (STARTTLS)" }
+                };
+            }
+            else
+            {
+                // SSL/TLS未使用時のポート
+                return new List<SmtpPortOption>
+                {
+                    new SmtpPortOption { Value = 25, Text = "25 (標準SMTP)" },
+                    new SmtpPortOption { Value = 587, Text = "587 (STARTTLS)" }
+                };
+            }
+        }
+
+        private void OnSslChanged(bool isChecked)
+        {
+            EmailSettings.EnableSsl = isChecked;
+
+            // SSL/TLS設定変更時にポートを適切なデフォルト値に変更
+            if (isChecked)
+            {
+                // SSL/TLS有効時は587をデフォルトに
+                if (EmailSettings.SmtpPort == 25)
+                {
+                    EmailSettings.SmtpPort = 587;
+                }
+            }
+            else
+            {
+                // SSL/TLS無効時は25をデフォルトに
+                if (EmailSettings.SmtpPort == 465)
+                {
+                    EmailSettings.SmtpPort = 25;
+                }
+            }
             StateHasChanged();
         }
 
@@ -86,6 +140,11 @@ namespace AutoDealerSphere.Client.Shared
         private void OnRegister()
         {
             this._submitted = true;
+        }
+
+        private async Task HandleTestConnection()
+        {
+            await OnTestConnection.InvokeAsync();
         }
     }
 }
