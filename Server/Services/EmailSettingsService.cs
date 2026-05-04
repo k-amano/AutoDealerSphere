@@ -2,6 +2,7 @@ using AutoDealerSphere.Shared.Models;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using MailKit.Net.Smtp;
+using MailKit.Security;
 
 namespace AutoDealerSphere.Server.Services
 {
@@ -52,20 +53,25 @@ namespace AutoDealerSphere.Server.Services
             return await Task.FromResult(_protector.Unprotect(encryptedPassword));
         }
 
-        public async Task<bool> TestConnectionAsync(EmailSettings settings, string plainPassword)
+        public async Task<(bool Success, string Message)> TestConnectionAsync(EmailSettings settings, string plainPassword)
         {
             try
             {
                 using var client = new SmtpClient();
-                await client.ConnectAsync(settings.SmtpHost, settings.SmtpPort, settings.EnableSsl);
+                var socketOptions = settings.SmtpPort == 465
+                    ? SecureSocketOptions.SslOnConnect
+                    : settings.EnableSsl
+                        ? SecureSocketOptions.StartTls
+                        : SecureSocketOptions.None;
+                await client.ConnectAsync(settings.SmtpHost, settings.SmtpPort, socketOptions);
                 await client.AuthenticateAsync(settings.Username, plainPassword);
                 await client.DisconnectAsync(true);
-                return true;
+                return (true, "接続テストに成功しました。");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "SMTP接続テストに失敗しました");
-                return false;
+                return (false, $"接続テストに失敗しました: {ex.Message}");
             }
         }
     }

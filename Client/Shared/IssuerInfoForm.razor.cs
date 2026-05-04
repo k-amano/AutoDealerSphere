@@ -17,11 +17,19 @@ namespace AutoDealerSphere.Client.Shared
         [Parameter]
         public string Password { get; set; }
         [Parameter]
+        public EventCallback<string> PasswordChanged { get; set; }
+        [Parameter]
         public bool IsEmailProcessing { get; set; }
         [Parameter]
         public EventCallback OnTestConnection { get; set; }
+        [Parameter]
+        public string TestConnectionMessage { get; set; } = "";
+        [Parameter]
+        public bool TestConnectionSuccess { get; set; }
 
         private bool _submitted = false;
+        private bool _showPassword = false;
+        private bool _showEmailHelp = false;
 
         private class AccountType
         {

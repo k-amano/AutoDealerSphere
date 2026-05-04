@@ -1,4 +1,5 @@
 using MailKit.Net.Smtp;
+using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
 
@@ -49,7 +50,12 @@ namespace AutoDealerSphere.Server.Services
             using var client = new SmtpClient();
             try
             {
-                await client.ConnectAsync(settings.SmtpHost, settings.SmtpPort, settings.EnableSsl);
+                var socketOptions = settings.SmtpPort == 465
+                    ? SecureSocketOptions.SslOnConnect
+                    : settings.EnableSsl
+                        ? SecureSocketOptions.StartTls
+                        : SecureSocketOptions.None;
+                await client.ConnectAsync(settings.SmtpHost, settings.SmtpPort, socketOptions);
                 await client.AuthenticateAsync(settings.Username, password);
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
