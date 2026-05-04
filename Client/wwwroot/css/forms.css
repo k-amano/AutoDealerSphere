@@ -583,3 +583,143 @@
     text-align: center;
     color: #666;
 }
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.email-help-link {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+    background: #1a5276;
+    border-radius: 50%;
+    width: 1.3rem;
+    height: 1.3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+}
+
+.email-help-link:hover {
+    background: #2980b9;
+}
+
+.email-help-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.email-help-modal {
+    background: #fff;
+    border-radius: 8px;
+    width: 720px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+
+.email-help-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: #1a5276;
+    color: #fff;
+    border-radius: 8px 8px 0 0;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.email-help-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.email-help-close:hover {
+    opacity: 0.7;
+}
+
+.email-help-content {
+    padding: 1.25rem;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.email-help-provider {
+    flex: 1;
+    min-width: 260px;
+}
+
+.email-help-provider strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #1a5276;
+    font-size: 1rem;
+    border-bottom: 2px solid #d6eaf8;
+    padding-bottom: 0.25rem;
+}
+
+.email-help-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+}
+
+.email-help-table td {
+    padding: 5px 6px;
+    border-bottom: 1px solid #eaf2fb;
+}
+
+.email-help-table td:first-child {
+    color: #555;
+    white-space: nowrap;
+    width: 40%;
+}
+
+.email-help-table code {
+    background: #e8f4fd;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.email-help-note {
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: 0.5rem;
+    line-height: 1.7;
+    background: #fef9e7;
+    border-left: 3px solid #f39c12;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 4px 4px 0;
+}
+
+.email-help-note a {
+    color: #1a5276;
+    word-break: break-all;
+}

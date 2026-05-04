@@ -126,8 +126,55 @@
 			</div>
 			</div>
 
-			<h4>メール設定</h4>
+			<h4>メール設定 <a class="email-help-link" @onclick="@(() => _showEmailHelp = true)" @onclick:preventDefault>？</a></h4>
 			<div class="form-section">
+
+			@if (_showEmailHelp)
+			{
+				<div class="email-help-overlay" @onclick="@(() => _showEmailHelp = false)">
+					<div class="email-help-modal" @onclick:stopPropagation>
+						<div class="email-help-modal-header">
+							<span>メール設定ガイド</span>
+							<button class="email-help-close" @onclick="@(() => _showEmailHelp = false)">✕</button>
+						</div>
+						<div class="email-help-content">
+							<div class="email-help-provider">
+								<strong>Gmail</strong>
+								<table class="email-help-table">
+									<tr><td>SMTPホスト</td><td><code>smtp.gmail.com</code></td></tr>
+									<tr><td>ポート</td><td><code>587</code></td></tr>
+									<tr><td>SSL/TLS</td><td>ON</td></tr>
+									<tr><td>ユーザー名</td><td>Gmailアドレス（例: you@gmail.com）</td></tr>
+									<tr><td>パスワード</td><td>アプリパスワード（16桁）</td></tr>
+								</table>
+								<div class="email-help-note">
+									⚠️ 通常のGmailパスワードは使用不可です。<br />
+									アプリパスワードの取得手順：<br />
+									① Googleアカウント → セキュリティ → 2段階認証を有効化<br />
+									② <a href="https://myaccount.google.com/apppasswords" target="_blank">https://myaccount.google.com/apppasswords</a> にアクセス<br />
+									③ アプリ名を入力して「作成」→ 表示された16桁をパスワードに使用
+								</div>
+							</div>
+							<div class="email-help-provider">
+								<strong>Office 365 / Microsoft 365</strong>
+								<table class="email-help-table">
+									<tr><td>SMTPホスト</td><td><code>smtp.office365.com</code></td></tr>
+									<tr><td>ポート</td><td><code>587</code></td></tr>
+									<tr><td>SSL/TLS</td><td>ON</td></tr>
+									<tr><td>ユーザー名</td><td>Microsoft 365メールアドレス</td></tr>
+									<tr><td>パスワード</td><td>通常のログインパスワード</td></tr>
+								</table>
+								<div class="email-help-note">
+									⚠️ 事前に管理者設定が必要です：<br />
+									① <a href="https://admin.microsoft.com" target="_blank">Microsoft 365管理センター</a> にアクセス<br />
+									② ユーザー → アクティブなユーザー → 対象ユーザーを選択<br />
+									③ メール → メールアプリの管理 →「認証済み SMTP」を ON にして保存
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
 			<div class="form-row">
 				<label>SMTPホスト</label>
 				<SfTextBox @bind-Value="@EmailSettings.SmtpHost" Placeholder="例: smtp.gmail.com"></SfTextBox>
@@ -161,15 +208,24 @@
 			</div>
 			<div class="form-row">
 				<label>SMTP認証パスワード</label>
-				<SfTextBox @bind-Value="@Password" Type="InputType.Password" Placeholder="SMTP認証用のパスワード"></SfTextBox>
+				<div style="display:flex; gap:0.5rem; align-items:center;">
+					<SfTextBox Value="@Password" ValueChanged="@((string v) => PasswordChanged.InvokeAsync(v))" Type="@(_showPassword ? InputType.Text : InputType.Password)" Placeholder="SMTP認証用のパスワード"></SfTextBox>
+					<SfButton OnClick="@(() => _showPassword = !_showPassword)" CssClass="e-outline" style="white-space:nowrap;">@(_showPassword ? "隠す" : "表示")</SfButton>
+				</div>
 			</div>
 			</div>
 
 			<div class="form-buttons">
 				<SfButton OnClick="OnRegister" IsPrimary="true">保存</SfButton>
-				<SfButton OnClick="HandleTestConnection" Disabled="@IsEmailProcessing">接続テスト</SfButton>
+				<SfButton OnClick="HandleTestConnection" Disabled="@IsEmailProcessing">@(IsEmailProcessing ? "テスト中..." : "接続テスト")</SfButton>
 				<SfButton OnClick="OnCancel">キャンセル</SfButton>
 			</div>
+			@if (!string.IsNullOrEmpty(TestConnectionMessage))
+			{
+				<div class="@(TestConnectionSuccess ? "alert-success" : "alert-error")" style="margin-top: 0.75rem; padding: 0.6rem 1rem; border-radius: 4px; font-size: 0.9rem;">
+					@TestConnectionMessage
+				</div>
+			}
 		</div>
 	</EditForm>
 </div>

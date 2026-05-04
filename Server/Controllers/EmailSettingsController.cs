@@ -20,16 +20,20 @@ namespace AutoDealerSphere.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<EmailSettings>> GetEmailSettings()
+        public async Task<ActionResult<EmailSettingsResponse>> GetEmailSettings()
         {
             var settings = await _emailSettingsService.GetSettingsAsync();
             if (settings == null)
             {
-                return Ok(new EmailSettings());
+                return Ok(new EmailSettingsResponse());
             }
-            // パスワードは返さない（セキュリティのため）
+            var plainPassword = "";
+            if (!string.IsNullOrEmpty(settings.EncryptedPassword))
+            {
+                plainPassword = await _emailSettingsService.DecryptPasswordAsync(settings.EncryptedPassword);
+            }
             settings.EncryptedPassword = "";
-            return Ok(settings);
+            return Ok(new EmailSettingsResponse { Settings = settings, PlainPassword = plainPassword });
         }
 
         [HttpPost]
@@ -50,18 +54,18 @@ namespace AutoDealerSphere.Server.Controllers
         }
 
         [HttpPost("test-connection")]
-        public async Task<ActionResult<bool>> TestConnection([FromBody] EmailSettingsRequest request)
+        public async Task<ActionResult<TestConnectionResult>> TestConnection([FromBody] EmailSettingsRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await _emailSettingsService.TestConnectionAsync(
+            var (success, message) = await _emailSettingsService.TestConnectionAsync(
                 request.Settings,
                 request.PlainPassword);
 
-            return Ok(result);
+            return Ok(new TestConnectionResult { Success = success, Message = message });
         }
 
         [HttpPost("send-test-email")]
@@ -83,5 +87,11 @@ namespace AutoDealerSphere.Server.Controllers
     {
         public EmailSettings Settings { get; set; } = new EmailSettings();
         public string PlainPassword { get; set; } = "";
+    }
+
+    public class TestConnectionResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = "";
     }
 }

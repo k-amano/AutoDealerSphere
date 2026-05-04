@@ -7,6 +7,6 @@ namespace AutoDealerSphere.Server.Services
         Task<EmailSettings?> GetSettingsAsync();
         Task<EmailSettings> CreateOrUpdateSettingsAsync(EmailSettings settings, string plainPassword);
         Task<string> DecryptPasswordAsync(string encryptedPassword);
-        Task<bool> TestConnectionAsync(EmailSettings settings, string plainPassword);
+        Task<(bool Success, string Message)> TestConnectionAsync(EmailSettings settings, string plainPassword);
     }
 }

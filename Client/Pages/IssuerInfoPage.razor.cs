@@ -18,6 +18,8 @@ namespace AutoDealerSphere.Client.Pages
         private AutoDealerSphere.Shared.Models.EmailSettings emailSettings = new AutoDealerSphere.Shared.Models.EmailSettings();
         private string password = "";
         private bool isEmailProcessing = false;
+        private string testConnectionMessage = "";
+        private bool testConnectionSuccess = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -75,11 +77,7 @@ namespace AutoDealerSphere.Client.Pages
 
                     var emailResponse = await Http.PostAsJsonAsync("api/EmailSettings", emailRequest);
 
-                    if (emailResponse.IsSuccessStatusCode)
-                    {
-                        password = ""; // セキュリティのためクリア
-                    }
-                    else
+                    if (!emailResponse.IsSuccessStatusCode)
                     {
                         var errorContent = await emailResponse.Content.ReadAsStringAsync();
                         Console.WriteLine($"メール設定の保存に失敗しました: {errorContent}");
@@ -99,17 +97,15 @@ namespace AutoDealerSphere.Client.Pages
         {
             try
             {
-                var response = await Http.GetFromJsonAsync<AutoDealerSphere.Shared.Models.EmailSettings>("api/EmailSettings");
+                var response = await Http.GetFromJsonAsync<AutoDealerSphere.Shared.Models.EmailSettingsResponse>("api/EmailSettings");
                 if (response != null)
                 {
-                    emailSettings = response;
+                    emailSettings = response.Settings;
+                    password = response.PlainPassword;
                 }
-                // 設定が存在しない場合は空のオブジェクトが返ってくるので、エラーメッセージは表示しない
             }
             catch (Exception ex)
             {
-                // 初回起動時など、設定が未登録の場合は正常な状態なのでエラーメッセージは表示しない
-                // サーバー側で適切に処理されているため、通常はここには来ない
                 Console.WriteLine($"メール設定の読み込み時の情報: {ex.Message}");
             }
         }
@@ -118,11 +114,13 @@ namespace AutoDealerSphere.Client.Pages
         {
             if (string.IsNullOrEmpty(password))
             {
-                Console.WriteLine("パスワードを入力してください。");
+                testConnectionMessage = "パスワードを入力してください。";
+                testConnectionSuccess = false;
                 return;
             }
 
             isEmailProcessing = true;
+            testConnectionMessage = "";
 
             try
             {
@@ -136,28 +134,25 @@ namespace AutoDealerSphere.Client.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadFromJsonAsync<bool>();
-                    if (result)
-                    {
-                        Console.WriteLine("接続テストに成功しました。");
-                    }
-                    else
-                    {
-                        Console.WriteLine("接続テストに失敗しました。設定を確認してください。");
-                    }
+                    var result = await response.Content.ReadFromJsonAsync<TestConnectionResult>();
+                    testConnectionSuccess = result?.Success ?? false;
+                    testConnectionMessage = result?.Message ?? "結果を取得できませんでした。";
                 }
                 else
                 {
-                    Console.WriteLine("接続テストに失敗しました。");
+                    testConnectionMessage = "接続テストに失敗しました。";
+                    testConnectionSuccess = false;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"接続テスト中にエラーが発生しました: {ex.Message}");
+                testConnectionMessage = $"接続テスト中にエラーが発生しました: {ex.Message}";
+                testConnectionSuccess = false;
             }
             finally
             {
                 isEmailProcessing = false;
+                StateHasChanged();
             }
         }
     }
@@ -166,5 +161,11 @@ namespace AutoDealerSphere.Client.Pages
     {
         public AutoDealerSphere.Shared.Models.EmailSettings Settings { get; set; } = new AutoDealerSphere.Shared.Models.EmailSettings();
         public string PlainPassword { get; set; } = "";
+    }
+
+    public class TestConnectionResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = "";
     }
 }

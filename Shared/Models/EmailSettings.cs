@@ -32,7 +32,6 @@ namespace AutoDealerSphere.Shared.Models
         [StringLength(100, ErrorMessage = "SMTP認証ユーザー名は100文字までです。")]
         public string Username { get; set; } = "";
 
-        [Required(ErrorMessage = "SMTP認証パスワードを入力してください。")]
         [StringLength(500, ErrorMessage = "SMTP認証パスワードは500文字までです。")]
         public string EncryptedPassword { get; set; } = "";
 
