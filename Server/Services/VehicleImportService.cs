@@ -102,12 +102,6 @@ namespace AutoDealerSphere.Server.Services
                         var zip = GetValue(values, columnIndexes.Zip);
                         var address = GetValue(values, columnIndexes.Address);
                         
-                        // 「岩瀬　艶雄」の住所を統一
-                        if (name == "岩瀬　艶雄" || name == "岩瀬 艶雄")
-                        {
-                            address = "香川県東かがわ市西村1445";
-                        }
-                        
                         // 既存の顧客を氏名で検索（同じ氏名は1つのClientにまとめる）
                         var client = await context.Clients.FirstOrDefaultAsync(c => c.Name == name);
 

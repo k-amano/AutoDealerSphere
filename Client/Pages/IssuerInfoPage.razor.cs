@@ -13,6 +13,7 @@ namespace AutoDealerSphere.Client.Pages
         private NavigationManager Navigation { get; set; }
 
         private IssuerInfo issuerInfo = new IssuerInfo();
+        private bool isInitialSetup = false;
 
         // Email settings properties
         private AutoDealerSphere.Shared.Models.EmailSettings emailSettings = new AutoDealerSphere.Shared.Models.EmailSettings();
@@ -23,6 +24,8 @@ namespace AutoDealerSphere.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            var uri = new Uri(Navigation.Uri);
+            isInitialSetup = uri.Query.Contains("setup=1");
             await LoadIssuerInfo();
             await LoadEmailSettings();
         }
@@ -84,6 +87,11 @@ namespace AutoDealerSphere.Client.Pages
                     }
                 }
 
+                if (isInitialSetup)
+                {
+                    Navigation.NavigateTo("/", replace: true);
+                    return;
+                }
                 StateHasChanged();
             }
             catch (Exception ex)

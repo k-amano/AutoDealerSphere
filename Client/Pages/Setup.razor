@@ -1,0 +1,58 @@
+@page "/setup"
+@inject NavigationManager NavigationManager
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using System.ComponentModel.DataAnnotations
+
+<div class="login-container">
+    <div class="login-box">
+        <h2 class="login-title">初回セットアップ</h2>
+        <p style="text-align:center; color:#666; margin-bottom:1.5rem; font-size:0.95rem;">
+            管理者アカウントを登録してください。
+        </p>
+
+        @if (isChecking)
+        {
+            <p style="text-align:center;">確認中...</p>
+        }
+        else
+        {
+            <EditForm Model="@model" OnValidSubmit="HandleSetup">
+                <DataAnnotationsValidator />
+                <div class="form">
+                    <div class="form-row">
+                        <label>名前</label>
+                        <SfTextBox @bind-Value="@model.Name" Placeholder="管理者の名前"></SfTextBox>
+                        <ValidationMessage For="@(() => model.Name)" />
+                    </div>
+                    <div class="form-row">
+                        <label>メールアドレス</label>
+                        <SfTextBox @bind-Value="@model.Email" Placeholder="メールアドレス"></SfTextBox>
+                        <ValidationMessage For="@(() => model.Email)" />
+                    </div>
+                    <div class="form-row">
+                        <label>パスワード</label>
+                        <SfTextBox @bind-Value="@model.Password" Type="InputType.Password" Placeholder="パスワード（6文字以上）"></SfTextBox>
+                        <ValidationMessage For="@(() => model.Password)" />
+                    </div>
+                    <div class="form-row">
+                        <label>パスワード確認</label>
+                        <SfTextBox @bind-Value="@model.ConfirmPassword" Type="InputType.Password" Placeholder="パスワードを再入力"></SfTextBox>
+                        <ValidationMessage For="@(() => model.ConfirmPassword)" />
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="error-message">@errorMessage</div>
+                }
+
+                <div class="form-buttons">
+                    <SfButton CssClass="e-primary" Disabled="@isProcessing">
+                        @(isProcessing ? "登録中..." : "管理者を登録")
+                    </SfButton>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>

@@ -11,6 +11,13 @@
 
 <h2>発行者情報管理</h2>
 
+@if (isInitialSetup)
+{
+    <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:4px; padding:0.75rem 1rem; margin-bottom:1rem; color:#856404;">
+        初回セットアップ中です。発行者情報を登録して「保存」ボタンを押すとログイン画面へ進みます。
+    </div>
+}
+
 <IssuerInfoForm
     Item="@issuerInfo"
     OnClickOK="SaveIssuerInfo"
