@@ -55,6 +55,14 @@ namespace AutoDealerSphere.Server.Controllers
 			return user;
 		}
 
+		[Route("has-admin")]
+		[HttpGet]
+		public async Task<ActionResult<bool>> HasAdmin()
+		{
+			if (_context == null) return Ok(false);
+			return Ok(await _context.Users.AnyAsync(u => u.Role == 2));
+		}
+
 		[Route("login")]
 		[HttpPost]
 		public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)

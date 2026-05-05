@@ -1,6 +1,7 @@
 @page "/"
 @inject NavigationManager NavigationManager
 @inject AuthenticationService AuthService
+@inject HttpClient Http
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.DataForm
 @using Syncfusion.Blazor.Inputs
@@ -135,6 +136,21 @@
 @code {
     private LoginModel loginModel = new LoginModel();
     private string errorMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var hasAdmin = await Http.GetFromJsonAsync<bool>("api/User/has-admin");
+        if (!hasAdmin)
+        {
+            NavigationManager.NavigateTo("/setup", replace: true);
+            return;
+        }
+        var issuerRegistered = await Http.GetFromJsonAsync<bool>("api/IssuerInfo/is-registered");
+        if (!issuerRegistered)
+        {
+            NavigationManager.NavigateTo("/issuerinfo", replace: true);
+        }
+    }
 
     private class LoginModel
     {

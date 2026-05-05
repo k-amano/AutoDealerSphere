@@ -15,6 +15,13 @@ namespace AutoDealerSphere.Server.Controllers
             _issuerInfoService = issuerInfoService;
         }
 
+        [HttpGet("is-registered")]
+        public async Task<ActionResult<bool>> IsRegistered()
+        {
+            var issuerInfo = await _issuerInfoService.GetIssuerInfoAsync();
+            return Ok(issuerInfo != null && !string.IsNullOrEmpty(issuerInfo.CompanyName));
+        }
+
         [HttpGet]
         public async Task<ActionResult<IssuerInfo>> GetIssuerInfo()
         {

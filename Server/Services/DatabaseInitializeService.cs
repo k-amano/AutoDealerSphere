@@ -41,7 +41,6 @@ namespace AutoDealerSphere.Server.Services
                 CreatePasswordResetTokensTableIfNotExists();
 
                 // 初期データの作成
-                CreateInitialAdminUser();
                 CreateInitialVehicleCategories();
                 CreateInitialStatutoryFees();
                 CreateInitialParts();
@@ -196,33 +195,6 @@ namespace AutoDealerSphere.Server.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Warning: Could not create Users table: {ex.Message}");
-            }
-        }
-
-        private void CreateInitialAdminUser()
-        {
-            try
-            {
-                // 管理者ユーザーが存在しない場合のみ作成
-                var adminExists = _context.Users.Any(u => u.Role == 2);
-                
-                if (!adminExists)
-                {
-                    var adminUser = new User
-                    {
-                        Name = "管理者",
-                        Email = "admin@example.com",
-                        Password = PasswordHashService.HashPassword("admin123"),
-                        Role = 2 // 管理者
-                    };
-
-                    _context.Users.Add(adminUser);
-                    _context.SaveChanges();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Warning: Could not create admin user: {ex.Message}");
             }
         }
 
