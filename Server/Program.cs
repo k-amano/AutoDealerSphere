@@ -1,14 +1,38 @@
 using AutoDealerSphere.Server.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 // Syncfusionライセンスキーを設定
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JEaF5cWWJCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXdec3VUR2ddV0V+WkpWYEk=");
 
-var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("crm01");
+WebApplicationBuilder builder;
+string connectionString;
+
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+{
+    // デバッグ時は元の動作（appsettings.json の接続文字列、ContentRootはデフォルト）
+    builder = WebApplication.CreateBuilder(args);
+    connectionString = builder.Configuration.GetConnectionString("crm01")!;
+}
+else
+{
+    // サービス起動時はexeフォルダ基準の絶対パスを使う
+    var exeFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule!.FileName)!;
+    var dbFolder = Path.Combine(exeFolder, "Data");
+    Directory.CreateDirectory(dbFolder);
+    connectionString = $"Data Source={Path.Combine(dbFolder, "crm01.db")}";
+
+    builder = WebApplication.CreateBuilder(new WebApplicationOptions
+    {
+        Args = args,
+        ContentRootPath = exeFolder,
+    });
+}
+
+// Windowsサービスとして動作する場合の対応
+builder.Host.UseWindowsService();
 
 // Add services to the container.
-
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
@@ -35,7 +59,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<SQLDBContext>();
-    
+
     try
     {
         var initializeService = new DatabaseInitializeService(dbContext);
@@ -56,12 +80,10 @@ if (app.Environment.IsDevelopment())
 else
 {
 	app.UseExceptionHandler("/Error");
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
