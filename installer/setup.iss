@@ -27,10 +27,12 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 [Files]
 Source: "..\publish\Server\*"; DestDir: "{app}\Server"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\publish\Launcher\*"; DestDir: "{app}\Launcher"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\installer\dotnet-runtime\windowsdesktop-runtime-9.0.15-win-x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: IsX64Compatible
+Source: "..\installer\dotnet-runtime\windowsdesktop-runtime-9.0.15-win-arm64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: IsArm64
 
 [Dirs]
-; データフォルダを作成
-Name: "{app}\Server\Data"
+; データフォルダを作成（ProgramData は全アカウントが書き込み可能）
+Name: "{commonappdata}\AutoDealerSphere"
 
 [Icons]
 ; デスクトップにショートカット
@@ -40,6 +42,9 @@ Name: "{group}\{#AppName}"; Filename: "{app}\Launcher\{#LauncherExe}"
 Name: "{group}\{#AppName}のアンインストール"; Filename: "{uninstallexe}"
 
 [Run]
+; .NET 9 デスクトップランタイム（未インストールの場合のみインストール）
+Filename: "{tmp}\windowsdesktop-runtime-9.0.15-win-x64.exe"; Parameters: "/silent /norestart"; Flags: runhidden waituntilterminated; Check: IsX64Compatible
+Filename: "{tmp}\windowsdesktop-runtime-9.0.15-win-arm64.exe"; Parameters: "/silent /norestart"; Flags: runhidden waituntilterminated; Check: IsArm64
 ; 既存サービスを停止・削除（再インストール時の残骸対策）
 Filename: "sc.exe"; Parameters: "stop ""{#ServiceName}"""; Flags: runhidden waituntilterminated
 Filename: "sc.exe"; Parameters: "delete ""{#ServiceName}"""; Flags: runhidden waituntilterminated
