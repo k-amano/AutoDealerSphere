@@ -16,11 +16,12 @@ if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development
 }
 else
 {
-    // サービス起動時はexeフォルダ基準の絶対パスを使う
+    // サービス起動時は ProgramData を使う（全アカウントが書き込み可能）
     var exeFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule!.FileName)!;
-    var dbFolder = Path.Combine(exeFolder, "Data");
+    var dbFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "AutoDealerSphere");
     Directory.CreateDirectory(dbFolder);
     connectionString = $"Data Source={Path.Combine(dbFolder, "crm01.db")}";
+    Console.WriteLine($"DB path: {connectionString}");
 
     builder = WebApplication.CreateBuilder(new WebApplicationOptions
     {
