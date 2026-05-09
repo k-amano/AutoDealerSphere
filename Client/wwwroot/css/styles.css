@@ -1,4 +1,9 @@
-﻿body {
+﻿html, body {
+	height: 100%;
+	overflow: hidden;
+}
+
+body {
 	font-size: 12px;
 	font-family: Arial, Helvetica, 'メイリオ',Meiryo,'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','ＭＳ Ｐゴシック',sans-serif;
 	color: #333;

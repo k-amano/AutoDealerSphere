@@ -93,3 +93,17 @@ cd "C:\Program Files (x86)\AutoDealerSphere"
 ### ランチャーが画面を表示しない場合
 
 サービスが起動していない可能性が高い。上記のサービス確認を先に行う。
+
+---
+
+## ポート設定
+
+| 用途 | HTTP | HTTPS |
+|------|------|-------|
+| 本番（Windowsサービス） | 5259 | - |
+| 開発（Visual Studioデバッグ） | 5260 | 7188 |
+
+開発ポートと本番サービスポートを分けることで、本番サービスを停止せずに Visual Studio でデバッグできる。
+
+- 本番ポートは `Server/appsettings.json` および `Launcher/MainForm.cs` の `AppUrl` で定義
+- 開発ポートは `Server/Properties/launchSettings.json` および `Client/Properties/launchSettings.json` で定義
