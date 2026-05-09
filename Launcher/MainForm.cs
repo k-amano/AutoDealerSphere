@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net.Http;
 using System.ServiceProcess;
+using System.Text.Json;
 
 namespace AutoDealerSphere.Launcher
 {
@@ -14,6 +15,9 @@ namespace AutoDealerSphere.Launcher
         private int _retryCount = 0;
         private bool _navigated = false;
         private const int MaxRetries = 40;
+        private static readonly string SettingsPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "AutoDealerSphere", "window.json");
 
         public MainForm()
         {
@@ -24,10 +28,8 @@ namespace AutoDealerSphere.Launcher
         private void InitializeComponent()
         {
             Text = "AutoDealerSphere - 起動中...";
-            Width = 1280;
-            Height = 800;
             MinimumSize = new Size(1024, 600);
-            StartPosition = FormStartPosition.CenterScreen;
+            RestoreWindowSettings();
 
             _webView = new Microsoft.Web.WebView2.WinForms.WebView2
             {
@@ -37,6 +39,8 @@ namespace AutoDealerSphere.Launcher
 
             _retryTimer = new System.Windows.Forms.Timer { Interval = 500 };
             _retryTimer.Tick += RetryTimer_Tick;
+
+            FormClosing += (s, e) => SaveWindowSettings();
         }
 
         private void StartService()
@@ -122,6 +126,49 @@ namespace AutoDealerSphere.Launcher
             _webView.Source = new Uri(AppUrl);
         }
 
+        private void RestoreWindowSettings()
+        {
+            WindowSettings? s = null;
+
+            if (File.Exists(SettingsPath))
+            {
+                var json = File.ReadAllText(SettingsPath);
+                s = JsonSerializer.Deserialize<WindowSettings>(json);
+            }
+
+            if (s != null)
+            {
+                StartPosition = FormStartPosition.Manual;
+                Bounds = new Rectangle(s.X, s.Y, s.Width, s.Height);
+                if (s.Maximized) WindowState = FormWindowState.Maximized;
+            }
+            else
+            {
+                Width = 1280;
+                Height = 800;
+                StartPosition = FormStartPosition.CenterScreen;
+            }
+        }
+
+        private void SaveWindowSettings()
+        {
+            try
+            {
+                var bounds = WindowState == FormWindowState.Normal ? Bounds : RestoreBounds;
+                var s = new WindowSettings
+                {
+                    X = bounds.X,
+                    Y = bounds.Y,
+                    Width = bounds.Width,
+                    Height = bounds.Height,
+                    Maximized = WindowState == FormWindowState.Maximized
+                };
+                Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
+                File.WriteAllText(SettingsPath, JsonSerializer.Serialize(s));
+            }
+            catch { }
+        }
+
         private void ShowError(string message)
         {
             var textBox = new TextBox
@@ -137,5 +184,14 @@ namespace AutoDealerSphere.Launcher
             Controls.Add(textBox);
             Text = "AutoDealerSphere - エラー";
         }
+    }
+
+    record WindowSettings
+    {
+        public int X { get; init; }
+        public int Y { get; init; }
+        public int Width { get; init; }
+        public int Height { get; init; }
+        public bool Maximized { get; init; }
     }
 }
