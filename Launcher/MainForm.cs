@@ -29,6 +29,7 @@ namespace AutoDealerSphere.Launcher
         {
             Text = "AutoDealerSphere - 起動中...";
             MinimumSize = new Size(1024, 600);
+            Icon = new Icon(Path.Combine(AppContext.BaseDirectory, "app.ico"));
             RestoreWindowSettings();
 
             _webView = new Microsoft.Web.WebView2.WinForms.WebView2
@@ -114,13 +115,13 @@ namespace AutoDealerSphere.Launcher
                     args.Handled = true;
                     Process.Start(new ProcessStartInfo(args.Uri) { UseShellExecute = true });
                 };
+                _webView.CoreWebView2.Navigate(AppUrl);
                 _webView.CoreWebView2.NavigationCompleted += (s, args) =>
                 {
                     var uri = _webView.Source?.ToString() ?? "";
                     if (!uri.StartsWith(AppUrl)) return;
                     Text = args.IsSuccess ? "AutoDealerSphere" : $"AutoDealerSphere - エラー (0x{args.WebErrorStatus:X})";
                 };
-                _webView.CoreWebView2.Navigate(AppUrl);
             };
 
             _webView.Source = new Uri(AppUrl);
