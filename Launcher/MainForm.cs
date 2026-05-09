@@ -112,6 +112,8 @@ namespace AutoDealerSphere.Launcher
                 };
                 _webView.CoreWebView2.NavigationCompleted += (s, args) =>
                 {
+                    var uri = _webView.Source?.ToString() ?? "";
+                    if (!uri.StartsWith(AppUrl)) return;
                     Text = args.IsSuccess ? "AutoDealerSphere" : $"AutoDealerSphere - エラー (0x{args.WebErrorStatus:X})";
                 };
                 _webView.CoreWebView2.Navigate(AppUrl);
