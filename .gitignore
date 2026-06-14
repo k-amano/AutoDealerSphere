@@ -55,3 +55,16 @@ obj/
 
 .task/
 Server/Data/
+
+# Visual Studio user-specific files
+*.user
+*.slnLaunch.user
+
+# Publish output
+publish/
+
+# Temporary / scratch directories
+SqliteTest/
+
+# Documentation assets (generated)
+docs/
