@@ -1,0 +1,23 @@
+@using AutoDealerSphere.Client.Services
+@using Microsoft.AspNetCore.Components.Web
+@inherits ErrorBoundary
+@inject ErrorService ErrorService
+@inject NavigationManager NavigationManager
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+
+@code {
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        ErrorService.SetError(new AutoDealerSphere.Shared.Models.ApiErrorResponse
+        {
+            Message = "",
+            StatusCode = 500,
+        });
+        NavigationManager.NavigateTo("/error");
+        return Task.CompletedTask;
+    }
+}
