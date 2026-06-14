@@ -1,5 +1,7 @@
+using AutoDealerSphere.Server.Middleware;
 using AutoDealerSphere.Server.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Diagnostics;
 
 // Syncfusionライセンスキーを設定
@@ -7,21 +9,23 @@ Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQx
 
 WebApplicationBuilder builder;
 string connectionString;
+string logFolder;
 
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
     // デバッグ時は元の動作（appsettings.json の接続文字列、ContentRootはデフォルト）
     builder = WebApplication.CreateBuilder(args);
     connectionString = builder.Configuration.GetConnectionString("crm01")!;
+    logFolder = Path.Combine(AppContext.BaseDirectory, "logs");
 }
 else
 {
     // サービス起動時は ProgramData を使う（全アカウントが書き込み可能）
     var exeFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule!.FileName)!;
-    var dbFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "AutoDealerSphere");
-    Directory.CreateDirectory(dbFolder);
-    connectionString = $"Data Source={Path.Combine(dbFolder, "crm01.db")}";
-    Console.WriteLine($"DB path: {connectionString}");
+    var dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "AutoDealerSphere");
+    Directory.CreateDirectory(dataFolder);
+    connectionString = $"Data Source={Path.Combine(dataFolder, "crm01.db")}";
+    logFolder = Path.Combine(dataFolder, "logs");
 
     builder = WebApplication.CreateBuilder(new WebApplicationOptions
     {
@@ -29,6 +33,23 @@ else
         ContentRootPath = exeFolder,
     });
 }
+
+Directory.CreateDirectory(logFolder);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File(
+        path: Path.Combine(logFolder, "app-.log"),
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Windowsサービスとして動作する場合の対応
 builder.Host.UseWindowsService();
@@ -68,20 +89,21 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Database initialization failed: {ex.Message}");
+        Log.Fatal(ex, "データベースの初期化に失敗しました");
         throw;
     }
 }
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
-	app.UseWebAssemblyDebugging();
+    app.UseWebAssemblyDebugging();
 }
 else
 {
-	app.UseExceptionHandler("/Error");
-	app.UseHsts();
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
