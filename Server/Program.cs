@@ -60,7 +60,6 @@ builder.Services.AddControllersWithViews()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
-builder.Services.AddRazorPages();
 builder.Services.AddDbContextFactory<SQLDBContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddDataProtection();
 builder.Services.AddScoped<IClientService, ClientService>();
@@ -112,7 +111,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
