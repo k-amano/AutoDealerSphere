@@ -7,31 +7,23 @@
 | AutoDealerSphere.Server.exe | Windowsサービス | ASP.NET Core Webサーバー（http://localhost:5259） |
 | AutoDealerSphere.exe | WinFormsアプリ | ランチャー（WebView2でサーバーに接続） |
 
-インストール先: `C:\Program Files (x86)\AutoDealerSphere\`
+インストール先: `C:\AutoDealerSphere\`
 
 ---
 
 ## 発行手順
 
-### 1. Server を発行
+ソリューションルート（`AutoDealerSphere.sln` があるフォルダ）で実行する:
 
-Visual Studio でServerプロジェクトを右クリック → 「発行」→ 発行先: `publish/Server/`
-
-または PowerShell:
-```
-cd Server
-dotnet publish -c Release -o ..\publish\Server
+```powershell
+cd C:\Users\Administrator\VisualStudioProjects\blazor\AutoDealerSphere
+dotnet publish Server -c Release -o publish\Server
+dotnet publish Launcher -c Release -o publish\Launcher
 ```
 
-### 2. Launcher を発行
-
-Visual Studio でLauncherプロジェクトを右クリック → 「発行」→ 発行先: `publish/Launcher/`
-
-または PowerShell:
-```
-cd Launcher
-dotnet publish -c Release -o ..\publish\Launcher
-```
+発行結果は以下に出力される:
+- `publish\Server\` — サーバー一式
+- `publish\Launcher\` — ランチャー一式
 
 ---
 
@@ -40,12 +32,21 @@ dotnet publish -c Release -o ..\publish\Launcher
 ### 前提
 - Inno Setup がインストールされていること
 
+### インストーラースクリプトの場所
+
+```
+C:\Users\Administrator\VisualStudioProjects\blazor\AutoDealerSphere\installer\setup.iss
+```
+
+インストーラースクリプトは発行先（`publish\Server\`、`publish\Launcher\`）を参照するため、
+**発行手順を先に完了してから**インストーラーを作成すること。
+
 ### 手順
 
 1. Inno Setup Compiler を開く
-2. `installer/setup.iss` を開く
+2. 上記パスの `setup.iss` を開く
 3. Build → Compile（F9）
-4. `installer_output/AutoDealerSphere_Setup.exe` が生成される
+4. `installer_output\AutoDealerSphere_Setup.exe` が生成される
 
 ---
 
