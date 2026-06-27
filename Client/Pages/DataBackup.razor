@@ -150,62 +150,19 @@
 
         try
         {
-            Console.WriteLine("バックアップ開始...");
             var response = await Http.GetAsync("api/DataManagement/backup");
-            Console.WriteLine($"API応答: {response.StatusCode}");
+            response.EnsureSuccessStatusCode();
 
-            if (response.IsSuccessStatusCode)
+            var backupData = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            backupResult = JsonSerializer.Deserialize<BackupResult>(backupData, options);
+
+            if (backupResult?.Success == true && !string.IsNullOrEmpty(backupResult.BackupData))
             {
-                var backupData = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"バックアップデータ受信: {backupData.Length} bytes");
-
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                backupResult = JsonSerializer.Deserialize<BackupResult>(backupData, options);
-                Console.WriteLine($"デシリアライズ結果: Success={backupResult?.Success}, HasData={!string.IsNullOrEmpty(backupResult?.BackupData)}");
-
-                if (backupResult?.Success == true && !string.IsNullOrEmpty(backupResult.BackupData))
-                {
-                    // Generate filename with timestamp (short format: bkYYYYMMDD-HHMM.zip)
-                    var now = DateTime.Now;
-                    backupFileName = $"bk{now:yyyyMMdd-HHmm}.zip";
-
-                    Console.WriteLine($"ファイル名: {backupFileName}");
-                    Console.WriteLine($"ZIPサイズ（Base64）: {backupResult.BackupData.Length} characters");
-
-                    // Download file (BackupData is already Base64-encoded ZIP)
-                    await JSRuntime.InvokeVoidAsync("downloadFile", backupFileName, backupResult.BackupData);
-                    Console.WriteLine("ダウンロード関数呼び出し完了");
-                }
-                else
-                {
-                    Console.WriteLine($"バックアップ失敗: {backupResult?.Message}");
-                }
+                var now = DateTime.Now;
+                backupFileName = $"bk{now:yyyyMMdd-HHmm}.zip";
+                await JSRuntime.InvokeVoidAsync("downloadFile", backupFileName, backupResult.BackupData);
             }
-            else
-            {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"API エラー: {errorContent}");
-                backupResult = new BackupResult
-                {
-                    Success = false,
-                    Message = $"バックアップに失敗しました: {response.StatusCode}",
-                    Error = errorContent
-                };
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"例外発生: {ex.Message}");
-            Console.WriteLine($"スタックトレース: {ex.StackTrace}");
-            backupResult = new BackupResult
-            {
-                Success = false,
-                Message = "バックアップ中にエラーが発生しました",
-                Error = ex.Message
-            };
         }
         finally
         {

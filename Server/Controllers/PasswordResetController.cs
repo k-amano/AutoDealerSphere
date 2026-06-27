@@ -26,55 +26,43 @@ namespace AutoDealerSphere.Server.Controllers
         [HttpPost("request")]
         public async Task<ActionResult> RequestPasswordReset([FromBody] PasswordResetRequest request)
         {
-            try
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            // セキュリティのため、ユーザーが存在しない場合も同じメッセージを返す
+            if (user != null)
             {
-                var user = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email == request.Email);
+                var existingTokens = await _context.PasswordResetTokens
+                    .Where(t => t.UserId == user.Id && !t.IsUsed)
+                    .ToListAsync();
 
-                // セキュリティのため、ユーザーが存在しない場合も同じメッセージを返す
-                if (user != null)
+                foreach (var token in existingTokens)
                 {
-                    // 既存の未使用トークンを無効化
-                    var existingTokens = await _context.PasswordResetTokens
-                        .Where(t => t.UserId == user.Id && !t.IsUsed)
-                        .ToListAsync();
-
-                    foreach (var token in existingTokens)
-                    {
-                        token.IsUsed = true;
-                    }
-
-                    // 新しいトークンを作成
-                    var resetToken = new PasswordResetToken
-                    {
-                        UserId = user.Id,
-                        Token = Guid.NewGuid().ToString(),
-                        CreatedAt = DateTime.Now,
-                        ExpiresAt = DateTime.Now.AddHours(1),
-                        IsUsed = false
-                    };
-
-                    _context.PasswordResetTokens.Add(resetToken);
-                    await _context.SaveChangesAsync();
-
-                    // メール送信
-                    var resetUrl = $"{request.BaseUrl}/reset-password";
-                    await _emailService.SendPasswordResetEmailAsync(
-                        user.Email,
-                        resetToken.Token,
-                        resetUrl);
-
-                    _logger.LogInformation($"パスワードリセットメールを送信しました: {user.Email}");
+                    token.IsUsed = true;
                 }
 
-                // 常に同じメッセージを返す（情報漏洩防止）
-                return Ok(new { message = "メールアドレスが登録されている場合、パスワードリセットのメールを送信しました。" });
+                var resetToken = new PasswordResetToken
+                {
+                    UserId = user.Id,
+                    Token = Guid.NewGuid().ToString(),
+                    CreatedAt = DateTime.Now,
+                    ExpiresAt = DateTime.Now.AddHours(1),
+                    IsUsed = false
+                };
+
+                _context.PasswordResetTokens.Add(resetToken);
+                await _context.SaveChangesAsync();
+
+                var resetUrl = $"{request.BaseUrl}/reset-password";
+                await _emailService.SendPasswordResetEmailAsync(
+                    user.Email,
+                    resetToken.Token,
+                    resetUrl);
+
+                _logger.LogInformation("パスワードリセットメールを送信しました: {Email}", user.Email);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "パスワードリセット要求処理中にエラーが発生しました");
-                return StatusCode(500, new { error = "メール送信に失敗しました。メール設定を確認してください。" });
-            }
+
+            return Ok(new { message = "メールアドレスが登録されている場合、パスワードリセットのメールを送信しました。" });
         }
 
         [HttpGet("verify/{token}")]

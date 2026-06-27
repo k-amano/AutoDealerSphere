@@ -95,27 +95,19 @@ namespace AutoDealerSphere.Client.Components
 
         private async Task LoadParts()
         {
-            try
+            var parts = await Http.GetFromJsonAsync<List<Part>>("api/Parts");
+            if (parts != null)
             {
-                var parts = await Http.GetFromJsonAsync<List<Part>>("api/Parts");
-                if (parts != null)
-                {
-                    _allParts = parts.Where(p => p.IsActive).ToList();
-                    _filteredParts = _allParts;
-                    
-                    // タイプのリストを作成
-                    _partTypes = _allParts
-                        .Where(p => !string.IsNullOrEmpty(p.Type))
-                        .Select(p => p.Type!)
-                        .Distinct()
-                        .OrderBy(t => t)
-                        .ToList();
-                    _partTypes.Insert(0, string.Empty); // "すべて"オプション
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"部品データの読み込みに失敗しました: {ex.Message}");
+                _allParts = parts.Where(p => p.IsActive).ToList();
+                _filteredParts = _allParts;
+
+                _partTypes = _allParts
+                    .Where(p => !string.IsNullOrEmpty(p.Type))
+                    .Select(p => p.Type!)
+                    .Distinct()
+                    .OrderBy(t => t)
+                    .ToList();
+                _partTypes.Insert(0, string.Empty);
             }
         }
 

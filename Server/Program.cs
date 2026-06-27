@@ -80,10 +80,11 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<SQLDBContext>();
+    var dbInitLogger = scope.ServiceProvider.GetRequiredService<ILogger<DatabaseInitializeService>>();
 
     try
     {
-        var initializeService = new DatabaseInitializeService(dbContext);
+        var initializeService = new DatabaseInitializeService(dbContext, dbInitLogger);
         initializeService.Initialize();
     }
     catch (Exception ex)

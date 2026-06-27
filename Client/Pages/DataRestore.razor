@@ -176,45 +176,19 @@
         try
         {
             var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(selectedFile.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024)); // 50MB max
+            var fileContent = new StreamContent(selectedFile.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024));
 
-            // Set content type based on file extension
             if (selectedFile.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-            {
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/zip");
-            }
             else
-            {
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            }
 
             content.Add(fileContent, "file", selectedFile.Name);
 
             var response = await Http.PostAsync("api/DataManagement/restore", content);
+            response.EnsureSuccessStatusCode();
 
-            if (response.IsSuccessStatusCode)
-            {
-                restoreResult = await response.Content.ReadFromJsonAsync<RestoreResult>();
-            }
-            else
-            {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                restoreResult = new RestoreResult
-                {
-                    Success = false,
-                    Message = $"レストアに失敗しました: {response.StatusCode}",
-                    Error = errorContent
-                };
-            }
-        }
-        catch (Exception ex)
-        {
-            restoreResult = new RestoreResult
-            {
-                Success = false,
-                Message = "レストア中にエラーが発生しました",
-                Error = ex.Message
-            };
+            restoreResult = await response.Content.ReadFromJsonAsync<RestoreResult>();
         }
         finally
         {

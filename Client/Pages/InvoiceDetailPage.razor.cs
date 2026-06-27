@@ -242,10 +242,7 @@ namespace AutoDealerSphere.Client.Pages
                     };
 
                     var response = await Http.PostAsJsonAsync($"api/Invoices/{InvoiceId}/details", detail);
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine($"Failed to add statutory fee: {statutoryFee.FeeType}");
-                    }
+                    response.EnsureSuccessStatusCode();
                 }
             }
 
@@ -256,10 +253,7 @@ namespace AutoDealerSphere.Client.Pages
                 if (!isSelected)
                 {
                     var response = await Http.DeleteAsync($"api/Invoices/{InvoiceId}/details/{existingDetail.Id}");
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine($"Failed to delete statutory fee: {existingDetail.ItemName}");
-                    }
+                    response.EnsureSuccessStatusCode();
                 }
             }
 
