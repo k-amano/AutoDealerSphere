@@ -32,21 +32,10 @@ namespace AutoDealerSphere.Client.Pages
                 };
 
                 var response = await Http.PostAsJsonAsync("api/PasswordReset/request", request);
-
                 if (response.IsSuccessStatusCode)
                 {
                     emailSent = true;
                 }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    errorMessage = $"送信に失敗しました: {errorContent}";
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"送信中にエラーが発生しました。メール設定を確認してください。";
-                Console.WriteLine($"Error: {ex.Message}");
             }
             finally
             {

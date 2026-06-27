@@ -71,15 +71,8 @@ namespace AutoDealerSphere.Server.Controllers
         [HttpPost("send-test-email")]
         public async Task<ActionResult<bool>> SendTestEmail([FromBody] string toEmail)
         {
-            try
-            {
-                var result = await _emailService.SendTestEmailAsync(toEmail);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            var result = await _emailService.SendTestEmailAsync(toEmail);
+            return Ok(result);
         }
     }
 

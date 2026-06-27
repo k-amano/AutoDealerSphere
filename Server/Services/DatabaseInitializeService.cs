@@ -1,15 +1,18 @@
 using AutoDealerSphere.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AutoDealerSphere.Server.Services
 {
     public class DatabaseInitializeService
     {
         private readonly SQLDBContext _context;
+        private readonly ILogger<DatabaseInitializeService> _logger;
 
-        public DatabaseInitializeService(SQLDBContext context)
+        public DatabaseInitializeService(SQLDBContext context, ILogger<DatabaseInitializeService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public void Initialize()
@@ -47,7 +50,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Database initialization error: {ex.Message}");
+                _logger.LogError(ex, "データベースの初期化中にエラーが発生しました");
                 throw;
             }
         }
@@ -72,7 +75,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create Clients table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: Clients table");
             }
         }
 
@@ -174,7 +177,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create Vehicles table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: Vehicles table");
             }
         }
 
@@ -194,7 +197,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create Users table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: Users table");
             }
         }
 
@@ -213,7 +216,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create VehicleCategories table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: VehicleCategories table");
             }
         }
 
@@ -234,7 +237,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create Parts table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: Parts table");
             }
         }
 
@@ -259,7 +262,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create StatutoryFees table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: StatutoryFees table");
             }
         }
 
@@ -292,7 +295,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create Invoices table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: Invoices table");
             }
         }
 
@@ -321,7 +324,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create InvoiceDetails table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: InvoiceDetails table");
             }
         }
 
@@ -348,7 +351,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create initial vehicle categories: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: initial vehicle categories");
             }
         }
 
@@ -390,7 +393,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create initial statutory fees: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: initial statutory fees");
             }
         }
 
@@ -496,7 +499,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create initial parts: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: initial parts");
             }
         }
 
@@ -542,7 +545,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create IssuerInfos table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: IssuerInfos table");
             }
         }
 
@@ -566,7 +569,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create EmailSettings table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: EmailSettings table");
             }
         }
 
@@ -588,7 +591,7 @@ namespace AutoDealerSphere.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not create PasswordResetTokens table: {ex.Message}");
+                _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: PasswordResetTokens table");
             }
         }
 
@@ -611,14 +614,14 @@ namespace AutoDealerSphere.Server.Services
                     if (count == 0)
                     {
                         _context.Database.ExecuteSqlRaw($"ALTER TABLE {tableName} ADD COLUMN {columnName} {columnDefinition}");
-                        Console.WriteLine($"Added column {columnName} to {tableName}");
+                        _logger.LogInformation("カラム {ColumnName} をテーブル {TableName} に追加しました", columnName, tableName);
                     }
                 }
             }
             catch (Exception ex)
             {
                 // カラムが既に存在する場合やテーブルが存在しない場合はエラーを無視
-                Console.WriteLine($"Note: Column {columnName} may already exist or table {tableName} doesn't exist: {ex.Message}");
+                _logger.LogDebug(ex, "カラム {ColumnName} の追加をスキップしました（既存またはテーブル未存在）: {TableName}", columnName, tableName);
             }
         }
     }

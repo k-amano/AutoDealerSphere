@@ -41,75 +41,50 @@ namespace AutoDealerSphere.Client.Components
 
         private async Task LoadVehicleAndFees()
         {
-            try
+            _vehicle = await Http.GetFromJsonAsync<Vehicle>($"api/Vehicles/{_vehicleId}");
+
+            if (_vehicle != null)
             {
-                // 車両情報を取得
-                _vehicle = await Http.GetFromJsonAsync<Vehicle>($"api/Vehicles/{_vehicleId}");
-                
-                if (_vehicle != null)
+                _vehicleDisplay = $"{_vehicle.VehicleName} ({_vehicle.LicensePlateNumber})";
+                _vehicleCategoryDisplay = _vehicle.VehicleCategory?.CategoryName ?? "未設定";
+
+                if (_vehicle.VehicleCategoryId > 0)
                 {
-                    _vehicleDisplay = $"{_vehicle.VehicleName} ({_vehicle.LicensePlateNumber})";
-                    _vehicleCategoryDisplay = _vehicle.VehicleCategory?.CategoryName ?? "未設定";
+                    var fees = await Http.GetFromJsonAsync<List<StatutoryFee>>($"api/StatutoryFees/category/{_vehicle.VehicleCategoryId}") ?? new();
+                    _statutoryFees = fees.OrderBy(f => f.Id).ToList();
 
-                    // 車両カテゴリに対応する法定費用を取得
-                    if (_vehicle.VehicleCategoryId > 0)
+                    foreach (var fee in _statutoryFees)
                     {
-                        var fees = await Http.GetFromJsonAsync<List<StatutoryFee>>($"api/StatutoryFees/category/{_vehicle.VehicleCategoryId}") ?? new();
-
-                        // ID順でソート
-                        _statutoryFees = fees.OrderBy(f => f.Id).ToList();
-
-                        // 各法定費用のチェックボックスを初期化
-                        foreach (var fee in _statutoryFees)
-                        {
-                            _selectedFees[fee.Id] = false;
-                        }
+                        _selectedFees[fee.Id] = false;
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading vehicle and fees: {ex.Message}");
-                _statutoryFees = new();
-            }
-            finally
-            {
-                _isLoading = false;
-                StateHasChanged();
-            }
+
+            _isLoading = false;
+            StateHasChanged();
         }
 
         private async Task LoadExistingInvoiceDetails()
         {
-            try
+            if (_invoiceId > 0)
             {
-                if (_invoiceId > 0)
+                var invoice = await Http.GetFromJsonAsync<Invoice>($"api/Invoices/{_invoiceId}");
+                if (invoice != null && invoice.InvoiceDetails != null)
                 {
-                    var invoice = await Http.GetFromJsonAsync<Invoice>($"api/Invoices/{_invoiceId}");
-                    if (invoice != null && invoice.InvoiceDetails != null)
+                    _existingInvoiceDetails = invoice.InvoiceDetails.Where(d => d.Type == "法定費用").ToList();
+
+                    foreach (var detail in _existingInvoiceDetails)
                     {
-                        _existingInvoiceDetails = invoice.InvoiceDetails.Where(d => d.Type == "法定費用").ToList();
-                        
-                        // 既存の法定費用項目にチェックを入れる
-                        foreach (var detail in _existingInvoiceDetails)
+                        var fee = _statutoryFees.FirstOrDefault(f => f.FeeType == detail.ItemName);
+                        if (fee != null && _selectedFees.ContainsKey(fee.Id))
                         {
-                            var fee = _statutoryFees.FirstOrDefault(f => f.FeeType == detail.ItemName);
-                            if (fee != null && _selectedFees.ContainsKey(fee.Id))
-                            {
-                                _selectedFees[fee.Id] = true;
-                            }
+                            _selectedFees[fee.Id] = true;
                         }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading existing invoice details: {ex.Message}");
-            }
-            finally
-            {
-                StateHasChanged();
-            }
+
+            StateHasChanged();
         }
 
         private async Task SaveSelectedFees()

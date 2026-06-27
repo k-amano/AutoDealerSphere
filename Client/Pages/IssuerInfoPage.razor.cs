@@ -32,89 +32,54 @@ namespace AutoDealerSphere.Client.Pages
 
         private async Task LoadIssuerInfo()
         {
-            try
+            var response = await Http.GetFromJsonAsync<IssuerInfo>("api/IssuerInfo");
+            if (response != null)
             {
-                var response = await Http.GetFromJsonAsync<IssuerInfo>("api/IssuerInfo");
-                if (response != null)
-                {
-                    issuerInfo = response;
-                }
-            }
-            catch (Exception ex)
-            {
-                // エラーがあってもデフォルト値で表示
-                Console.WriteLine($"データの読み込みに失敗しました: {ex.Message}");
+                issuerInfo = response;
             }
         }
 
         private async Task SaveIssuerInfo(IssuerInfo issuer)
         {
-            try
+            var issuerResponse = await Http.PostAsJsonAsync("api/IssuerInfo", issuer);
+
+            if (issuerResponse.IsSuccessStatusCode)
             {
-                // 発行者情報を保存
-                var issuerResponse = await Http.PostAsJsonAsync("api/IssuerInfo", issuer);
-
-                if (issuerResponse.IsSuccessStatusCode)
+                var savedInfo = await issuerResponse.Content.ReadFromJsonAsync<IssuerInfo>();
+                if (savedInfo != null)
                 {
-                    var savedInfo = await issuerResponse.Content.ReadFromJsonAsync<IssuerInfo>();
-                    if (savedInfo != null)
-                    {
-                        issuerInfo = savedInfo;
-                    }
+                    issuerInfo = savedInfo;
                 }
-                else
-                {
-                    var errorContent = await issuerResponse.Content.ReadAsStringAsync();
-                    Console.WriteLine($"発行者情報の保存に失敗しました: {errorContent}");
-                    return;
-                }
-
-                // メール設定を保存（パスワードが入力されている場合のみ）
-                if (!string.IsNullOrEmpty(password))
-                {
-                    var emailRequest = new EmailSettingsRequestModel
-                    {
-                        Settings = emailSettings,
-                        PlainPassword = password
-                    };
-
-                    var emailResponse = await Http.PostAsJsonAsync("api/EmailSettings", emailRequest);
-
-                    if (!emailResponse.IsSuccessStatusCode)
-                    {
-                        var errorContent = await emailResponse.Content.ReadAsStringAsync();
-                        Console.WriteLine($"メール設定の保存に失敗しました: {errorContent}");
-                    }
-                }
-
-                if (isInitialSetup)
-                {
-                    Navigation.NavigateTo("/", replace: true);
-                    return;
-                }
-                StateHasChanged();
             }
-            catch (Exception ex)
+
+            // メール設定を保存（パスワードが入力されている場合のみ）
+            if (!string.IsNullOrEmpty(password))
             {
-                Console.WriteLine($"保存中にエラーが発生しました: {ex.Message}");
+                var emailRequest = new EmailSettingsRequestModel
+                {
+                    Settings = emailSettings,
+                    PlainPassword = password
+                };
+
+                await Http.PostAsJsonAsync("api/EmailSettings", emailRequest);
             }
+
+            if (isInitialSetup)
+            {
+                Navigation.NavigateTo("/", replace: true);
+                return;
+            }
+            StateHasChanged();
         }
 
         // Email settings methods
         private async Task LoadEmailSettings()
         {
-            try
+            var response = await Http.GetFromJsonAsync<AutoDealerSphere.Shared.Models.EmailSettingsResponse>("api/EmailSettings");
+            if (response != null)
             {
-                var response = await Http.GetFromJsonAsync<AutoDealerSphere.Shared.Models.EmailSettingsResponse>("api/EmailSettings");
-                if (response != null)
-                {
-                    emailSettings = response.Settings;
-                    password = response.PlainPassword;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"メール設定の読み込み時の情報: {ex.Message}");
+                emailSettings = response.Settings;
+                password = response.PlainPassword;
             }
         }
 
@@ -151,11 +116,6 @@ namespace AutoDealerSphere.Client.Pages
                     testConnectionMessage = "接続テストに失敗しました。";
                     testConnectionSuccess = false;
                 }
-            }
-            catch (Exception ex)
-            {
-                testConnectionMessage = $"接続テスト中にエラーが発生しました: {ex.Message}";
-                testConnectionSuccess = false;
             }
             finally
             {

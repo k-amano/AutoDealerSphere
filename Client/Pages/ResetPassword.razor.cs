@@ -41,18 +41,9 @@ namespace AutoDealerSphere.Client.Pages
                 var response = await Http.GetAsync($"api/PasswordReset/verify/{token}");
 
                 if (response.IsSuccessStatusCode)
-                {
                     isValidToken = true;
-                }
                 else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
                     errorMessage = "トークンが無効または期限切れです。";
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"エラーが発生しました: {ex.Message}";
             }
             finally
             {
@@ -92,20 +83,10 @@ namespace AutoDealerSphere.Client.Pages
                 };
 
                 var response = await Http.PostAsJsonAsync("api/PasswordReset/reset", request);
-
                 if (response.IsSuccessStatusCode)
-                {
                     passwordReset = true;
-                }
                 else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    errorMessage = $"パスワードリセットに失敗しました: {errorContent}";
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = $"エラーが発生しました: {ex.Message}";
+                    errorMessage = "パスワードリセットに失敗しました。";
             }
             finally
             {

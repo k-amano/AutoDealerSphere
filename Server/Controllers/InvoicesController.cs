@@ -97,23 +97,16 @@ namespace AutoDealerSphere.Server.Controllers
         [HttpGet("{id}/export")]
         public async Task<IActionResult> ExportToExcel(int id)
         {
-            try
+            var invoice = await _invoiceService.GetInvoiceByIdAsync(id);
+            if (invoice == null)
             {
-                var invoice = await _invoiceService.GetInvoiceByIdAsync(id);
-                if (invoice == null)
-                {
-                    return NotFound($"Invoice with ID {id} not found");
-                }
+                return NotFound($"Invoice with ID {id} not found");
+            }
 
-                var excelData = await _invoiceService.ExportToExcelAsync(id);
-                var fileName = $"請求書{invoice.InvoiceNumber}.xlsx";
-                
-                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error exporting invoice: {ex.Message}");
-            }
+            var excelData = await _invoiceService.ExportToExcelAsync(id);
+            var fileName = $"請求書{invoice.InvoiceNumber}.xlsx";
+
+            return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         // 明細エンドポイント

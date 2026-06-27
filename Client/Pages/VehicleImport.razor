@@ -179,36 +179,15 @@
         try
         {
             var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // 10MB max
+            var fileContent = new StreamContent(selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024));
             fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
             content.Add(fileContent, "file", selectedFile.Name);
             content.Add(new StringContent(replaceExistingData.ToString()), "replaceExisting");
 
             var response = await Http.PostAsync("api/VehicleImport/upload", content);
-            
-            if (response.IsSuccessStatusCode)
-            {
-                importResult = await response.Content.ReadFromJsonAsync<ImportResult>();
-            }
-            else
-            {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                importResult = new ImportResult
-                {
-                    Success = false,
-                    Message = $"インポートに失敗しました: {response.StatusCode}",
-                    Errors = new List<string> { errorContent }
-                };
-            }
-        }
-        catch (Exception ex)
-        {
-            importResult = new ImportResult
-            {
-                Success = false,
-                Message = "インポート中にエラーが発生しました",
-                Errors = new List<string> { ex.Message }
-            };
+            response.EnsureSuccessStatusCode();
+
+            importResult = await response.Content.ReadFromJsonAsync<ImportResult>();
         }
         finally
         {

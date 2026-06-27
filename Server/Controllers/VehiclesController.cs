@@ -180,24 +180,16 @@ namespace AutoDealerSphere.Server.Controllers
         {
             try
             {
-                Console.WriteLine($"[ImportJson] 開始 - Vehicle ID: {id}");
 
                 // 車両を取得
                 var vehicle = await _context.Vehicles.FindAsync(id);
                 if (vehicle == null)
                 {
-                    Console.WriteLine($"[ImportJson] エラー: 車両が見つかりません ID: {id}");
                     return NotFound($"Vehicle with ID {id} not found.");
                 }
 
-                Console.WriteLine($"[ImportJson] 車両を取得しました: {vehicle.VehicleName ?? "名前なし"}");
 
                 // 取り込み前のデータを記録
-                Console.WriteLine("[ImportJson] 取り込み前のデータ:");
-                Console.WriteLine($"  - 車検証番号: {vehicle.InspectionCertificateNumber ?? "null"}");
-                Console.WriteLine($"  - 車名: {vehicle.VehicleName ?? "null"}");
-                Console.WriteLine($"  - 型式: {vehicle.VehicleModel ?? "null"}");
-                Console.WriteLine($"  - 車台番号: {vehicle.ChassisNumber ?? "null"}");
 
                 var root = jsonDocument.RootElement;
                 var updatedFields = new List<string>();
@@ -211,13 +203,11 @@ namespace AutoDealerSphere.Server.Controllers
                 JsonElement certInfo;
                 if (root.TryGetProperty("CertInfo", out certInfo))
                 {
-                    Console.WriteLine($"[ImportJson] CertInfoオブジェクトを検出しました");
                 }
                 else
                 {
                     // CertInfoがない場合はルートを使用（後方互換性）
                     certInfo = root;
-                    Console.WriteLine($"[ImportJson] CertInfoが見つからないため、ルートオブジェクトを使用します");
                 }
 
                 // 車検証番号 (ElectCertMgNo)
@@ -225,7 +215,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(electCertMgNo.GetString());
                     vehicle.InspectionCertificateNumber = value;
-                    Console.WriteLine($"[ImportJson] 車検証番号をセット: {value}");
                     updatedFields.Add($"InspectionCertificateNumber = {value}");
                 }
                 // 後方互換性
@@ -233,7 +222,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(certNumber.GetString());
                     vehicle.InspectionCertificateNumber = value;
-                    Console.WriteLine($"[ImportJson] 車検証番号をセット(後方互換): {value}");
                     updatedFields.Add($"InspectionCertificateNumber = {value}");
                 }
 
@@ -242,14 +230,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(carName.GetString());
                     vehicle.VehicleName = value;
-                    Console.WriteLine($"[ImportJson] 車名をセット: {value}");
                     updatedFields.Add($"VehicleName = {value}");
                 }
                 else if (certInfo.TryGetProperty("vehicle_name", out var vehicleName))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(vehicleName.GetString());
                     vehicle.VehicleName = value;
-                    Console.WriteLine($"[ImportJson] 車名をセット(後方互換): {value}");
                     updatedFields.Add($"VehicleName = {value}");
                 }
 
@@ -258,14 +244,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(model.GetString());
                     vehicle.VehicleModel = value;
-                    Console.WriteLine($"[ImportJson] 型式をセット: {value}");
                     updatedFields.Add($"VehicleModel = {value}");
                 }
                 else if (certInfo.TryGetProperty("vehicle_model", out var vehicleModel))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(vehicleModel.GetString());
                     vehicle.VehicleModel = value;
-                    Console.WriteLine($"[ImportJson] 型式をセット(後方互換): {value}");
                     updatedFields.Add($"VehicleModel = {value}");
                 }
 
@@ -274,14 +258,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(carNo.GetString());
                     vehicle.ChassisNumber = value;
-                    Console.WriteLine($"[ImportJson] 車台番号をセット: {value}");
                     updatedFields.Add($"ChassisNumber = {value}");
                 }
                 else if (certInfo.TryGetProperty("chassis_number", out var chassisNumber))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(chassisNumber.GetString());
                     vehicle.ChassisNumber = value;
-                    Console.WriteLine($"[ImportJson] 車台番号をセット(後方互換): {value}");
                     updatedFields.Add($"ChassisNumber = {value}");
                 }
 
@@ -290,14 +272,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(engModel.GetString());
                     vehicle.EngineModel = value;
-                    Console.WriteLine($"[ImportJson] エンジン型式をセット: {value}");
                     updatedFields.Add($"EngineModel = {value}");
                 }
                 else if (certInfo.TryGetProperty("engine_model", out var engineModel))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(engineModel.GetString());
                     vehicle.EngineModel = value;
-                    Console.WriteLine($"[ImportJson] エンジン型式をセット(後方互換): {value}");
                     updatedFields.Add($"EngineModel = {value}");
                 }
 
@@ -306,14 +286,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(modelSpecifyNo.GetString());
                     vehicle.TypeCertificationNumber = value;
-                    Console.WriteLine($"[ImportJson] 型式指定番号をセット: {value}");
                     updatedFields.Add($"TypeCertificationNumber = {value}");
                 }
                 else if (certInfo.TryGetProperty("type_certification_number", out var typeCertNumber))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(typeCertNumber.GetString());
                     vehicle.TypeCertificationNumber = value;
-                    Console.WriteLine($"[ImportJson] 型式指定番号をセット(後方互換): {value}");
                     updatedFields.Add($"TypeCertificationNumber = {value}");
                 }
 
@@ -322,14 +300,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(classifyAroundNo.GetString());
                     vehicle.CategoryNumber = value;
-                    Console.WriteLine($"[ImportJson] 類別区分番号をセット: {value}");
                     updatedFields.Add($"CategoryNumber = {value}");
                 }
                 else if (certInfo.TryGetProperty("category_number", out var categoryNum))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(categoryNum.GetString());
                     vehicle.CategoryNumber = value;
-                    Console.WriteLine($"[ImportJson] 類別区分番号をセット(後方互換): {value}");
                     updatedFields.Add($"CategoryNumber = {value}");
                 }
 
@@ -347,7 +323,6 @@ namespace AutoDealerSphere.Server.Controllers
                             vehicle.LicensePlateClassification = parts[1];  // 500
                             vehicle.LicensePlateHiragana = parts[2];  // め
                             vehicle.LicensePlateNumber = parts[3];  // 3924
-                            Console.WriteLine($"[ImportJson] ナンバープレート情報をセット: {plateInfo}");
                             updatedFields.Add($"LicensePlate = {plateInfo}");
                         }
                     }
@@ -359,7 +334,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         var value = CharacterConverter.NormalizeVehicleData(plateLocation.GetString());
                         vehicle.LicensePlateLocation = value;
-                        Console.WriteLine($"[ImportJson] ナンバープレート地域をセット: {value}");
                         updatedFields.Add($"LicensePlateLocation = {value}");
                     }
 
@@ -367,7 +341,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         var value = CharacterConverter.NormalizeVehicleData(plateClass.GetString());
                         vehicle.LicensePlateClassification = value;
-                        Console.WriteLine($"[ImportJson] 分類番号をセット: {value}");
                         updatedFields.Add($"LicensePlateClassification = {value}");
                     }
 
@@ -375,7 +348,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         var value = CharacterConverter.NormalizeVehicleData(plateHiragana.GetString());
                         vehicle.LicensePlateHiragana = value;
-                        Console.WriteLine($"[ImportJson] ひらがなをセット: {value}");
                         updatedFields.Add($"LicensePlateHiragana = {value}");
                     }
 
@@ -383,7 +355,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         var value = CharacterConverter.NormalizeVehicleData(plateNumber.GetString());
                         vehicle.LicensePlateNumber = value;
-                        Console.WriteLine($"[ImportJson] ナンバーをセット: {value}");
                         updatedFields.Add($"LicensePlateNumber = {value}");
                     }
                 }
@@ -412,7 +383,6 @@ namespace AutoDealerSphere.Server.Controllers
                             {
                                 var date = new DateTime(actualYear, monthNum, 1);
                                 vehicle.FirstRegistrationDate = date;
-                                Console.WriteLine($"[ImportJson] 初度登録年月をセット: {date:yyyy-MM}");
                                 updatedFields.Add($"FirstRegistrationDate = {date:yyyy-MM}");
                             }
                         }
@@ -427,7 +397,6 @@ namespace AutoDealerSphere.Server.Controllers
                         CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                     {
                         vehicle.FirstRegistrationDate = date;
-                        Console.WriteLine($"[ImportJson] 初度登録年月をセット(後方互換): {date:yyyy-MM-dd}");
                         updatedFields.Add($"FirstRegistrationDate = {date:yyyy-MM-dd}");
                     }
                 }
@@ -437,14 +406,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(use.GetString());
                     vehicle.Purpose = value;
-                    Console.WriteLine($"[ImportJson] 用途をセット: {value}");
                     updatedFields.Add($"Purpose = {value}");
                 }
                 else if (certInfo.TryGetProperty("purpose", out var purpose))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(purpose.GetString());
                     vehicle.Purpose = value;
-                    Console.WriteLine($"[ImportJson] 用途をセット(後方互換): {value}");
                     updatedFields.Add($"Purpose = {value}");
                 }
 
@@ -453,14 +420,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(privateBusiness.GetString());
                     vehicle.PersonalBusinessUse = value;
-                    Console.WriteLine($"[ImportJson] 自家用・事業用をセット: {value}");
                     updatedFields.Add($"PersonalBusinessUse = {value}");
                 }
                 else if (certInfo.TryGetProperty("personal_business_use", out var pbUse))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(pbUse.GetString());
                     vehicle.PersonalBusinessUse = value;
-                    Console.WriteLine($"[ImportJson] 自家用・事業用をセット(後方互換): {value}");
                     updatedFields.Add($"PersonalBusinessUse = {value}");
                 }
 
@@ -469,14 +434,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(carShape.GetString());
                     vehicle.BodyShape = value;
-                    Console.WriteLine($"[ImportJson] 車体の形状をセット: {value}");
                     updatedFields.Add($"BodyShape = {value}");
                 }
                 else if (certInfo.TryGetProperty("body_shape", out var bodyShape))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(bodyShape.GetString());
                     vehicle.BodyShape = value;
-                    Console.WriteLine($"[ImportJson] 車体の形状をセット(後方互換): {value}");
                     updatedFields.Add($"BodyShape = {value}");
                 }
 
@@ -488,7 +451,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         vehicle.SeatingCapacity = capValue;
                         vehicle.PassengerCapacity = capValue;
-                        Console.WriteLine($"[ImportJson] 乗車定員をセット: {capValue}");
                         updatedFields.Add($"SeatingCapacity = {capValue}");
                     }
                 }
@@ -496,7 +458,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     vehicle.SeatingCapacity = seatValue;
                     vehicle.PassengerCapacity = seatValue;
-                    Console.WriteLine($"[ImportJson] 乗車定員をセット(後方互換): {seatValue}");
                     updatedFields.Add($"SeatingCapacity = {seatValue}");
                 }
 
@@ -507,14 +468,12 @@ namespace AutoDealerSphere.Server.Controllers
                     if (loadStr != "-" && int.TryParse(loadStr, out var loadValue))
                     {
                         vehicle.MaxLoadCapacity = loadValue;
-                        Console.WriteLine($"[ImportJson] 最大積載量をセット: {loadValue}");
                         updatedFields.Add($"MaxLoadCapacity = {loadValue}");
                     }
                 }
                 else if (certInfo.TryGetProperty("max_load_capacity", out var maxLoad) && maxLoad.TryGetInt32(out var loadValue2))
                 {
                     vehicle.MaxLoadCapacity = loadValue2;
-                    Console.WriteLine($"[ImportJson] 最大積載量をセット(後方互換): {loadValue2}");
                     updatedFields.Add($"MaxLoadCapacity = {loadValue2}");
                 }
 
@@ -525,14 +484,12 @@ namespace AutoDealerSphere.Server.Controllers
                     if (int.TryParse(wgtStr, out var wgtValue))
                     {
                         vehicle.VehicleWeight = wgtValue;
-                        Console.WriteLine($"[ImportJson] 車両重量をセット: {wgtValue}");
                         updatedFields.Add($"VehicleWeight = {wgtValue}");
                     }
                 }
                 else if (certInfo.TryGetProperty("vehicle_weight", out var vWeight) && vWeight.TryGetInt32(out var weightValue))
                 {
                     vehicle.VehicleWeight = weightValue;
-                    Console.WriteLine($"[ImportJson] 車両重量をセット(後方互換): {weightValue}");
                     updatedFields.Add($"VehicleWeight = {weightValue}");
                 }
 
@@ -543,14 +500,12 @@ namespace AutoDealerSphere.Server.Controllers
                     if (int.TryParse(totalWgtStr, out var totalWgtValue))
                     {
                         vehicle.VehicleTotalWeight = totalWgtValue;
-                        Console.WriteLine($"[ImportJson] 車両総重量をセット: {totalWgtValue}");
                         updatedFields.Add($"VehicleTotalWeight = {totalWgtValue}");
                     }
                 }
                 else if (certInfo.TryGetProperty("vehicle_total_weight", out var vTotalWeight) && vTotalWeight.TryGetInt32(out var totalWeightValue))
                 {
                     vehicle.VehicleTotalWeight = totalWeightValue;
-                    Console.WriteLine($"[ImportJson] 車両総重量をセット(後方互換): {totalWeightValue}");
                     updatedFields.Add($"VehicleTotalWeight = {totalWeightValue}");
                 }
 
@@ -561,14 +516,12 @@ namespace AutoDealerSphere.Server.Controllers
                     if (int.TryParse(lengthStr, out var lengthValue))
                     {
                         vehicle.VehicleLength = lengthValue;
-                        Console.WriteLine($"[ImportJson] 長さをセット: {lengthValue}");
                         updatedFields.Add($"VehicleLength = {lengthValue}");
                     }
                 }
                 else if (certInfo.TryGetProperty("vehicle_length", out var vLength) && vLength.TryGetInt32(out var lengthValue2))
                 {
                     vehicle.VehicleLength = lengthValue2;
-                    Console.WriteLine($"[ImportJson] 長さをセット(後方互換): {lengthValue2}");
                     updatedFields.Add($"VehicleLength = {lengthValue2}");
                 }
 
@@ -579,14 +532,12 @@ namespace AutoDealerSphere.Server.Controllers
                     if (int.TryParse(widthStr, out var widthValue))
                     {
                         vehicle.VehicleWidth = widthValue;
-                        Console.WriteLine($"[ImportJson] 幅をセット: {widthValue}");
                         updatedFields.Add($"VehicleWidth = {widthValue}");
                     }
                 }
                 else if (certInfo.TryGetProperty("vehicle_width", out var vWidth) && vWidth.TryGetInt32(out var widthValue2))
                 {
                     vehicle.VehicleWidth = widthValue2;
-                    Console.WriteLine($"[ImportJson] 幅をセット(後方互換): {widthValue2}");
                     updatedFields.Add($"VehicleWidth = {widthValue2}");
                 }
 
@@ -597,14 +548,12 @@ namespace AutoDealerSphere.Server.Controllers
                     if (int.TryParse(heightStr, out var heightValue))
                     {
                         vehicle.VehicleHeight = heightValue;
-                        Console.WriteLine($"[ImportJson] 高さをセット: {heightValue}");
                         updatedFields.Add($"VehicleHeight = {heightValue}");
                     }
                 }
                 else if (certInfo.TryGetProperty("vehicle_height", out var vHeight) && vHeight.TryGetInt32(out var heightValue2))
                 {
                     vehicle.VehicleHeight = heightValue2;
-                    Console.WriteLine($"[ImportJson] 高さをセット(後方互換): {heightValue2}");
                     updatedFields.Add($"VehicleHeight = {heightValue2}");
                 }
 
@@ -616,7 +565,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         vehicle.FrontOverhang = frontValue;
                         vehicle.FrontAxleWeight = frontValue;
-                        Console.WriteLine($"[ImportJson] 前前軸重をセット: {frontValue}");
                         updatedFields.Add($"FrontOverhang = {frontValue}");
                     }
                 }
@@ -624,7 +572,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     vehicle.FrontOverhang = frontValue2;
                     vehicle.FrontAxleWeight = frontValue2;
-                    Console.WriteLine($"[ImportJson] 前前軸重をセット(後方互換): {frontValue2}");
                     updatedFields.Add($"FrontOverhang = {frontValue2}");
                 }
 
@@ -636,7 +583,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         vehicle.RearOverhang = rearValue;
                         vehicle.RearAxleWeight = rearValue;
-                        Console.WriteLine($"[ImportJson] 後後軸重をセット: {rearValue}");
                         updatedFields.Add($"RearOverhang = {rearValue}");
                     }
                 }
@@ -644,7 +590,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     vehicle.RearOverhang = rearValue2;
                     vehicle.RearAxleWeight = rearValue2;
-                    Console.WriteLine($"[ImportJson] 後後軸重をセット(後方互換): {rearValue2}");
                     updatedFields.Add($"RearOverhang = {rearValue2}");
                 }
 
@@ -655,7 +600,6 @@ namespace AutoDealerSphere.Server.Controllers
                     if (decimal.TryParse(dispStr, out var dispValue))
                     {
                         vehicle.Displacement = dispValue;
-                        Console.WriteLine($"[ImportJson] 排気量をセット: {dispValue}L");
                         updatedFields.Add($"Displacement = {dispValue}L");
                     }
                 }
@@ -665,13 +609,11 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         var literValue = ccValue / 1000m;
                         vehicle.Displacement = literValue;
-                        Console.WriteLine($"[ImportJson] 排気量をセット(後方互換): {ccValue}cc → {literValue}L");
                         updatedFields.Add($"Displacement = {literValue}L");
                     }
                     else if (displacement.TryGetDecimal(out var decValue))
                     {
                         vehicle.Displacement = decValue;
-                        Console.WriteLine($"[ImportJson] 排気量をセット: {decValue}L");
                         updatedFields.Add($"Displacement = {decValue}L");
                     }
                 }
@@ -680,7 +622,6 @@ namespace AutoDealerSphere.Server.Controllers
                 if (root.TryGetProperty("rated_output", out var ratedOutput) && ratedOutput.TryGetDecimal(out var outputValue))
                 {
                     vehicle.RatedOutput = outputValue;
-                    Console.WriteLine($"[ImportJson] 定格出力をセット: {outputValue}kW");
                     updatedFields.Add($"RatedOutput = {outputValue}kW");
                 }
 
@@ -689,14 +630,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(fuelClass.GetString());
                     vehicle.FuelType = value;
-                    Console.WriteLine($"[ImportJson] 燃料の種類をセット: {value}");
                     updatedFields.Add($"FuelType = {value}");
                 }
                 else if (certInfo.TryGetProperty("fuel_type", out var fuelType))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(fuelType.GetString());
                     vehicle.FuelType = value;
-                    Console.WriteLine($"[ImportJson] 燃料の種類をセット(後方互換): {value}");
                     updatedFields.Add($"FuelType = {value}");
                 }
 
@@ -727,7 +666,6 @@ namespace AutoDealerSphere.Server.Controllers
                             {
                                 var date = new DateTime(actualYear, monthNum, dayNum);
                                 vehicle.InspectionExpiryDate = date;
-                                Console.WriteLine($"[ImportJson] 車検満了日をセット: {date:yyyy-MM-dd}");
                                 updatedFields.Add($"InspectionExpiryDate = {date:yyyy-MM-dd}");
                             }
                         }
@@ -742,7 +680,6 @@ namespace AutoDealerSphere.Server.Controllers
                         CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                     {
                         vehicle.InspectionExpiryDate = date;
-                        Console.WriteLine($"[ImportJson] 車検満了日をセット(後方互換): {date:yyyy-MM-dd}");
                         updatedFields.Add($"InspectionExpiryDate = {date:yyyy-MM-dd}");
                     }
                 }
@@ -755,7 +692,6 @@ namespace AutoDealerSphere.Server.Controllers
                     if (value != null && value != "***")
                     {
                         vehicle.UserNameOrCompany = value;
-                        Console.WriteLine($"[ImportJson] 使用者名をセット: {value}");
                         updatedFields.Add($"UserNameOrCompany = {value}");
                     }
                 }
@@ -763,7 +699,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(userName.GetString());
                     vehicle.UserNameOrCompany = value;
-                    Console.WriteLine($"[ImportJson] 使用者名をセット(後方互換): {value}");
                     updatedFields.Add($"UserNameOrCompany = {value}");
                 }
 
@@ -781,7 +716,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         var fullAddr = addrChar + addrNum;
                         vehicle.UserAddress = fullAddr;
-                        Console.WriteLine($"[ImportJson] 使用者住所をセット: {fullAddr}");
                         updatedFields.Add($"UserAddress = {fullAddr}");
                     }
                 }
@@ -789,7 +723,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(userAddr.GetString());
                     vehicle.UserAddress = value;
-                    Console.WriteLine($"[ImportJson] 使用者住所をセット(後方互換): {value}");
                     updatedFields.Add($"UserAddress = {value}");
                 }
 
@@ -798,14 +731,12 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(ownerLowLevel.GetString());
                     vehicle.OwnerNameOrCompany = value;
-                    Console.WriteLine($"[ImportJson] 所有者名をセット: {value}");
                     updatedFields.Add($"OwnerNameOrCompany = {value}");
                 }
                 else if (certInfo.TryGetProperty("owner_name_or_company", out var ownerName))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(ownerName.GetString());
                     vehicle.OwnerNameOrCompany = value;
-                    Console.WriteLine($"[ImportJson] 所有者名をセット(後方互換): {value}");
                     updatedFields.Add($"OwnerNameOrCompany = {value}");
                 }
 
@@ -820,14 +751,12 @@ namespace AutoDealerSphere.Server.Controllers
                     }
                     var fullAddr = addrChar + addrNum;
                     vehicle.OwnerAddress = fullAddr;
-                    Console.WriteLine($"[ImportJson] 所有者住所をセット: {fullAddr}");
                     updatedFields.Add($"OwnerAddress = {fullAddr}");
                 }
                 else if (certInfo.TryGetProperty("owner_address", out var ownerAddr))
                 {
                     var value = CharacterConverter.NormalizeVehicleData(ownerAddr.GetString());
                     vehicle.OwnerAddress = value;
-                    Console.WriteLine($"[ImportJson] 所有者住所をセット(後方互換): {value}");
                     updatedFields.Add($"OwnerAddress = {value}");
                 }
 
@@ -845,7 +774,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         var fullHq = hqChar + hqNum;
                         vehicle.BaseLocation = fullHq;
-                        Console.WriteLine($"[ImportJson] 使用の本拠の位置をセット: {fullHq}");
                         updatedFields.Add($"BaseLocation = {fullHq}");
                     }
                 }
@@ -853,7 +781,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = CharacterConverter.NormalizeVehicleData(baseLoc.GetString());
                     vehicle.BaseLocation = value;
-                    Console.WriteLine($"[ImportJson] 使用の本拠の位置をセット(後方互換): {value}");
                     updatedFields.Add($"BaseLocation = {value}");
                 }
 
@@ -861,7 +788,6 @@ namespace AutoDealerSphere.Server.Controllers
                 if (root.TryGetProperty("mileage", out var mileage) && mileage.TryGetDecimal(out var mileageValue))
                 {
                     vehicle.Mileage = mileageValue;
-                    Console.WriteLine($"[ImportJson] 走行距離をセット: {mileageValue}");
                     updatedFields.Add($"Mileage = {mileageValue}");
                 }
 
@@ -874,7 +800,6 @@ namespace AutoDealerSphere.Server.Controllers
                         CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                     {
                         vehicle.MileageUpdateDate = date;
-                        Console.WriteLine($"[ImportJson] 走行距離更新日をセット: {date:yyyy-MM-dd}");
                         updatedFields.Add($"MileageUpdateDate = {date:yyyy-MM-dd}");
                     }
                 }
@@ -884,7 +809,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = qrCode.GetString();
                     vehicle.QRCodeData = value;
-                    Console.WriteLine($"[ImportJson] QRコードデータをセット");
                     updatedFields.Add("QRCodeData = [データあり]");
                 }
 
@@ -893,7 +817,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = icTag.GetString();
                     vehicle.ICTagId = value;
-                    Console.WriteLine($"[ImportJson] ICタグIDをセット: {value}");
                     updatedFields.Add($"ICTagId = {value}");
                 }
 
@@ -904,7 +827,6 @@ namespace AutoDealerSphere.Server.Controllers
                     {
                         var flagValue = elecFlag.GetBoolean();
                         vehicle.ElectronicCertificateFlag = flagValue;
-                        Console.WriteLine($"[ImportJson] 電子車検証フラグをセット: {flagValue}");
                         updatedFields.Add($"ElectronicCertificateFlag = {flagValue}");
                     }
                     catch (InvalidOperationException)
@@ -922,7 +844,6 @@ namespace AutoDealerSphere.Server.Controllers
                         CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                     {
                         vehicle.IssueDate = date;
-                        Console.WriteLine($"[ImportJson] 発行年月日をセット: {date:yyyy-MM-dd}");
                         updatedFields.Add($"IssueDate = {date:yyyy-MM-dd}");
                     }
                 }
@@ -932,7 +853,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = issueOffice.GetString();
                     vehicle.IssueOffice = value;
-                    Console.WriteLine($"[ImportJson] 発行事務所をセット: {value}");
                     updatedFields.Add($"IssueOffice = {value}");
                 }
 
@@ -941,7 +861,6 @@ namespace AutoDealerSphere.Server.Controllers
                 {
                     var value = certVersion.GetString();
                     vehicle.CertificateVersion = value;
-                    Console.WriteLine($"[ImportJson] 車検証バージョンをセット: {value}");
                     updatedFields.Add($"CertificateVersion = {value}");
                 }
 
@@ -949,43 +868,27 @@ namespace AutoDealerSphere.Server.Controllers
                 vehicle.UpdatedAt = DateTime.Now;
 
                 // データベースを更新
-                Console.WriteLine($"[ImportJson] データベース更新開始 - {updatedFields.Count}個のフィールドを更新");
                 _context.Entry(vehicle).State = EntityState.Modified;
 
                 var saveCount = await _context.SaveChangesAsync();
-                Console.WriteLine($"[ImportJson] SaveChangesAsync完了 - {saveCount}件の変更を保存");
 
                 // 保存後の検証 - データベースから再読み込み
                 await _context.Entry(vehicle).ReloadAsync();
-                Console.WriteLine("[ImportJson] データベースから再読み込み完了");
 
                 // 保存後のデータを確認
-                Console.WriteLine("[ImportJson] 保存後のデータ:");
-                Console.WriteLine($"  - 車検証番号: {vehicle.InspectionCertificateNumber ?? "null"}");
-                Console.WriteLine($"  - 車名: {vehicle.VehicleName ?? "null"}");
-                Console.WriteLine($"  - 型式: {vehicle.VehicleModel ?? "null"}");
-                Console.WriteLine($"  - 車台番号: {vehicle.ChassisNumber ?? "null"}");
-                Console.WriteLine($"  - UpdatedAt: {vehicle.UpdatedAt:yyyy-MM-dd HH:mm:ss}");
 
                 // 再度データベースからクエリして確認
                 var verifiedVehicle = await _context.Vehicles.FindAsync(id);
                 if (verifiedVehicle != null)
                 {
-                    Console.WriteLine("[ImportJson] 再検証 - FindAsync:");
-                    Console.WriteLine($"  - 車検証番号: {verifiedVehicle.InspectionCertificateNumber ?? "null"}");
-                    Console.WriteLine($"  - 車名: {verifiedVehicle.VehicleName ?? "null"}");
-                    Console.WriteLine($"  - 型式: {verifiedVehicle.VehicleModel ?? "null"}");
-                    Console.WriteLine($"  - 車台番号: {verifiedVehicle.ChassisNumber ?? "null"}");
 
                     if (string.IsNullOrEmpty(verifiedVehicle.InspectionCertificateNumber) &&
                         root.TryGetProperty("inspection_certificate_number", out var certCheck) &&
                         !string.IsNullOrEmpty(certCheck.GetString()))
                     {
-                        Console.WriteLine("[ImportJson] ⚠️警告: 車検証番号が正しく保存されていません!");
                     }
                 }
 
-                Console.WriteLine($"[ImportJson] 完了 - {updatedFields.Count}個のフィールドを更新しました");
                 return Ok(new {
                     message = "JSON import successful",
                     updatedFieldsCount = updatedFields.Count,
@@ -993,22 +896,9 @@ namespace AutoDealerSphere.Server.Controllers
                     vehicleId = id
                 });
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
-                Console.WriteLine($"[ImportJson] JSONパースエラー: {ex.Message}");
-                return BadRequest($"JSON parse error: {ex.Message}");
-            }
-            catch (DbUpdateException ex)
-            {
-                Console.WriteLine($"[ImportJson] データベース更新エラー: {ex.Message}");
-                Console.WriteLine($"[ImportJson] InnerException: {ex.InnerException?.Message}");
-                return StatusCode(500, $"Database update error: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[ImportJson] 予期しないエラー: {ex.Message}");
-                Console.WriteLine($"[ImportJson] StackTrace: {ex.StackTrace}");
-                return StatusCode(500, $"Unexpected error: {ex.Message}");
+                return BadRequest("JSONの形式が正しくありません。");
             }
         }
     }

@@ -167,75 +167,46 @@ namespace AutoDealerSphere.Client.Pages
 
             try
             {
-                // ファイルサイズチェック（最大10MB）
                 if (_selectedFile.Size > 10 * 1024 * 1024)
                 {
                     _importMessage = "ファイルサイズが大きすぎます（最大10MB）";
                     return;
                 }
 
-                // ファイル読み込み
                 using var stream = _selectedFile.OpenReadStream(10 * 1024 * 1024);
                 using var reader = new StreamReader(stream);
                 var jsonContent = await reader.ReadToEndAsync();
 
-                // JSONパース検証
                 JsonDocument jsonDoc;
                 try
                 {
                     jsonDoc = JsonDocument.Parse(jsonContent);
-
-                    // JSONの内容をコンソールに出力
-                    await JSRuntime.InvokeVoidAsync("console.log", "=== 取り込むJSONデータ ===");
-                    await JSRuntime.InvokeVoidAsync("console.log", jsonContent);
                 }
-                catch (JsonException ex)
+                catch (JsonException)
                 {
-                    _importMessage = $"JSONフォーマットエラー: {ex.Message}";
-                    await JSRuntime.InvokeVoidAsync("console.error", "JSONパースエラー:", ex.Message);
+                    _importMessage = "JSONフォーマットエラー：ファイルの形式を確認してください。";
                     return;
                 }
 
-                // APIに送信
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 var response = await Http.PostAsync($"api/vehicles/{_item.Id}/import-json", content);
+                response.EnsureSuccessStatusCode();
 
-                if (response.IsSuccessStatusCode)
+                await ReloadVehicleData();
+
+                var (isVerified, verificationMessage) = await VerifyImportedData(jsonDoc, _item);
+
+                if (isVerified)
                 {
-                    // データベースから最新データを再読み込み
-                    await ReloadVehicleData();
-
-                    // 再読み込み後のデータをコンソールに出力
-                    await JSRuntime.InvokeVoidAsync("console.log", "=== データベースから再読み込みした車両データ ===");
-                    await LogVehicleData(_item);
-
-                    // JSONデータとDBデータの完全検証
-                    var (isVerified, verificationMessage) = await VerifyImportedData(jsonDoc, _item);
-
-                    if (isVerified)
-                    {
-                        _importSuccess = true;
-                        // 車検証番号を含むメッセージ
-                        var certNumber = _item?.InspectionCertificateNumber ?? "(番号なし)";
-                        _importMessage = $"車検証番号{certNumber}のデータを取り込みました";
-                    }
-                    else
-                    {
-                        _importSuccess = false;
-                        _importMessage = verificationMessage;
-                    }
+                    _importSuccess = true;
+                    var certNumber = _item?.InspectionCertificateNumber ?? "(番号なし)";
+                    _importMessage = $"車検証番号{certNumber}のデータを取り込みました";
                 }
                 else
                 {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    _importMessage = $"取り込みエラー: {response.StatusCode} - {errorContent}";
-                    await JSRuntime.InvokeVoidAsync("console.error", "API エラー:", response.StatusCode, errorContent);
+                    _importSuccess = false;
+                    _importMessage = verificationMessage;
                 }
-            }
-            catch (Exception ex)
-            {
-                _importMessage = $"予期しないエラー: {ex.Message}";
-                await JSRuntime.InvokeVoidAsync("console.error", "予期しないエラー:", ex.Message);
             }
             finally
             {
