@@ -66,5 +66,6 @@ publish/
 # Temporary / scratch directories
 SqliteTest/
 
-# Documentation assets (generated)
-docs/
+# Documentation assets (generated images)
+docs/*.ico
+docs/*.png
