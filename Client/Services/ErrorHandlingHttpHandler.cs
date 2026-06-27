@@ -7,11 +7,13 @@ namespace AutoDealerSphere.Client.Services;
 public class ErrorHandlingHttpHandler : DelegatingHandler
 {
     private readonly ErrorService _errorService;
+    private readonly ClientLogService _clientLogService;
     private readonly NavigationManager _navigationManager;
 
-    public ErrorHandlingHttpHandler(ErrorService errorService, NavigationManager navigationManager)
+    public ErrorHandlingHttpHandler(ErrorService errorService, ClientLogService clientLogService, NavigationManager navigationManager)
     {
         _errorService = errorService;
+        _clientLogService = clientLogService;
         _navigationManager = navigationManager;
     }
 
@@ -22,8 +24,9 @@ public class ErrorHandlingHttpHandler : DelegatingHandler
         {
             response = await base.SendAsync(request, cancellationToken);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            await _clientLogService.LogErrorAsync(ex);
             _errorService.SetError(new ApiErrorResponse
             {
                 Message = "",

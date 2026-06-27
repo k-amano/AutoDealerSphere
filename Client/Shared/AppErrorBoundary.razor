@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @inherits ErrorBoundary
 @inject ErrorService ErrorService
+@inject ClientLogService ClientLogService
 @inject NavigationManager NavigationManager
 
 @if (CurrentException is null)
@@ -10,14 +11,14 @@
 }
 
 @code {
-    protected override Task OnErrorAsync(Exception exception)
+    protected override async Task OnErrorAsync(Exception exception)
     {
+        await ClientLogService.LogErrorAsync(exception);
         ErrorService.SetError(new AutoDealerSphere.Shared.Models.ApiErrorResponse
         {
             Message = "",
             StatusCode = 500,
         });
         NavigationManager.NavigateTo("/error");
-        return Task.CompletedTask;
     }
 }
