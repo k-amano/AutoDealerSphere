@@ -1,0 +1,678 @@
+format_version: 1
+doc_type: specification
+title: "自動車販売管理システム（AutoDealerSphere）操作マニュアル"
+language: ja
+sections:
+  - title: "はじめに"
+    blocks:
+      - type: text
+        content: |
+          本書は、自動車販売管理システム「AutoDealerSphere」の操作マニュアルです。インストール方法、初期設定、および各画面の操作方法について説明します。
+
+          AutoDealerSphere は、自動車販売店向けの顧客管理システムです。顧客情報・車両情報・部品情報・請求書の管理、データのバックアップ・レストアなどの機能を提供します。
+    sections:
+      - title: "システム構成"
+        blocks:
+          - type: table
+            caption: "システム構成"
+            header: ["コンポーネント", "種別", "役割"]
+            rows:
+              - ["AutoDealerSphere.Server.exe", "Windowsサービス", "Webサーバー（http://localhost:5259）として常駐します。"]
+              - ["AutoDealerSphere.exe", "デスクトップアプリ", "ランチャー。起動するとサーバーに接続して操作画面を表示します。"]
+          - type: text
+            content: |
+              サーバーはWindowsサービスとして自動的に起動しているため、利用者はデスクトップのランチャーアイコンをダブルクリックするだけで操作画面を開くことができます。
+      - title: "動作環境"
+        blocks:
+          - type: list
+            style: bullet
+            items:
+              - "OS: Windows（64ビット）"
+              - "Microsoft Edge WebView2 ランタイム（インストーラーに同梱されています）"
+              - "インストール先: C:\\AutoDealerSphere\\"
+  - title: "インストール"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          本章では、システムのインストール手順とアップデート手順を説明します。
+    sections:
+      - title: "初回インストール"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "インストーラー「AutoDealerSphere_Setup.exe」を右クリックし、「管理者として実行」を選択します。"
+              - "画面の指示に従ってインストールを進めます。"
+              - "インストールが完了すると、Windowsサービス「AutoDealerSphere」が登録され、デスクトップに「AutoDealerSphere」アイコンが作成されます。"
+          - type: image
+            path: "docs/manual-images/installer.png"
+            caption: "インストーラー画面"
+            width: "70%"
+            align: center
+          - type: note
+            style: important
+            content: |
+              インストーラーは必ず「管理者として実行」してください。管理者権限がない場合、Windowsサービスの登録に失敗します。
+      - title: "インストール後の動作確認"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "Windowsの「ファイル名を指定して実行」（Windowsキー + R）で「services.msc」を入力し、サービス一覧を開きます。"
+              - "「AutoDealerSphere」サービスの状態が「実行中」になっていることを確認します。"
+              - "デスクトップの「AutoDealerSphere」アイコンをダブルクリックし、操作画面が表示されることを確認します。"
+          - type: image
+            path: "docs/manual-images/services.png"
+            caption: "サービス一覧での確認"
+            width: "70%"
+            align: center
+      - title: "アップデート（再インストール）"
+        blocks:
+          - type: text
+            content: |
+              新しいバージョンをインストールする場合は、既存のサービスを停止・削除してからインストーラーを実行します。
+          - type: list
+            style: number
+            items:
+              - "コマンドプロンプトを「管理者として実行」で開きます。"
+              - "以下のコマンドを順に実行し、サービスを停止・削除します。"
+              - "「AutoDealerSphere_Setup.exe」を管理者として実行します。"
+          - type: code
+            language: bat
+            caption: "サービスの停止・削除コマンド"
+            content: |
+              sc stop AutoDealerSphere
+              sc delete AutoDealerSphere
+          - type: note
+            style: info
+            content: |
+              アップデートを行ってもデータベースは保持されます。念のため、アップデート前にバックアップ（「データ管理」の章を参照）を取得することを推奨します。
+  - title: "初期設定"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          インストール後、初めてシステムを起動すると初期設定画面が表示されます。初期設定は「管理者アカウントの登録」と「発行者情報の登録」の2ステップです。
+      - type: figure
+        format: mermaid
+        caption: "初期設定の流れ"
+        code: |
+          flowchart LR
+            A[起動] --> B[初回セットアップ<br>管理者アカウント登録]
+            B --> C[発行者情報登録]
+            C --> D[ログイン画面]
+    sections:
+      - title: "管理者アカウントの登録"
+        blocks:
+          - type: text
+            content: |
+              初回起動時に「初回セットアップ」画面が表示されます。システムを管理する管理者アカウントを登録してください。
+          - type: image
+            path: "docs/manual-images/setup.png"
+            caption: "初回セットアップ画面"
+            width: "70%"
+            align: center
+          - type: table
+            caption: "初回セットアップの入力項目"
+            header: ["項目", "必須", "説明"]
+            rows:
+              - ["名前", "必須", "管理者の名前を入力します（40文字まで）。"]
+              - ["メールアドレス", "必須", "ログインIDとして使用するメールアドレスを入力します。"]
+              - ["パスワード", "必須", "6文字以上のパスワードを入力します。"]
+              - ["パスワード確認", "必須", "確認のため同じパスワードを再入力します。"]
+          - type: list
+            style: number
+            items:
+              - "各項目を入力します。"
+              - "「管理者を登録」ボタンをクリックします。"
+              - "登録が完了すると、発行者情報の登録画面に移動します。"
+          - type: note
+            style: important
+            content: |
+              ここで登録したメールアドレスとパスワードは、以後のログインに必要です。忘れないように控えてください。
+      - title: "発行者情報の登録"
+        blocks:
+          - type: text
+            content: |
+              発行者情報は、請求書に印字される自社の情報です。管理者アカウントの登録後、続けて登録します。
+
+              入力項目の詳細は「発行者情報管理」の章を参照してください。登録後、ログイン画面に移動します。
+          - type: image
+            path: "docs/manual-images/issuer-info-setup.png"
+            caption: "発行者情報登録画面"
+            width: "70%"
+            align: center
+  - title: "ログイン・ログアウト"
+    page_break_before: true
+    sections:
+      - title: "ログイン"
+        blocks:
+          - type: text
+            content: |
+              システムを起動するとログイン画面が表示されます。
+          - type: image
+            path: "docs/manual-images/login.png"
+            caption: "ログイン画面"
+            width: "70%"
+            align: center
+          - type: list
+            style: number
+            items:
+              - "メールアドレスを入力します。"
+              - "パスワードを入力します。"
+              - "「ログイン」ボタンをクリックします。"
+              - "ログインに成功すると、顧客管理画面が表示されます。"
+          - type: note
+            style: info
+            content: |
+              メールアドレスまたはパスワードが誤っている場合は、エラーメッセージが表示されます。入力内容を確認して再度お試しください。
+      - title: "パスワードを忘れた場合"
+        blocks:
+          - type: text
+            content: |
+              ログイン画面の「パスワードを忘れた場合」リンクから、パスワードの再設定ができます。
+          - type: image
+            path: "docs/manual-images/forgot-password.png"
+            caption: "パスワードを忘れた場合の画面"
+            width: "70%"
+            align: center
+          - type: list
+            style: number
+            items:
+              - "ログイン画面の「パスワードを忘れた場合」をクリックします。"
+              - "登録されているメールアドレスを入力し、「送信」ボタンをクリックします。"
+              - "届いたメールに記載されたリンクを開きます。"
+              - "新しいパスワードを設定し、ログイン画面から再度ログインします。"
+          - type: note
+            style: warning
+            content: |
+              パスワードリセットメールを送信するには、発行者情報管理画面でメール送信（SMTP）設定が完了している必要があります。
+      - title: "ログアウト"
+        blocks:
+          - type: text
+            content: |
+              画面左側のメニューの「ログアウト」をクリックすると、ログイン画面に戻ります。
+  - title: "画面構成"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          ログイン後の画面は、上部のタイトルバー、左側のメニュー、右側のメイン画面で構成されます。メニューから各機能の画面に移動します。
+      - type: image
+        path: "docs/manual-images/main-layout.png"
+        caption: "画面構成（メニューとメイン画面）"
+        width: "80%"
+        align: center
+      - type: table
+        caption: "メニュー一覧"
+        header: ["メニュー", "機能"]
+        rows:
+          - ["顧客管理", "顧客情報の検索・登録・編集・削除を行います。"]
+          - ["車両管理", "車両情報の検索・登録・編集・削除を行います。"]
+          - ["データ管理 > データインポート", "CSVファイルから顧客・車両データを取り込みます。"]
+          - ["データ管理 > バックアップ", "全データをバックアップファイルとして保存します。"]
+          - ["データ管理 > レストア", "バックアップファイルからデータを復元します。"]
+          - ["部品管理", "部品情報の検索・登録・編集を行います。"]
+          - ["請求書管理", "請求書の作成・編集・Excel出力を行います。"]
+          - ["ユーザー管理", "システム利用者の登録・編集を行います。"]
+          - ["発行者情報管理", "請求書に印字する自社情報とメール送信設定を管理します。"]
+          - ["ログアウト", "ログイン画面に戻ります。"]
+      - type: text
+        content: |
+          「データ管理」のように子項目を持つメニューは、クリックすると子項目が展開されます。
+  - title: "顧客管理"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          顧客管理画面では、顧客情報の検索・登録・編集・削除を行います。
+    sections:
+      - title: "顧客の検索"
+        blocks:
+          - type: image
+            path: "docs/manual-images/client-list.png"
+            caption: "顧客一覧画面"
+            width: "80%"
+            align: center
+          - type: table
+            caption: "検索条件"
+            header: ["項目", "説明"]
+            rows:
+              - ["名前・カナ", "名前またはカナで部分一致検索します。"]
+              - ["メールアドレス", "メールアドレスで部分一致検索します。"]
+              - ["電話番号", "電話番号で部分一致検索します。"]
+              - ["住所", "郵便番号、都道府県、住所で部分一致検索します。"]
+          - type: list
+            style: number
+            items:
+              - "検索条件を入力します（複数指定可）。"
+              - "「検索」ボタンをクリックすると、条件に一致する顧客が一覧に表示されます。"
+              - "条件をすべて空にして検索すると、全件が表示されます。"
+          - type: text
+            content: |
+              一覧には顧客ごとに名前・カナ・電話番号・住所・メールアドレスが2行で表示されます。列見出しをクリックすると並べ替えができます。
+      - title: "顧客の新規登録"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "顧客一覧画面の「新規追加」ボタンをクリックします。"
+              - "顧客情報（名前、カナ、郵便番号、都道府県、住所、建物名、電話番号、メールアドレスなど）を入力します。"
+              - "「OK」ボタンをクリックして保存します。"
+          - type: image
+            path: "docs/manual-images/client-add.png"
+            caption: "顧客登録画面"
+            width: "70%"
+            align: center
+      - title: "顧客の編集・削除"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "顧客一覧で編集したい顧客の名前をクリックします。"
+              - "編集画面で内容を修正し、「OK」ボタンをクリックして保存します。"
+              - "削除する場合は、編集画面の「削除」ボタンをクリックします。"
+          - type: image
+            path: "docs/manual-images/client-edit.png"
+            caption: "顧客編集画面"
+            width: "70%"
+            align: center
+  - title: "車両管理"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          車両管理画面では、車両情報の検索・登録・編集・削除を行います。車両は顧客（所有者）に紐付けて管理します。
+    sections:
+      - title: "車両の検索"
+        blocks:
+          - type: image
+            path: "docs/manual-images/vehicle-list.png"
+            caption: "車両一覧画面"
+            width: "80%"
+            align: center
+          - type: table
+            caption: "検索条件"
+            header: ["項目", "説明"]
+            rows:
+              - ["車名・型式", "車名または型式で部分一致検索します。"]
+              - ["ナンバー", "ナンバープレートで部分一致検索します。"]
+              - ["所有者", "所有者名で部分一致検索します。"]
+              - ["車検満了日", "開始日～終了日の範囲で検索します。車検が近い車両の抽出に利用できます。"]
+          - type: text
+            content: |
+              一覧には車両ごとにナンバー・車名・型式・所有者・初度登録日・車検満了日・走行距離が表示されます。ナンバーをクリックすると車両編集画面へ、所有者名をクリックすると顧客編集画面へ移動します。
+      - title: "車両の新規登録"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "車両一覧画面の「新規追加」ボタンをクリックします。"
+              - "車両情報を入力します。所有者は登録済みの顧客から選択します。"
+              - "「OK」ボタンをクリックして保存します。"
+          - type: table
+            caption: "車両情報の主な入力項目"
+            header: ["分類", "項目"]
+            rows:
+              - ["基本情報", "車名、型式、車種、排気量(cc)、用途、自家用・事業用、車体の形状、燃料の種類"]
+              - ["ナンバープレート", "登録地域、分類番号、ひらがな、ナンバー"]
+              - ["登録・車検情報", "初度登録年月、車検満了日、車検証番号、車台番号、型式指定番号、類別区分番号"]
+              - ["その他", "走行距離(km)、所有者（顧客）"]
+      - title: "車両の編集・削除"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "車両一覧で編集したい車両のナンバーをクリックします。"
+              - "編集画面で内容を修正し、「OK」ボタンをクリックして保存します。"
+              - "削除する場合は、編集画面の「削除」ボタンをクリックします。"
+          - type: image
+            path: "docs/manual-images/vehicle-edit.png"
+            caption: "車両編集画面"
+            width: "70%"
+            align: center
+      - title: "車検証JSONの取り込み"
+        blocks:
+          - type: text
+            content: |
+              車両編集画面では、車検証情報のJSONファイルを取り込んで車両情報を自動入力できます。
+          - type: list
+            style: number
+            items:
+              - "車両編集画面上部の「車検証json取り込み」欄でJSONファイルを選択します。"
+              - "「JSONデータを取り込み」ボタンをクリックします。"
+              - "取り込み結果のメッセージを確認し、反映された内容を確認して保存します。"
+          - type: note
+            style: info
+            content: |
+              車検証JSONの取り込みは、登録済みの車両の編集画面でのみ利用できます。
+  - title: "部品管理"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          部品管理画面では、請求書の明細で使用する部品の情報（部品名、タイプ、単価）を管理します。
+    sections:
+      - title: "部品の検索"
+        blocks:
+          - type: image
+            path: "docs/manual-images/part-list.png"
+            caption: "部品一覧画面"
+            width: "80%"
+            align: center
+          - type: list
+            style: number
+            items:
+              - "「部品名」「タイプ」を入力し、「検索」ボタンをクリックします（部分一致）。"
+              - "条件をすべて空にして検索すると、全件が表示されます。"
+      - title: "部品の登録・編集"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "新規登録する場合は「新規登録」ボタンをクリックします。"
+              - "編集する場合は一覧の部品名をクリックします。"
+              - "部品名、タイプ、単価を入力し、保存します。"
+          - type: image
+            path: "docs/manual-images/part-edit.png"
+            caption: "部品編集画面"
+            width: "70%"
+            align: center
+  - title: "請求書管理"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          請求書管理画面では、整備・修理などの請求書を作成し、Excel形式で出力できます。請求書は「基本情報」「明細」「法定費用」で構成されます。
+    sections:
+      - title: "請求書の検索"
+        blocks:
+          - type: image
+            path: "docs/manual-images/invoice-list.png"
+            caption: "請求書一覧画面"
+            width: "80%"
+            align: center
+          - type: table
+            caption: "検索条件"
+            header: ["項目", "説明"]
+            rows:
+              - ["請求書番号", "請求書番号で部分一致検索します。"]
+              - ["顧客名", "顧客名で部分一致検索します。"]
+              - ["請求日", "開始日～終了日の範囲で検索します。"]
+          - type: text
+            content: |
+              一覧には請求書番号・顧客名・車番・請求日・合計金額が表示されます。請求書番号をクリックすると詳細画面に移動します。
+      - title: "請求書の新規作成"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "請求書一覧画面の「新規追加」ボタンをクリックします。"
+              - "基本情報入力ダイアログで、顧客・車両・請求日・作業完了日などを入力します。"
+              - "「保存」すると請求書が作成され、詳細画面に移動します。"
+          - type: image
+            path: "docs/manual-images/invoice-new-dialog.png"
+            caption: "請求書の基本情報入力ダイアログ"
+            width: "70%"
+            align: center
+          - type: note
+            style: warning
+            content: |
+              請求書の作成には顧客データが必要です。顧客が1件も登録されていない場合、「新規追加」ボタンは無効になります。先に顧客情報を登録してください。
+          - type: note
+            style: info
+            content: |
+              請求書番号は保存時に自動採番されます。
+      - title: "請求書詳細画面"
+        blocks:
+          - type: image
+            path: "docs/manual-images/invoice-detail.png"
+            caption: "請求書詳細画面"
+            width: "80%"
+            align: center
+          - type: text
+            content: |
+              請求書詳細画面では、基本情報・明細一覧・法定費用一覧・合計金額・備考を確認できます。小計・消費税・合計金額は明細と法定費用から自動計算されます。
+          - type: table
+            caption: "請求書詳細画面のボタン"
+            header: ["ボタン", "機能"]
+            rows:
+              - ["基本編集", "顧客・車両・請求日などの基本情報を編集します。"]
+              - ["明細追加", "整備内容や部品の明細を追加します。明細の項目名をクリックすると編集できます。"]
+              - ["法定費用", "自賠責保険料・重量税などの法定費用を選択して追加します。"]
+              - ["一覧へ戻る", "請求書一覧画面に戻ります。"]
+              - ["前ページ／次ページ", "同じ請求書番号の枝番間を移動します。"]
+              - ["Excel出力", "請求書をExcelファイルとしてダウンロードします。"]
+              - ["請求書追加", "同じ請求書番号の枝番（2枚目以降）を追加します。"]
+              - ["削除実行", "表示中の請求書を削除します。確認ダイアログで「実行」をクリックすると削除されます。"]
+      - title: "明細の追加・編集"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "請求書詳細画面の「明細追加」ボタンをクリックします。"
+              - "項目名、タイプ、修理方法、数量、単価、工賃を入力します。部品管理に登録した部品を選択して入力することもできます。"
+              - "「保存」すると明細一覧に追加され、小計・合計が自動計算されます。"
+              - "登録済みの明細は、明細一覧の項目名をクリックすると編集・削除できます。"
+          - type: image
+            path: "docs/manual-images/invoice-detail-dialog.png"
+            caption: "明細編集ダイアログ"
+            width: "70%"
+            align: center
+      - title: "法定費用の追加"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "請求書詳細画面の「法定費用」ボタンをクリックします。"
+              - "ダイアログで該当する法定費用（自賠責保険料、重量税、印紙代など）を選択します。"
+              - "「保存」すると法定費用一覧に追加されます。"
+          - type: note
+            style: info
+            content: |
+              法定費用は非課税として扱われ、消費税の計算対象には含まれません。
+      - title: "Excel出力"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "請求書詳細画面の「Excel出力」ボタンをクリックします。"
+              - "請求書がExcelファイルとしてダウンロードされます。"
+          - type: text
+            content: |
+              出力されるExcelファイルには、発行者情報管理画面で登録した自社情報（社名、住所、インボイス番号、振込先口座など）が印字されます。
+  - title: "データ管理"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          データ管理では、外部データの取り込み（インポート）、バックアップ、レストア（復元）を行います。
+    sections:
+      - title: "データインポート"
+        blocks:
+          - type: text
+            content: |
+              CSVまたはTXTファイルから、顧客情報と車両データを一括で取り込みます。
+          - type: image
+            path: "docs/manual-images/vehicle-import.png"
+            caption: "車両データインポート画面"
+            width: "80%"
+            align: center
+          - type: list
+            style: number
+            items:
+              - "メニューの「データ管理」>「データインポート」を開きます。"
+              - "「インポートファイルを選択してください」からCSVまたはTXTファイルを選択します。"
+              - "既存の車両データをすべて削除してから取り込む場合は、「既存データを置き換える」にチェックを入れます。"
+              - "「インポート開始」ボタンをクリックします。"
+              - "インポート結果（新規顧客件数、車両データ件数、エラー詳細）を確認します。"
+          - type: table
+            caption: "インポートファイルの主なカラム"
+            header: ["カラム名", "説明"]
+            rows:
+              - ["fld_顧客ID", "顧客を識別する一意のID"]
+              - ["fld_氏名", "顧客の氏名"]
+              - ["fld_郵便番号", "顧客の郵便番号"]
+              - ["fld_所有者の住所", "顧客の住所"]
+              - ["その他", "車両番号、車体番号、車検証情報などの車両情報カラム"]
+          - type: note
+            style: warning
+            content: |
+              「既存データを置き換える」にチェックを入れると、既存の車両データはすべて削除されます。実行前にバックアップを取得することを推奨します。
+              アップロードできるファイルサイズは最大10MBです。
+      - title: "バックアップ"
+        blocks:
+          - type: text
+            content: |
+              データベースの全データ（ユーザー、顧客、車両、車両カテゴリ、部品、法定費用、請求書、請求明細、発行者情報）をCSV形式（ZIP圧縮）でバックアップします。
+          - type: image
+            path: "docs/manual-images/data-backup.png"
+            caption: "データバックアップ画面"
+            width: "80%"
+            align: center
+          - type: list
+            style: number
+            items:
+              - "メニューの「データ管理」>「バックアップ」を開きます。"
+              - "「バックアップ開始」ボタンをクリックします。"
+              - "バックアップファイル（例: bk20260707-1030.zip）がダウンロードされます。"
+              - "バックアップ結果（各データの件数）を確認します。"
+          - type: note
+            style: important
+            content: |
+              バックアップファイルは、システムのトラブルに備えて定期的に取得し、パソコン本体とは別の場所（外付けドライブなど）に保管することを推奨します。
+      - title: "レストア"
+        blocks:
+          - type: text
+            content: |
+              バックアップファイル（ZIP形式またはJSON形式）からデータを復元します。
+          - type: image
+            path: "docs/manual-images/data-restore.png"
+            caption: "データレストア画面"
+            width: "80%"
+            align: center
+          - type: list
+            style: number
+            items:
+              - "メニューの「データ管理」>「レストア」を開きます。"
+              - "「バックアップファイルを選択してください」からバックアップファイル（.zip または .json）を選択します。"
+              - "「既存のデータを削除してレストアすることを理解しました」にチェックを入れます。"
+              - "「レストア開始」ボタンをクリックします。"
+              - "レストア結果（各データの件数）を確認します。"
+          - type: note
+            style: important
+            content: |
+              レストアを実行すると、現在のデータはすべて削除され、バックアップファイルのデータに置き換えられます。この操作は元に戻せません。実行前に現在のデータをバックアップすることを強く推奨します。
+              アップロードできるファイルサイズは最大50MBです。
+  - title: "ユーザー管理"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          ユーザー管理画面では、システムを利用するユーザーの登録・編集を行います。
+      - type: image
+        path: "docs/manual-images/user-list.png"
+        caption: "ユーザー一覧画面"
+        width: "80%"
+        align: center
+    sections:
+      - title: "ユーザーの検索"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "「名前」「メールアドレス」を入力し、「検索」ボタンをクリックします（部分一致）。"
+              - "一覧にはユーザーごとに名前・メールアドレス・権限（管理者／一般ユーザー）が表示されます。"
+      - title: "ユーザーの登録・編集"
+        blocks:
+          - type: list
+            style: number
+            items:
+              - "新規登録する場合は「新規追加」ボタンをクリックします。"
+              - "編集する場合は一覧のユーザー名をクリックします。"
+              - "名前、メールアドレス、パスワード、権限を入力し、保存します。"
+          - type: image
+            path: "docs/manual-images/user-edit.png"
+            caption: "ユーザー編集画面"
+            width: "70%"
+            align: center
+          - type: table
+            caption: "権限の種類"
+            header: ["権限", "説明"]
+            rows:
+              - ["管理者", "システムの全機能を利用できます。"]
+              - ["一般ユーザー", "日常業務の機能を利用できます。"]
+  - title: "発行者情報管理"
+    page_break_before: true
+    blocks:
+      - type: text
+        content: |
+          発行者情報管理画面では、請求書に印字される自社情報と、パスワードリセットメールなどの送信に使用するメール（SMTP）設定を管理します。
+      - type: image
+        path: "docs/manual-images/issuer-info.png"
+        caption: "発行者情報管理画面"
+        width: "80%"
+        align: center
+    sections:
+      - title: "発行者情報の入力項目"
+        blocks:
+          - type: table
+            caption: "発行者情報の入力項目"
+            header: ["分類", "項目", "説明"]
+            rows:
+              - [{value: "会社情報", rowspan: 6}, "郵便番号", "自社の郵便番号"]
+              - ["住所", "自社の住所"]
+              - ["社名", "請求書に印字される社名"]
+              - ["役職・氏名", "代表者などの役職と氏名"]
+              - ["電話番号・FAX番号", "自社の連絡先"]
+              - ["インボイス番号", "適格請求書発行事業者の登録番号"]
+              - [{value: "振込先口座", rowspan: 2}, "銀行名・支店名", "振込先の銀行名と支店名（複数口座の登録が可能）"]
+              - ["口座種別・口座番号・名義人", "振込先口座の詳細"]
+          - type: list
+            style: number
+            items:
+              - "各項目を入力します。"
+              - "「保存」ボタンをクリックします。"
+      - title: "メール送信（SMTP）設定"
+        blocks:
+          - type: text
+            content: |
+              パスワードリセットメールを送信するためのメールサーバー設定です。ご利用のメールサービスの情報を入力してください。
+          - type: table
+            caption: "メール設定の入力項目"
+            header: ["項目", "説明", "入力例"]
+            rows:
+              - ["SMTPホスト", "メール送信サーバーのホスト名", "smtp.gmail.com"]
+              - ["SMTPポート", "メール送信サーバーのポート番号", "587"]
+              - ["SSL/TLS使用", "暗号化通信を使用するかどうか", "使用する"]
+              - ["送信者メールアドレス", "メールの差出人アドレス", "noreply@example.com"]
+              - ["送信者名", "メールの差出人名", "AutoDealerSphere"]
+              - ["SMTP認証ユーザー名", "メールサーバーの認証ユーザー名", "-"]
+              - ["SMTP認証パスワード", "メールサーバーの認証パスワード", "-"]
+          - type: list
+            style: number
+            items:
+              - "各項目を入力します。"
+              - "「接続テスト」ボタンをクリックし、設定が正しいことを確認します。"
+              - "「保存」ボタンをクリックします。"
+          - type: note
+            style: info
+            content: |
+              接続テストを実行するには、SMTP認証パスワードの入力が必要です。パスワードが未入力の場合、メール設定は保存されません。
+  - title: "トラブルシューティング"
+    page_break_before: true
+    blocks:
+      - type: table
+        caption: "よくあるトラブルと対処方法"
+        header: ["症状", "原因", "対処方法"]
+        rows:
+          - ["ランチャーを起動しても画面が表示されない", "サーバー（Windowsサービス）が起動していない", "services.msc を開き、「AutoDealerSphere」サービスが「実行中」であることを確認します。停止している場合は右クリックして「開始」を選択します。"]
+          - ["サービスが起動しない", "サーバーの実行エラー", "イベントビューアー > Windowsログ > システム で「AutoDealerSphere」のエラー内容を確認し、システム管理者に連絡してください。"]
+          - ["ログインできない", "メールアドレスまたはパスワードの誤り", "入力内容を確認してください。パスワードを忘れた場合は「パスワードを忘れた場合」から再設定してください。"]
+          - ["パスワードリセットメールが届かない", "メール（SMTP）設定が未完了または誤り", "管理者に依頼し、発行者情報管理画面のメール設定を確認・接続テストしてください。"]
+          - ["請求書の「新規追加」ボタンが押せない", "顧客データが未登録", "先に顧客管理画面から顧客情報を登録してください。"]
+      - type: note
+        style: info
+        content: |
+          上記で解決しない場合は、システム管理者にお問い合わせください。
