@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>自動車販売管理システム（AutoDealerSphere）
+操作マニュアル</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 15mm 20mm 15mm;
+        }
+        
+        /* ゴシック体（タイトル、表、リスト、キャプション用） */
+        :root {
+            --font-gothic: "游ゴシック", "Yu Gothic", "YuGothic", "ＭＳ ゴシック", "MS Gothic", sans-serif;
+            --font-mincho: "游明朝", "Yu Mincho", "YuMincho", "ＭＳ 明朝", "MS Mincho", serif;
+        }
+        
+        body {
+            font-family: var(--font-mincho);
+            font-size: 10.5pt;
+            line-height: 1.5;
+            color: #000;
+            margin: 0;
+            padding: 20px;
+            max-width: 210mm;
+        }
+        
+        /* ヘッダー */
+        .header {
+            font-family: var(--font-gothic);
+            font-size: 9pt;
+            border-bottom: 1pt solid #000;
+            padding-bottom: 3pt;
+            margin-bottom: 15pt;
+        }
+        
+        /* 表紙 */
+        .cover {
+            font-family: var(--font-gothic);
+            page-break-after: always;
+            text-align: center;
+            padding-top: 100pt;
+            min-height: 500pt;
+        }
+        .cover-title {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #00876c;
+            margin-bottom: 15pt;
+            line-height: 1.4;
+        }
+        .cover-subtitle {
+            font-size: 14pt;
+            margin-bottom: 40pt;
+        }
+        .cover-info {
+            font-size: 12pt;
+            margin: 8pt 0;
+        }
+        .cover-meta {
+            margin-top: 60pt;
+            font-size: 11pt;
+        }
+        .cover-meta table {
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+        .cover-meta th, .cover-meta td {
+            padding: 4pt 12pt;
+            text-align: left;
+            border: none;
+        }
+        .cover-meta th {
+            background: none;
+            font-weight: normal;
+        }
+        
+        /* 改訂履歴ページ */
+        .revision-page {
+            page-break-after: always;
+        }
+        .revision-title {
+            font-family: var(--font-gothic);
+            font-size: 14pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20pt;
+        }
+        
+        /* 見出し1 - 緑背景帯 */
+        h1 {
+            font-family: var(--font-gothic);
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 20pt 0 10pt 0;
+            padding: 6pt 10pt;
+            background-color: #00876c;
+            color: #fff;
+        }
+        
+        /* 見出し2 - 左に青縦線 */
+        h2 {
+            font-family: var(--font-gothic);
+            font-size: 12pt;
+            font-weight: bold;
+            margin: 15pt 0 8pt 0;
+            padding: 4pt 0 4pt 10pt;
+            border-left: 4pt solid #2e75b6;
+            background-color: #f0f0f0;
+        }
+        
+        /* 見出し3 */
+        h3 {
+            font-family: var(--font-gothic);
+            font-size: 11pt;
+            font-weight: bold;
+            margin: 12pt 0 6pt 0;
+        }
+        
+        /* 段落（本文は明朝体） */
+        p {
+            margin: 6pt 0;
+            text-align: justify;
+        }
+        
+        /* 表キャプション */
+        .table-caption {
+            font-family: var(--font-gothic);
+            font-size: 10pt;
+            font-weight: bold;
+            margin: 10pt 0 4pt 0;
+        }
+        
+        /* 図キャプション */
+        .figure-caption {
+            font-family: var(--font-gothic);
+            font-size: 10pt;
+            margin: 4pt 0 10pt 0;
+        }
+        
+        /* 表 */
+        table {
+            font-family: var(--font-gothic);
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 10pt 0;
+            font-size: 10pt;
+        }
+        th, td {
+            border: 1pt solid #000;
+            padding: 4pt 6pt;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #d9d9d9;
+            font-weight: normal;
+            text-align: center;
+        }
+        .row-header {
+            background-color: #d9d9d9;
+            text-align: center;
+        }
+        
+        /* リスト */
+        ul, ol {
+            font-family: var(--font-gothic);
+            margin: 6pt 0 6pt 25pt;
+            padding: 0;
+        }
+        li {
+            margin: 3pt 0;
+        }
+        
+        /* Mermaid図 */
+        .mermaid-container {
+            margin: 10pt 0;
+            text-align: center;
+        }
+        .mermaid {
+            display: inline-block;
+        }
+        
+        /* コードブロック */
+        .code-block {
+            background-color: #f5f5f5;
+            border: 1pt solid #ccc;
+            padding: 8pt 10pt;
+            margin: 8pt 0;
+            font-family: "ＭＳ ゴシック", "MS Gothic", monospace;
+            font-size: 9pt;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .code-caption {
+            font-size: 10pt;
+            margin: 8pt 0 4pt 0;
+        }
+        
+        /* 注釈 */
+        .note {
+            margin: 10pt 0;
+            padding: 8pt 12pt;
+            border-left: 4pt solid #666;
+            background-color: #f9f9f9;
+        }
+        .note-info {
+            border-left-color: #2e75b6;
+            background-color: #e8f4fc;
+        }
+        .note-warning {
+            border-left-color: #e6a700;
+            background-color: #fff8e6;
+        }
+        .note-important {
+            border-left-color: #c00;
+            background-color: #fee;
+        }
+        
+        /* 画像 */
+        .image-container {
+            margin: 10pt 0;
+        }
+        .image-container.align-center {
+            text-align: center;
+        }
+        .image-container.align-right {
+            text-align: right;
+        }
+        .image-container img {
+            max-width: 100%;
+        }
+        .image-missing {
+            display: inline-block;
+            padding: 20pt 40pt;
+            border: 1pt dashed #999;
+            color: #666;
+            background-color: #f5f5f5;
+        }
+        
+        /* ページ区切り */
+        .page-break {
+            page-break-before: always;
+        }
+        
+        /* フッター */
+        .footer {
+            margin-top: 30pt;
+            font-size: 9pt;
+            text-align: right;
+            color: #666;
+            border-top: 1pt solid #ccc;
+            padding-top: 5pt;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad: true});</script>
+</head>
+<body>
+<div class="cover">
+<div class="cover-title">自動車販売管理システム（AutoDealerSphere）<br>操作マニュアル</div>
+</div>
+<div class="header">自動車販売管理システム（AutoDealerSphere）
+操作マニュアル</div>
+<h1>1. はじめに</h1>
+<p>本書は、自動車販売管理システム「AutoDealerSphere」の操作マニュアルです。インストール方法、初期設定、および各画面の操作方法について説明します。</p>
+<p>AutoDealerSphere は、自動車販売店向けの顧客管理システムです。顧客情報・車両情報・部品情報・請求書の管理、データのバックアップ・レストアなどの機能を提供します。</p>
+<h2>1.1. システム構成</h2>
+<div class="table-caption">表 1.1-1 システム構成</div>
+<table>
+<tr>
+<th>コンポーネント</th>
+<th>種別</th>
+<th>役割</th>
+</tr>
+<tr>
+<td>AutoDealerSphere.Server.exe</td>
+<td>Windowsサービス</td>
+<td>Webサーバー（http://localhost:5259）として常駐します。</td>
+</tr>
+<tr>
+<td>AutoDealerSphere.exe</td>
+<td>デスクトップアプリ</td>
+<td>ランチャー。起動するとサーバーに接続して操作画面を表示します。</td>
+</tr>
+</table>
+<p>サーバーはWindowsサービスとして自動的に起動しているため、利用者はデスクトップのランチャーアイコンをダブルクリックするだけで操作画面を開くことができます。</p>
+<h2>1.2. 動作環境</h2>
+<ul>
+<li>OS: Windows（64ビット）</li>
+<li>Microsoft Edge WebView2 ランタイム（インストーラーに同梱されています）</li>
+<li>インストール先: C:\AutoDealerSphere\</li>
+</ul>
+<div class="page-break"></div>
+<h1>2. インストール</h1>
+<p>本章では、システムのインストール手順とアップデート手順を説明します。</p>
+<h2>2.1. 初回インストール</h2>
+<ol>
+<li>インストーラー「AutoDealerSphere_Setup.exe」を右クリックし、「管理者として実行」を選択します。</li>
+<li>画面の指示に従ってインストールを進めます。</li>
+<li>インストールが完了すると、Windowsサービス「AutoDealerSphere」が登録され、デスクトップに「AutoDealerSphere」アイコンが作成されます。</li>
+</ol>
+<div class="image-container align-center">
+<img src="docs/manual-images/installer.png" alt="インストーラー画面" style="width:70%;">
+<div class="figure-caption">図 1 インストーラー画面</div>
+</div>
+<div class="note note-important">インストーラーは必ず「管理者として実行」してください。管理者権限がない場合、Windowsサービスの登録に失敗します。</div>
+<h2>2.2. インストール後の動作確認</h2>
+<ol>
+<li>Windowsの「ファイル名を指定して実行」（Windowsキー + R）で「services.msc」を入力し、サービス一覧を開きます。</li>
+<li>「AutoDealerSphere」サービスの状態が「実行中」になっていることを確認します。</li>
+<li>デスクトップの「AutoDealerSphere」アイコンをダブルクリックし、操作画面が表示されることを確認します。</li>
+</ol>
+<div class="image-container align-center">
+<img src="docs/manual-images/services.png" alt="サービス一覧での確認" style="width:70%;">
+<div class="figure-caption">図 2 サービス一覧での確認</div>
+</div>
+<h2>2.3. アップデート（再インストール）</h2>
+<p>新しいバージョンをインストールする場合は、既存のサービスを停止・削除してからインストーラーを実行します。</p>
+<ol>
+<li>コマンドプロンプトを「管理者として実行」で開きます。</li>
+<li>以下のコマンドを順に実行し、サービスを停止・削除します。</li>
+<li>「AutoDealerSphere_Setup.exe」を管理者として実行します。</li>
+</ol>
+<div class="code-caption">サービスの停止・削除コマンド</div>
+<pre class="code-block"><code>sc stop AutoDealerSphere
+sc delete AutoDealerSphere
+</code></pre>
+<div class="note note-info">アップデートを行ってもデータベースは保持されます。念のため、アップデート前にバックアップ（「データ管理」の章を参照）を取得することを推奨します。</div>
+<div class="page-break"></div>
+<h1>3. 初期設定</h1>
+<p>インストール後、初めてシステムを起動すると初期設定画面が表示されます。初期設定は「管理者アカウントの登録」と「発行者情報の登録」の2ステップです。</p>
+<div class="mermaid-container">
+<div class="mermaid">
+flowchart LR
+  A[起動] --> B[初回セットアップ<br>管理者アカウント登録]
+  B --> C[発行者情報登録]
+  C --> D[ログイン画面]
+
+</div>
+<div class="figure-caption">図 1 初期設定の流れ</div>
+</div>
+<h2>3.1. 管理者アカウントの登録</h2>
+<p>初回起動時に「初回セットアップ」画面が表示されます。システムを管理する管理者アカウントを登録してください。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/setup.png" alt="初回セットアップ画面" style="width:70%;">
+<div class="figure-caption">図 3 初回セットアップ画面</div>
+</div>
+<div class="table-caption">表 3.1-2 初回セットアップの入力項目</div>
+<table>
+<tr>
+<th>項目</th>
+<th>必須</th>
+<th>説明</th>
+</tr>
+<tr>
+<td>名前</td>
+<td>必須</td>
+<td>管理者の名前を入力します（40文字まで）。</td>
+</tr>
+<tr>
+<td>メールアドレス</td>
+<td>必須</td>
+<td>ログインIDとして使用するメールアドレスを入力します。</td>
+</tr>
+<tr>
+<td>パスワード</td>
+<td>必須</td>
+<td>6文字以上のパスワードを入力します。</td>
+</tr>
+<tr>
+<td>パスワード確認</td>
+<td>必須</td>
+<td>確認のため同じパスワードを再入力します。</td>
+</tr>
+</table>
+<ol>
+<li>各項目を入力します。</li>
+<li>「管理者を登録」ボタンをクリックします。</li>
+<li>登録が完了すると、発行者情報の登録画面に移動します。</li>
+</ol>
+<div class="note note-important">ここで登録したメールアドレスとパスワードは、以後のログインに必要です。忘れないように控えてください。</div>
+<h2>3.2. 発行者情報の登録</h2>
+<p>発行者情報は、請求書に印字される自社の情報です。管理者アカウントの登録後、続けて登録します。</p>
+<p>入力項目の詳細は「発行者情報管理」の章を参照してください。登録後、ログイン画面に移動します。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/issuer-info-setup.png" alt="発行者情報登録画面" style="width:70%;">
+<div class="figure-caption">図 4 発行者情報登録画面</div>
+</div>
+<div class="page-break"></div>
+<h1>4. ログイン・ログアウト</h1>
+<h2>4.1. ログイン</h2>
+<p>システムを起動するとログイン画面が表示されます。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/login.png" alt="ログイン画面" style="width:70%;">
+<div class="figure-caption">図 5 ログイン画面</div>
+</div>
+<ol>
+<li>メールアドレスを入力します。</li>
+<li>パスワードを入力します。</li>
+<li>「ログイン」ボタンをクリックします。</li>
+<li>ログインに成功すると、顧客管理画面が表示されます。</li>
+</ol>
+<div class="note note-info">メールアドレスまたはパスワードが誤っている場合は、エラーメッセージが表示されます。入力内容を確認して再度お試しください。</div>
+<h2>4.2. パスワードを忘れた場合</h2>
+<p>ログイン画面の「パスワードを忘れた場合」リンクから、パスワードの再設定ができます。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/forgot-password.png" alt="パスワードを忘れた場合の画面" style="width:70%;">
+<div class="figure-caption">図 6 パスワードを忘れた場合の画面</div>
+</div>
+<ol>
+<li>ログイン画面の「パスワードを忘れた場合」をクリックします。</li>
+<li>登録されているメールアドレスを入力し、「送信」ボタンをクリックします。</li>
+<li>届いたメールに記載されたリンクを開きます。</li>
+<li>新しいパスワードを設定し、ログイン画面から再度ログインします。</li>
+</ol>
+<div class="note note-warning">パスワードリセットメールを送信するには、発行者情報管理画面でメール送信（SMTP）設定が完了している必要があります。</div>
+<h2>4.3. ログアウト</h2>
+<p>画面左側のメニューの「ログアウト」をクリックすると、ログイン画面に戻ります。</p>
+<div class="page-break"></div>
+<h1>5. 画面構成</h1>
+<p>ログイン後の画面は、上部のタイトルバー、左側のメニュー、右側のメイン画面で構成されます。メニューから各機能の画面に移動します。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/main-layout.png" alt="画面構成（メニューとメイン画面）" style="width:80%;">
+<div class="figure-caption">図 7 画面構成（メニューとメイン画面）</div>
+</div>
+<div class="table-caption">表 5-3 メニュー一覧</div>
+<table>
+<tr>
+<th>メニュー</th>
+<th>機能</th>
+</tr>
+<tr>
+<td>顧客管理</td>
+<td>顧客情報の検索・登録・編集・削除を行います。</td>
+</tr>
+<tr>
+<td>車両管理</td>
+<td>車両情報の検索・登録・編集・削除を行います。</td>
+</tr>
+<tr>
+<td>データ管理 &gt; データインポート</td>
+<td>CSVファイルから顧客・車両データを取り込みます。</td>
+</tr>
+<tr>
+<td>データ管理 &gt; バックアップ</td>
+<td>全データをバックアップファイルとして保存します。</td>
+</tr>
+<tr>
+<td>データ管理 &gt; レストア</td>
+<td>バックアップファイルからデータを復元します。</td>
+</tr>
+<tr>
+<td>部品管理</td>
+<td>部品情報の検索・登録・編集を行います。</td>
+</tr>
+<tr>
+<td>請求書管理</td>
+<td>請求書の作成・編集・Excel出力を行います。</td>
+</tr>
+<tr>
+<td>ユーザー管理</td>
+<td>システム利用者の登録・編集を行います。</td>
+</tr>
+<tr>
+<td>発行者情報管理</td>
+<td>請求書に印字する自社情報とメール送信設定を管理します。</td>
+</tr>
+<tr>
+<td>ログアウト</td>
+<td>ログイン画面に戻ります。</td>
+</tr>
+</table>
+<p>「データ管理」のように子項目を持つメニューは、クリックすると子項目が展開されます。</p>
+<div class="page-break"></div>
+<h1>6. 顧客管理</h1>
+<p>顧客管理画面では、顧客情報の検索・登録・編集・削除を行います。</p>
+<h2>6.1. 顧客の検索</h2>
+<div class="image-container align-center">
+<img src="docs/manual-images/client-list.png" alt="顧客一覧画面" style="width:80%;">
+<div class="figure-caption">図 8 顧客一覧画面</div>
+</div>
+<div class="table-caption">表 6.1-4 検索条件</div>
+<table>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+<tr>
+<td>名前・カナ</td>
+<td>名前またはカナで部分一致検索します。</td>
+</tr>
+<tr>
+<td>メールアドレス</td>
+<td>メールアドレスで部分一致検索します。</td>
+</tr>
+<tr>
+<td>電話番号</td>
+<td>電話番号で部分一致検索します。</td>
+</tr>
+<tr>
+<td>住所</td>
+<td>郵便番号、都道府県、住所で部分一致検索します。</td>
+</tr>
+</table>
+<ol>
+<li>検索条件を入力します（複数指定可）。</li>
+<li>「検索」ボタンをクリックすると、条件に一致する顧客が一覧に表示されます。</li>
+<li>条件をすべて空にして検索すると、全件が表示されます。</li>
+</ol>
+<p>一覧には顧客ごとに名前・カナ・電話番号・住所・メールアドレスが2行で表示されます。列見出しをクリックすると並べ替えができます。</p>
+<h2>6.2. 顧客の新規登録</h2>
+<ol>
+<li>顧客一覧画面の「新規追加」ボタンをクリックします。</li>
+<li>顧客情報（名前、カナ、郵便番号、都道府県、住所、建物名、電話番号、メールアドレスなど）を入力します。</li>
+<li>「OK」ボタンをクリックして保存します。</li>
+</ol>
+<div class="image-container align-center">
+<img src="docs/manual-images/client-add.png" alt="顧客登録画面" style="width:70%;">
+<div class="figure-caption">図 9 顧客登録画面</div>
+</div>
+<h2>6.3. 顧客の編集・削除</h2>
+<ol>
+<li>顧客一覧で編集したい顧客の名前をクリックします。</li>
+<li>編集画面で内容を修正し、「OK」ボタンをクリックして保存します。</li>
+<li>削除する場合は、編集画面の「削除」ボタンをクリックします。</li>
+</ol>
+<div class="image-container align-center">
+<img src="docs/manual-images/client-edit.png" alt="顧客編集画面" style="width:70%;">
+<div class="figure-caption">図 10 顧客編集画面</div>
+</div>
+<div class="page-break"></div>
+<h1>7. 車両管理</h1>
+<p>車両管理画面では、車両情報の検索・登録・編集・削除を行います。車両は顧客（所有者）に紐付けて管理します。</p>
+<h2>7.1. 車両の検索</h2>
+<div class="image-container align-center">
+<img src="docs/manual-images/vehicle-list.png" alt="車両一覧画面" style="width:80%;">
+<div class="figure-caption">図 11 車両一覧画面</div>
+</div>
+<div class="table-caption">表 7.1-5 検索条件</div>
+<table>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+<tr>
+<td>車名・型式</td>
+<td>車名または型式で部分一致検索します。</td>
+</tr>
+<tr>
+<td>ナンバー</td>
+<td>ナンバープレートで部分一致検索します。</td>
+</tr>
+<tr>
+<td>所有者</td>
+<td>所有者名で部分一致検索します。</td>
+</tr>
+<tr>
+<td>車検満了日</td>
+<td>開始日～終了日の範囲で検索します。車検が近い車両の抽出に利用できます。</td>
+</tr>
+</table>
+<p>一覧には車両ごとにナンバー・車名・型式・所有者・初度登録日・車検満了日・走行距離が表示されます。ナンバーをクリックすると車両編集画面へ、所有者名をクリックすると顧客編集画面へ移動します。</p>
+<h2>7.2. 車両の新規登録</h2>
+<ol>
+<li>車両一覧画面の「新規追加」ボタンをクリックします。</li>
+<li>車両情報を入力します。所有者は登録済みの顧客から選択します。</li>
+<li>「OK」ボタンをクリックして保存します。</li>
+</ol>
+<div class="table-caption">表 7.2-6 車両情報の主な入力項目</div>
+<table>
+<tr>
+<th>分類</th>
+<th>項目</th>
+</tr>
+<tr>
+<td>基本情報</td>
+<td>車名、型式、車種、排気量(cc)、用途、自家用・事業用、車体の形状、燃料の種類</td>
+</tr>
+<tr>
+<td>ナンバープレート</td>
+<td>登録地域、分類番号、ひらがな、ナンバー</td>
+</tr>
+<tr>
+<td>登録・車検情報</td>
+<td>初度登録年月、車検満了日、車検証番号、車台番号、型式指定番号、類別区分番号</td>
+</tr>
+<tr>
+<td>その他</td>
+<td>走行距離(km)、所有者（顧客）</td>
+</tr>
+</table>
+<h2>7.3. 車両の編集・削除</h2>
+<ol>
+<li>車両一覧で編集したい車両のナンバーをクリックします。</li>
+<li>編集画面で内容を修正し、「OK」ボタンをクリックして保存します。</li>
+<li>削除する場合は、編集画面の「削除」ボタンをクリックします。</li>
+</ol>
+<div class="image-container align-center">
+<img src="docs/manual-images/vehicle-edit.png" alt="車両編集画面" style="width:70%;">
+<div class="figure-caption">図 12 車両編集画面</div>
+</div>
+<h2>7.4. 車検証JSONの取り込み</h2>
+<p>車両編集画面では、車検証情報のJSONファイルを取り込んで車両情報を自動入力できます。</p>
+<ol>
+<li>車両編集画面上部の「車検証json取り込み」欄でJSONファイルを選択します。</li>
+<li>「JSONデータを取り込み」ボタンをクリックします。</li>
+<li>取り込み結果のメッセージを確認し、反映された内容を確認して保存します。</li>
+</ol>
+<div class="note note-info">車検証JSONの取り込みは、登録済みの車両の編集画面でのみ利用できます。</div>
+<div class="page-break"></div>
+<h1>8. 部品管理</h1>
+<p>部品管理画面では、請求書の明細で使用する部品の情報（部品名、タイプ、単価）を管理します。</p>
+<h2>8.1. 部品の検索</h2>
+<div class="image-container align-center">
+<img src="docs/manual-images/part-list.png" alt="部品一覧画面" style="width:80%;">
+<div class="figure-caption">図 13 部品一覧画面</div>
+</div>
+<ol>
+<li>「部品名」「タイプ」を入力し、「検索」ボタンをクリックします（部分一致）。</li>
+<li>条件をすべて空にして検索すると、全件が表示されます。</li>
+</ol>
+<h2>8.2. 部品の登録・編集</h2>
+<ol>
+<li>新規登録する場合は「新規登録」ボタンをクリックします。</li>
+<li>編集する場合は一覧の部品名をクリックします。</li>
+<li>部品名、タイプ、単価を入力し、保存します。</li>
+</ol>
+<div class="image-container align-center">
+<img src="docs/manual-images/part-edit.png" alt="部品編集画面" style="width:70%;">
+<div class="figure-caption">図 14 部品編集画面</div>
+</div>
+<div class="page-break"></div>
+<h1>9. 請求書管理</h1>
+<p>請求書管理画面では、整備・修理などの請求書を作成し、Excel形式で出力できます。請求書は「基本情報」「明細」「法定費用」で構成されます。</p>
+<h2>9.1. 請求書の検索</h2>
+<div class="image-container align-center">
+<img src="docs/manual-images/invoice-list.png" alt="請求書一覧画面" style="width:80%;">
+<div class="figure-caption">図 15 請求書一覧画面</div>
+</div>
+<div class="table-caption">表 9.1-7 検索条件</div>
+<table>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+<tr>
+<td>請求書番号</td>
+<td>請求書番号で部分一致検索します。</td>
+</tr>
+<tr>
+<td>顧客名</td>
+<td>顧客名で部分一致検索します。</td>
+</tr>
+<tr>
+<td>請求日</td>
+<td>開始日～終了日の範囲で検索します。</td>
+</tr>
+</table>
+<p>一覧には請求書番号・顧客名・車番・請求日・合計金額が表示されます。請求書番号をクリックすると詳細画面に移動します。</p>
+<h2>9.2. 請求書の新規作成</h2>
+<ol>
+<li>請求書一覧画面の「新規追加」ボタンをクリックします。</li>
+<li>基本情報入力ダイアログで、顧客・車両・請求日・作業完了日などを入力します。</li>
+<li>「保存」すると請求書が作成され、詳細画面に移動します。</li>
+</ol>
+<div class="image-container align-center">
+<img src="docs/manual-images/invoice-new-dialog.png" alt="請求書の基本情報入力ダイアログ" style="width:70%;">
+<div class="figure-caption">図 16 請求書の基本情報入力ダイアログ</div>
+</div>
+<div class="note note-warning">請求書の作成には顧客データが必要です。顧客が1件も登録されていない場合、「新規追加」ボタンは無効になります。先に顧客情報を登録してください。</div>
+<div class="note note-info">請求書番号は保存時に自動採番されます。</div>
+<h2>9.3. 請求書詳細画面</h2>
+<div class="image-container align-center">
+<img src="docs/manual-images/invoice-detail.png" alt="請求書詳細画面" style="width:80%;">
+<div class="figure-caption">図 17 請求書詳細画面</div>
+</div>
+<p>請求書詳細画面では、基本情報・明細一覧・法定費用一覧・合計金額・備考を確認できます。小計・消費税・合計金額は明細と法定費用から自動計算されます。</p>
+<div class="table-caption">表 9.3-8 請求書詳細画面のボタン</div>
+<table>
+<tr>
+<th>ボタン</th>
+<th>機能</th>
+</tr>
+<tr>
+<td>基本編集</td>
+<td>顧客・車両・請求日などの基本情報を編集します。</td>
+</tr>
+<tr>
+<td>明細追加</td>
+<td>整備内容や部品の明細を追加します。明細の項目名をクリックすると編集できます。</td>
+</tr>
+<tr>
+<td>法定費用</td>
+<td>自賠責保険料・重量税などの法定費用を選択して追加します。</td>
+</tr>
+<tr>
+<td>一覧へ戻る</td>
+<td>請求書一覧画面に戻ります。</td>
+</tr>
+<tr>
+<td>前ページ／次ページ</td>
+<td>同じ請求書番号の枝番間を移動します。</td>
+</tr>
+<tr>
+<td>Excel出力</td>
+<td>請求書をExcelファイルとしてダウンロードします。</td>
+</tr>
+<tr>
+<td>請求書追加</td>
+<td>同じ請求書番号の枝番（2枚目以降）を追加します。</td>
+</tr>
+<tr>
+<td>削除実行</td>
+<td>表示中の請求書を削除します。確認ダイアログで「実行」をクリックすると削除されます。</td>
+</tr>
+</table>
+<h2>9.4. 明細の追加・編集</h2>
+<ol>
+<li>請求書詳細画面の「明細追加」ボタンをクリックします。</li>
+<li>項目名、タイプ、修理方法、数量、単価、工賃を入力します。部品管理に登録した部品を選択して入力することもできます。</li>
+<li>「保存」すると明細一覧に追加され、小計・合計が自動計算されます。</li>
+<li>登録済みの明細は、明細一覧の項目名をクリックすると編集・削除できます。</li>
+</ol>
+<div class="image-container align-center">
+<img src="docs/manual-images/invoice-detail-dialog.png" alt="明細編集ダイアログ" style="width:70%;">
+<div class="figure-caption">図 18 明細編集ダイアログ</div>
+</div>
+<h2>9.5. 法定費用の追加</h2>
+<ol>
+<li>請求書詳細画面の「法定費用」ボタンをクリックします。</li>
+<li>ダイアログで該当する法定費用（自賠責保険料、重量税、印紙代など）を選択します。</li>
+<li>「保存」すると法定費用一覧に追加されます。</li>
+</ol>
+<div class="note note-info">法定費用は非課税として扱われ、消費税の計算対象には含まれません。</div>
+<h2>9.6. Excel出力</h2>
+<ol>
+<li>請求書詳細画面の「Excel出力」ボタンをクリックします。</li>
+<li>請求書がExcelファイルとしてダウンロードされます。</li>
+</ol>
+<p>出力されるExcelファイルには、発行者情報管理画面で登録した自社情報（社名、住所、インボイス番号、振込先口座など）が印字されます。</p>
+<div class="page-break"></div>
+<h1>10. データ管理</h1>
+<p>データ管理では、外部データの取り込み（インポート）、バックアップ、レストア（復元）を行います。</p>
+<h2>10.1. データインポート</h2>
+<p>CSVまたはTXTファイルから、顧客情報と車両データを一括で取り込みます。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/vehicle-import.png" alt="車両データインポート画面" style="width:80%;">
+<div class="figure-caption">図 19 車両データインポート画面</div>
+</div>
+<ol>
+<li>メニューの「データ管理」&gt;「データインポート」を開きます。</li>
+<li>「インポートファイルを選択してください」からCSVまたはTXTファイルを選択します。</li>
+<li>既存の車両データをすべて削除してから取り込む場合は、「既存データを置き換える」にチェックを入れます。</li>
+<li>「インポート開始」ボタンをクリックします。</li>
+<li>インポート結果（新規顧客件数、車両データ件数、エラー詳細）を確認します。</li>
+</ol>
+<div class="table-caption">表 10.1-9 インポートファイルの主なカラム</div>
+<table>
+<tr>
+<th>カラム名</th>
+<th>説明</th>
+</tr>
+<tr>
+<td>fld_顧客ID</td>
+<td>顧客を識別する一意のID</td>
+</tr>
+<tr>
+<td>fld_氏名</td>
+<td>顧客の氏名</td>
+</tr>
+<tr>
+<td>fld_郵便番号</td>
+<td>顧客の郵便番号</td>
+</tr>
+<tr>
+<td>fld_所有者の住所</td>
+<td>顧客の住所</td>
+</tr>
+<tr>
+<td>その他</td>
+<td>車両番号、車体番号、車検証情報などの車両情報カラム</td>
+</tr>
+</table>
+<div class="note note-warning">「既存データを置き換える」にチェックを入れると、既存の車両データはすべて削除されます。実行前にバックアップを取得することを推奨します。<br>アップロードできるファイルサイズは最大10MBです。</div>
+<h2>10.2. バックアップ</h2>
+<p>データベースの全データ（ユーザー、顧客、車両、車両カテゴリ、部品、法定費用、請求書、請求明細、発行者情報）をCSV形式（ZIP圧縮）でバックアップします。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/data-backup.png" alt="データバックアップ画面" style="width:80%;">
+<div class="figure-caption">図 20 データバックアップ画面</div>
+</div>
+<ol>
+<li>メニューの「データ管理」&gt;「バックアップ」を開きます。</li>
+<li>「バックアップ開始」ボタンをクリックします。</li>
+<li>バックアップファイル（例: bk20260707-1030.zip）がダウンロードされます。</li>
+<li>バックアップ結果（各データの件数）を確認します。</li>
+</ol>
+<div class="note note-important">バックアップファイルは、システムのトラブルに備えて定期的に取得し、パソコン本体とは別の場所（外付けドライブなど）に保管することを推奨します。</div>
+<h2>10.3. レストア</h2>
+<p>バックアップファイル（ZIP形式またはJSON形式）からデータを復元します。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/data-restore.png" alt="データレストア画面" style="width:80%;">
+<div class="figure-caption">図 21 データレストア画面</div>
+</div>
+<ol>
+<li>メニューの「データ管理」&gt;「レストア」を開きます。</li>
+<li>「バックアップファイルを選択してください」からバックアップファイル（.zip または .json）を選択します。</li>
+<li>「既存のデータを削除してレストアすることを理解しました」にチェックを入れます。</li>
+<li>「レストア開始」ボタンをクリックします。</li>
+<li>レストア結果（各データの件数）を確認します。</li>
+</ol>
+<div class="note note-important">レストアを実行すると、現在のデータはすべて削除され、バックアップファイルのデータに置き換えられます。この操作は元に戻せません。実行前に現在のデータをバックアップすることを強く推奨します。<br>アップロードできるファイルサイズは最大50MBです。</div>
+<div class="page-break"></div>
+<h1>11. ユーザー管理</h1>
+<p>ユーザー管理画面では、システムを利用するユーザーの登録・編集を行います。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/user-list.png" alt="ユーザー一覧画面" style="width:80%;">
+<div class="figure-caption">図 22 ユーザー一覧画面</div>
+</div>
+<h2>11.1. ユーザーの検索</h2>
+<ol>
+<li>「名前」「メールアドレス」を入力し、「検索」ボタンをクリックします（部分一致）。</li>
+<li>一覧にはユーザーごとに名前・メールアドレス・権限（管理者／一般ユーザー）が表示されます。</li>
+</ol>
+<h2>11.2. ユーザーの登録・編集</h2>
+<ol>
+<li>新規登録する場合は「新規追加」ボタンをクリックします。</li>
+<li>編集する場合は一覧のユーザー名をクリックします。</li>
+<li>名前、メールアドレス、パスワード、権限を入力し、保存します。</li>
+</ol>
+<div class="image-container align-center">
+<img src="docs/manual-images/user-edit.png" alt="ユーザー編集画面" style="width:70%;">
+<div class="figure-caption">図 23 ユーザー編集画面</div>
+</div>
+<div class="table-caption">表 11.2-10 権限の種類</div>
+<table>
+<tr>
+<th>権限</th>
+<th>説明</th>
+</tr>
+<tr>
+<td>管理者</td>
+<td>システムの全機能を利用できます。</td>
+</tr>
+<tr>
+<td>一般ユーザー</td>
+<td>日常業務の機能を利用できます。</td>
+</tr>
+</table>
+<div class="page-break"></div>
+<h1>12. 発行者情報管理</h1>
+<p>発行者情報管理画面では、請求書に印字される自社情報と、パスワードリセットメールなどの送信に使用するメール（SMTP）設定を管理します。</p>
+<div class="image-container align-center">
+<img src="docs/manual-images/issuer-info.png" alt="発行者情報管理画面" style="width:80%;">
+<div class="figure-caption">図 24 発行者情報管理画面</div>
+</div>
+<h2>12.1. 発行者情報の入力項目</h2>
+<div class="table-caption">表 12.1-11 発行者情報の入力項目</div>
+<table>
+<tr>
+<th>分類</th>
+<th>項目</th>
+<th>説明</th>
+</tr>
+<tr>
+<td rowspan="6">会社情報</td>
+<td>郵便番号</td>
+<td>自社の郵便番号</td>
+</tr>
+<tr>
+<td>住所</td>
+<td>自社の住所</td>
+</tr>
+<tr>
+<td>社名</td>
+<td>請求書に印字される社名</td>
+</tr>
+<tr>
+<td>役職・氏名</td>
+<td>代表者などの役職と氏名</td>
+</tr>
+<tr>
+<td>電話番号・FAX番号</td>
+<td>自社の連絡先</td>
+</tr>
+<tr>
+<td>インボイス番号</td>
+<td>適格請求書発行事業者の登録番号</td>
+</tr>
+<tr>
+<td rowspan="2">振込先口座</td>
+<td>銀行名・支店名</td>
+<td>振込先の銀行名と支店名（複数口座の登録が可能）</td>
+</tr>
+<tr>
+<td>口座種別・口座番号・名義人</td>
+<td>振込先口座の詳細</td>
+</tr>
+</table>
+<ol>
+<li>各項目を入力します。</li>
+<li>「保存」ボタンをクリックします。</li>
+</ol>
+<h2>12.2. メール送信（SMTP）設定</h2>
+<p>パスワードリセットメールを送信するためのメールサーバー設定です。ご利用のメールサービスの情報を入力してください。</p>
+<div class="table-caption">表 12.2-12 メール設定の入力項目</div>
+<table>
+<tr>
+<th>項目</th>
+<th>説明</th>
+<th>入力例</th>
+</tr>
+<tr>
+<td>SMTPホスト</td>
+<td>メール送信サーバーのホスト名</td>
+<td>smtp.gmail.com</td>
+</tr>
+<tr>
+<td>SMTPポート</td>
+<td>メール送信サーバーのポート番号</td>
+<td>587</td>
+</tr>
+<tr>
+<td>SSL/TLS使用</td>
+<td>暗号化通信を使用するかどうか</td>
+<td>使用する</td>
+</tr>
+<tr>
+<td>送信者メールアドレス</td>
+<td>メールの差出人アドレス</td>
+<td>noreply@example.com</td>
+</tr>
+<tr>
+<td>送信者名</td>
+<td>メールの差出人名</td>
+<td>AutoDealerSphere</td>
+</tr>
+<tr>
+<td>SMTP認証ユーザー名</td>
+<td>メールサーバーの認証ユーザー名</td>
+<td>-</td>
+</tr>
+<tr>
+<td>SMTP認証パスワード</td>
+<td>メールサーバーの認証パスワード</td>
+<td>-</td>
+</tr>
+</table>
+<ol>
+<li>各項目を入力します。</li>
+<li>「接続テスト」ボタンをクリックし、設定が正しいことを確認します。</li>
+<li>「保存」ボタンをクリックします。</li>
+</ol>
+<div class="note note-info">接続テストを実行するには、SMTP認証パスワードの入力が必要です。パスワードが未入力の場合、メール設定は保存されません。</div>
+<div class="page-break"></div>
+<h1>13. トラブルシューティング</h1>
+<div class="table-caption">表 13-13 よくあるトラブルと対処方法</div>
+<table>
+<tr>
+<th>症状</th>
+<th>原因</th>
+<th>対処方法</th>
+</tr>
+<tr>
+<td>ランチャーを起動しても画面が表示されない</td>
+<td>サーバー（Windowsサービス）が起動していない</td>
+<td>services.msc を開き、「AutoDealerSphere」サービスが「実行中」であることを確認します。停止している場合は右クリックして「開始」を選択します。</td>
+</tr>
+<tr>
+<td>サービスが起動しない</td>
+<td>サーバーの実行エラー</td>
+<td>イベントビューアー &gt; Windowsログ &gt; システム で「AutoDealerSphere」のエラー内容を確認し、システム管理者に連絡してください。</td>
+</tr>
+<tr>
+<td>ログインできない</td>
+<td>メールアドレスまたはパスワードの誤り</td>
+<td>入力内容を確認してください。パスワードを忘れた場合は「パスワードを忘れた場合」から再設定してください。</td>
+</tr>
+<tr>
+<td>パスワードリセットメールが届かない</td>
+<td>メール（SMTP）設定が未完了または誤り</td>
+<td>管理者に依頼し、発行者情報管理画面のメール設定を確認・接続テストしてください。</td>
+</tr>
+<tr>
+<td>請求書の「新規追加」ボタンが押せない</td>
+<td>顧客データが未登録</td>
+<td>先に顧客管理画面から顧客情報を登録してください。</td>
+</tr>
+</table>
+<div class="note note-info">上記で解決しない場合は、システム管理者にお問い合わせください。</div>
+<div class="footer">生成日時：2026-07-07 17:53</div>
+</body></html>
