@@ -1,0 +1,124 @@
+format_version: 1
+doc_type: specification
+title: "ユーザー登録\n機能仕様書"
+language: ja
+
+cover:
+  version: "1.0.0"
+  date: "2025-01-02"
+  organization: "株式会社サンプル"
+  department: "システム開発部"
+  author: "山田太郎"
+  approver: "田中部長"
+
+revisions:
+  - version: "1.0.0"
+    date: "2025-01-02"
+    author: "山田太郎"
+    summary: "初版作成"
+
+sections:
+  - title: "概要"
+    blocks:
+      - type: text
+        content: |
+          本書はユーザー登録機能の仕様を定義する。
+          
+          メールアドレスの重複チェック、パスワードの強度検証を行い、
+          登録完了後に確認メールを送信する。
+      - type: table
+        caption: "機能情報"
+        row_header_cols: 1
+        header: ["項目", "内容"]
+        rows:
+          - ["機能ID", "USER-001"]
+          - ["ステータス", "承認済"]
+          - ["担当", "チームA"]
+
+  - title: "エンティティ定義"
+    page_break_before: true
+    sections:
+      - title: "User"
+        blocks:
+          - type: text
+            content: "システムのユーザーを表すエンティティ。"
+          - type: table
+            caption: "Userエンティティ"
+            header:
+              - [{value: "基本情報", colspan: 2}, {value: "検証", colspan: 2}]
+              - ["項目名", "型", "制約", "説明"]
+            rows:
+              - ["id", "int", "自動採番", "ユーザーID"]
+              - ["name", "string", "必須 最大100文字", "ユーザー名"]
+              - ["email", "string", "必須 一意 email形式", "メールアドレス"]
+              - ["password_hash", "string", "", "ハッシュ化されたパスワード"]
+              - ["created_at", "datetime", "自動設定", "作成日時"]
+              - ["is_active", "boolean", "初期値: false", "有効フラグ"]
+
+  - title: "操作仕様"
+    page_break_before: true
+    sections:
+      - title: "register_user"
+        blocks:
+          - type: text
+            content: "新規ユーザーを登録する。"
+          - type: table
+            caption: "入出力パラメータ"
+            header: ["区分", "項目名", "型", "必須", "説明"]
+            rows:
+              - [{value: "入力", rowspan: 3}, "name", "string", "○", "ユーザー名"]
+              - ["email", "string", "○", "メールアドレス"]
+              - ["password", "string", "○", "パスワード（8文字以上）"]
+              - ["出力", "user", "User", "－", "登録されたユーザー"]
+          - type: figure
+            format: mermaid
+            caption: "登録処理フロー"
+            code: |
+              flowchart TD
+                A[入力受付] --> B{バリデーション}
+                B -- OK --> C[メール重複チェック]
+                B -- NG --> D[ValidationError]
+                C -- 重複なし --> E[ユーザー作成]
+                C -- 重複あり --> F[EmailAlreadyExistsError]
+                E --> G[確認メール送信]
+                G --> H[完了]
+          - type: note
+            style: warning
+            content: |
+              ※パスワードは8文字以上、英数字混合で設定してください。
+              ※確認メールの有効期限は24時間です。
+          - type: list
+            style: number
+            items:
+              - text: "ビジネスルール"
+                children:
+                  - "RULE-001: メールアドレスの重複チェック"
+                  - "RULE-002: パスワード長のチェック（8文字以上）"
+                  - "RULE-003: パスワード強度のチェック（英数字混合）"
+                  - "RULE-004: ユーザー名の空チェック"
+          - type: table
+            caption: "ビジネスルール詳細"
+            header: ["ルールID", "条件", "例外", "メッセージ"]
+            rows:
+              - ["RULE-001", "同じメールアドレスが既に登録されている", "EmailAlreadyExistsError", "このメールアドレスは既に使用されています"]
+              - ["RULE-002", "パスワードが8文字未満", "ValidationError", "パスワードは8文字以上で入力してください"]
+              - ["RULE-003", "パスワードに英字と数字の両方が含まれていない", "ValidationError", "パスワードは英字と数字を含めてください"]
+              - ["RULE-004", "ユーザー名が空", "ValidationError", "ユーザー名を入力してください"]
+
+      - title: "activate_user"
+        blocks:
+          - type: text
+            content: "確認メールのリンクからユーザーをアクティベートする。"
+          - type: table
+            caption: "入出力パラメータ"
+            header: ["区分", "項目名", "型", "必須", "説明"]
+            rows:
+              - [{value: "入力", rowspan: 2}, "user_id", "int", "○", "ユーザーID"]
+              - ["token", "string", "○", "アクティベーショントークン"]
+              - ["出力", "success", "boolean", "－", "成功フラグ"]
+          - type: list
+            style: bullet
+            items:
+              - "成功時: is_activeをtrueに更新"
+              - "トークン無効時: InvalidTokenErrorを返却"
+              - "ユーザー不在時: UserNotFoundErrorを返却"
