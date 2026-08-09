@@ -10,11 +10,23 @@
         <div class="error-icon">⚠</div>
         <h2 class="error-title">処理中にエラーが発生しました</h2>
 
-        <p class="error-message">
-            操作を完了できませんでした。<br>
-            しばらく時間をおいてから再度お試しください。<br>
-            問題が解決しない場合は、下記のエラーIDをサポートまでお知らせください。
-        </p>
+        @if (!string.IsNullOrEmpty(ErrorService.CurrentError?.Message))
+        {
+            <p class="error-message">@ErrorService.CurrentError.Message</p>
+        }
+        else
+        {
+            <p class="error-message">
+                操作を完了できませんでした。<br>
+                しばらく時間をおいてから再度お試しください。
+            </p>
+        }
+        @if (!string.IsNullOrEmpty(ErrorService.CurrentError?.TraceId))
+        {
+            <p class="error-message">
+                問題が解決しない場合は、下記のエラーIDをサポートまでお知らせください。
+            </p>
+        }
 
         @if (!string.IsNullOrEmpty(ErrorService.CurrentError?.TraceId))
         {

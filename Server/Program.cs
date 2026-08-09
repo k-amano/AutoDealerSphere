@@ -1,5 +1,6 @@
 using AutoDealerSphere.Server.Middleware;
 using AutoDealerSphere.Server.Services;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Diagnostics;
@@ -10,6 +11,7 @@ Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("***REMOVED***");
 WebApplicationBuilder builder;
 string connectionString;
 string logFolder;
+string keysFolder;
 
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
@@ -17,6 +19,7 @@ if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development
     builder = WebApplication.CreateBuilder(args);
     connectionString = builder.Configuration.GetConnectionString("crm01")!;
     logFolder = Path.Combine(AppContext.BaseDirectory, "logs");
+    keysFolder = Path.Combine(AppContext.BaseDirectory, "keys");
 }
 else
 {
@@ -26,12 +29,45 @@ else
     Directory.CreateDirectory(dataFolder);
     connectionString = $"Data Source={Path.Combine(dataFolder, "crm01.db")}";
     logFolder = Path.Combine(dataFolder, "logs");
+    keysFolder = Path.Combine(dataFolder, "keys");
 
     builder = WebApplication.CreateBuilder(new WebApplicationOptions
     {
         Args = args,
         ContentRootPath = exeFolder,
     });
+}
+
+// 管理者パスワードを忘れ、リセットメールも送れない場合の復旧用CLI
+// 使い方（管理者コマンドプロンプト）: AutoDealerSphere.Server.exe --reset-password <メールアドレス> <新パスワード>
+if (args.Length >= 1 && args[0] == "--reset-password")
+{
+    if (args.Length != 3)
+    {
+        Console.WriteLine("使い方: AutoDealerSphere.Server.exe --reset-password <メールアドレス> <新パスワード>");
+        return 1;
+    }
+    if (args[2].Length < 6)
+    {
+        Console.WriteLine("パスワードは6文字以上で指定してください。");
+        return 1;
+    }
+    var cliConfig = new ConfigurationBuilder()
+        .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:crm01"] = connectionString })
+        .Build();
+    using (var db = new SQLDBContext(cliConfig))
+    {
+        var user = db.Users.FirstOrDefault(u => u.Email == args[1]);
+        if (user == null)
+        {
+            Console.WriteLine($"ユーザーが見つかりません: {args[1]}");
+            return 1;
+        }
+        user.Password = PasswordHashService.HashPassword(args[2]);
+        db.SaveChanges();
+        Console.WriteLine($"パスワードを更新しました: {args[1]}");
+    }
+    return 0;
 }
 
 Directory.CreateDirectory(logFolder);
@@ -61,7 +97,13 @@ builder.Services.AddControllersWithViews()
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 builder.Services.AddDbContextFactory<SQLDBContext>(options => options.UseSqlite(connectionString));
-builder.Services.AddDataProtection();
+
+// キーを固定フォルダに永続化する。既定の保存先は実行アカウント依存のため、
+// サービス実行と手動実行（別アカウント）で暗号化データが復号できなくなる
+Directory.CreateDirectory(keysFolder);
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(keysFolder))
+    .SetApplicationName("AutoDealerSphere");
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IVehicleImportService, VehicleImportService>();
 builder.Services.AddScoped<IPartService, PartService>();
@@ -116,3 +158,4 @@ app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();
+return 0;

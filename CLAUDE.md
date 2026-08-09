@@ -45,7 +45,7 @@ dotnet run
    - On startup, the application ensures database tables are created (see Server/Program.cs:17-31)
    - Database context is configured with SQLite connection string from appsettings.json
    - Database initialization is handled by DatabaseInitializeService
-   - Initial admin user is created automatically (admin@example.com / admin123)
+   - No initial admin user is seeded; on first access the app redirects to /setup where the administrator account is registered interactively
 
 3. **Service Pattern**:
    - Services are registered in DI container (e.g., IClientService)
@@ -63,4 +63,4 @@ dotnet run
 - Database tables are created if they don't exist on startup, preserving existing data
 - The application supports User, Client, and Vehicle management with full CRUD operations
 - Japanese language is used throughout the UI (labels, error messages, etc.)
-- Initial admin user is created automatically for system access
+- The admin user is created via the first-run setup screen (/setup), not seeded automatically

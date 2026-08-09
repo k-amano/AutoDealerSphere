@@ -1,3 +1,4 @@
+using AutoDealerSphere.Server.Exceptions;
 using AutoDealerSphere.Shared.Models;
 using System.Net;
 using System.Text.Json;
@@ -21,28 +22,33 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+        catch (BusinessException ex)
+        {
+            // ユーザーに理由を表示してよい業務エラー
+            _logger.LogWarning(ex, "業務エラーが発生しました。Path: {Path}", context.Request.Path);
+            await WriteErrorResponseAsync(context, HttpStatusCode.BadRequest, ex.Message);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "未処理の例外が発生しました。Path: {Path}", context.Request.Path);
-            await WriteErrorResponseAsync(context, ex);
+            await WriteErrorResponseAsync(context, HttpStatusCode.InternalServerError,
+                "サーバーでエラーが発生しました。管理者にお問い合わせください。");
         }
     }
 
-    private static async Task WriteErrorResponseAsync(HttpContext context, Exception ex)
+    private static async Task WriteErrorResponseAsync(HttpContext context, HttpStatusCode statusCode, string message)
     {
         if (context.Response.HasStarted)
             return;
 
-        var traceId = context.TraceIdentifier;
-
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        context.Response.StatusCode = (int)statusCode;
         context.Response.ContentType = "application/json";
 
         var response = new ApiErrorResponse
         {
-            TraceId = traceId,
-            Message = "サーバーでエラーが発生しました。管理者にお問い合わせください。",
-            StatusCode = (int)HttpStatusCode.InternalServerError,
+            TraceId = context.TraceIdentifier,
+            Message = message,
+            StatusCode = (int)statusCode,
         };
 
         var json = JsonSerializer.Serialize(response);

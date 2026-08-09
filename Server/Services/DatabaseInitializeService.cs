@@ -577,6 +577,7 @@ namespace AutoDealerSphere.Server.Services
         {
             try
             {
+                AddColumnIfNotExists("PasswordResetTokens", "FailedCount", "INTEGER NOT NULL DEFAULT 0");
                 _context.Database.ExecuteSqlRaw(@"
                         CREATE TABLE IF NOT EXISTS PasswordResetTokens (
                             Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -585,6 +586,7 @@ namespace AutoDealerSphere.Server.Services
                             CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
                             ExpiresAt TEXT NOT NULL,
                             IsUsed INTEGER NOT NULL DEFAULT 0,
+                            FailedCount INTEGER NOT NULL DEFAULT 0,
                             FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
                         )
                     ");

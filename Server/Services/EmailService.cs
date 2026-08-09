@@ -1,3 +1,4 @@
+using AutoDealerSphere.Server.Exceptions;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
@@ -16,15 +17,15 @@ namespace AutoDealerSphere.Server.Services
             _logger = logger;
         }
 
-        public async Task SendPasswordResetEmailAsync(string toEmail, string resetToken, string resetUrl)
+        public async Task SendPasswordResetCodeAsync(string toEmail, string code)
         {
-            var subject = "パスワードリセットのご依頼";
+            var subject = "パスワードリセットの認証コード";
             var body = $@"
-                <h2>パスワードリセットのご依頼</h2>
+                <h2>パスワードリセットの認証コード</h2>
                 <p>パスワードリセットのリクエストを受け付けました。</p>
-                <p>以下のリンクをクリックして、新しいパスワードを設定してください：</p>
-                <p><a href='{resetUrl}?token={resetToken}'>パスワードをリセット</a></p>
-                <p>このリンクは1時間有効です。</p>
+                <p>アプリの「パスワードを忘れた場合」画面に、以下の認証コードを入力してください：</p>
+                <p style='font-size: 28px; font-weight: bold; letter-spacing: 6px;'>{code}</p>
+                <p>このコードは15分間有効です。</p>
                 <p>※このメールに心当たりがない場合は、無視してください。</p>
             ";
 
@@ -36,10 +37,14 @@ namespace AutoDealerSphere.Server.Services
             var settings = await _settingsService.GetSettingsAsync();
             if (settings == null)
             {
-                throw new InvalidOperationException("メール設定が登録されていません。");
+                throw new BusinessException("メール設定が登録されていないため、メールを送信できません。発行者情報画面でメール設定を登録してください。");
             }
 
             var password = await _settingsService.DecryptPasswordAsync(settings.EncryptedPassword);
+            if (password == null)
+            {
+                throw new BusinessException("メール設定のパスワードを復号できませんでした。発行者情報画面でメール設定のパスワードを再登録してください。");
+            }
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(settings.SenderName, settings.SenderEmail));

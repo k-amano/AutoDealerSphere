@@ -48,9 +48,17 @@ namespace AutoDealerSphere.Server.Services
             return settings;
         }
 
-        public async Task<string> DecryptPasswordAsync(string encryptedPassword)
+        public async Task<string?> DecryptPasswordAsync(string encryptedPassword)
         {
-            return await Task.FromResult(_protector.Unprotect(encryptedPassword));
+            try
+            {
+                return await Task.FromResult<string?>(_protector.Unprotect(encryptedPassword));
+            }
+            catch (System.Security.Cryptography.CryptographicException ex)
+            {
+                _logger.LogWarning(ex, "メール設定のパスワードを復号できませんでした。メール設定画面でパスワードの再登録が必要です");
+                return null;
+            }
         }
 
         public async Task<(bool Success, string Message)> TestConnectionAsync(EmailSettings settings, string plainPassword)

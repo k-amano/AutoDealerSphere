@@ -11,11 +11,28 @@ namespace AutoDealerSphere.Client.Pages
         [Inject]
         private NavigationManager Navigation { get; set; }
 
-        private async Task SendResetEmail()
+        private enum Step { SelectUser, EnterCode, Done }
+
+        private Step step = Step.SelectUser;
+        private List<ResetUserItem> users = new();
+        private int? selectedUserId;
+        private string maskedEmail = "";
+        private string verificationCode = "";
+        private string newPassword = "";
+        private string confirmPassword = "";
+        private string errorMessage = "";
+        private bool isProcessing = false;
+
+        protected override async Task OnInitializedAsync()
         {
-            if (string.IsNullOrEmpty(email))
+            users = await Http.GetFromJsonAsync<List<ResetUserItem>>("api/PasswordReset/users") ?? new();
+        }
+
+        private async Task SendResetCode()
+        {
+            if (selectedUserId == null)
             {
-                errorMessage = "メールアドレスを入力してください。";
+                errorMessage = "ユーザーを選択してください。";
                 return;
             }
 
@@ -24,17 +41,13 @@ namespace AutoDealerSphere.Client.Pages
 
             try
             {
-                var baseUrl = Navigation.BaseUri.TrimEnd('/');
-                var request = new PasswordResetRequestModel
-                {
-                    Email = email,
-                    BaseUrl = baseUrl
-                };
-
-                var response = await Http.PostAsJsonAsync("api/PasswordReset/request", request);
+                var response = await Http.PostAsJsonAsync("api/PasswordReset/request",
+                    new PasswordResetRequestModel { UserId = selectedUserId.Value });
                 if (response.IsSuccessStatusCode)
                 {
-                    emailSent = true;
+                    var result = await response.Content.ReadFromJsonAsync<PasswordResetRequestResult>();
+                    maskedEmail = result?.MaskedEmail ?? "";
+                    step = Step.EnterCode;
                 }
             }
             finally
@@ -43,15 +56,86 @@ namespace AutoDealerSphere.Client.Pages
             }
         }
 
+        private async Task ResetPasswordAsync()
+        {
+            if (string.IsNullOrEmpty(verificationCode))
+            {
+                errorMessage = "認証コードを入力してください。";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(newPassword))
+            {
+                errorMessage = "新しいパスワードを入力してください。";
+                return;
+            }
+
+            if (newPassword.Length < 6)
+            {
+                errorMessage = "パスワードは6文字以上で入力してください。";
+                return;
+            }
+
+            if (newPassword != confirmPassword)
+            {
+                errorMessage = "パスワードが一致しません。";
+                return;
+            }
+
+            isProcessing = true;
+            errorMessage = "";
+
+            try
+            {
+                var response = await Http.PostAsJsonAsync("api/PasswordReset/reset",
+                    new ResetPasswordRequestModel { UserId = selectedUserId!.Value, Code = verificationCode, NewPassword = newPassword });
+                if (response.IsSuccessStatusCode)
+                {
+                    step = Step.Done;
+                }
+            }
+            finally
+            {
+                isProcessing = false;
+            }
+        }
+
+        private void BackToSelectUser()
+        {
+            verificationCode = "";
+            newPassword = "";
+            confirmPassword = "";
+            errorMessage = "";
+            maskedEmail = "";
+            step = Step.SelectUser;
+        }
+
         private void GoToLogin()
         {
-            Navigation.NavigateTo("/login");
+            Navigation.NavigateTo("/");
         }
+    }
+
+    public class ResetUserItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
     }
 
     public class PasswordResetRequestModel
     {
-        public string Email { get; set; } = "";
-        public string BaseUrl { get; set; } = "";
+        public int UserId { get; set; }
+    }
+
+    public class PasswordResetRequestResult
+    {
+        public string MaskedEmail { get; set; } = "";
+    }
+
+    public class ResetPasswordRequestModel
+    {
+        public int UserId { get; set; }
+        public string Code { get; set; } = "";
+        public string NewPassword { get; set; } = "";
     }
 }

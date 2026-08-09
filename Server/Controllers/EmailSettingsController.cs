@@ -30,7 +30,8 @@ namespace AutoDealerSphere.Server.Controllers
             var plainPassword = "";
             if (!string.IsNullOrEmpty(settings.EncryptedPassword))
             {
-                plainPassword = await _emailSettingsService.DecryptPasswordAsync(settings.EncryptedPassword);
+                // 復号できない場合（暗号化キー喪失など）は空欄にして再入力を促す
+                plainPassword = await _emailSettingsService.DecryptPasswordAsync(settings.EncryptedPassword) ?? "";
             }
             settings.EncryptedPassword = "";
             return Ok(new EmailSettingsResponse { Settings = settings, PlainPassword = plainPassword });
