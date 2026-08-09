@@ -46,7 +46,7 @@ sections:
               - "画面の指示に従ってインストールを進めます。"
               - "インストールが完了すると、Windowsサービス「AutoDealerSphere」が登録され、デスクトップに「AutoDealerSphere」アイコンが作成されます。"
           - type: image
-            path: "docs/manual-images/installer.png"
+            path: "images/installer.png"
             caption: "インストーラー画面"
             width: "70%"
             align: center
@@ -63,7 +63,7 @@ sections:
               - "「AutoDealerSphere」サービスの状態が「実行中」になっていることを確認します。"
               - "デスクトップの「AutoDealerSphere」アイコンをダブルクリックし、操作画面が表示されることを確認します。"
           - type: image
-            path: "docs/manual-images/services.png"
+            path: "images/services.png"
             caption: "サービス一覧での確認"
             width: "70%"
             align: center
@@ -109,7 +109,7 @@ sections:
             content: |
               初回起動時に「初回セットアップ」画面が表示されます。システムを管理する管理者アカウントを登録してください。
           - type: image
-            path: "docs/manual-images/setup.png"
+            path: "images/setup.png"
             caption: "初回セットアップ画面"
             width: "70%"
             align: center
@@ -139,7 +139,7 @@ sections:
 
               入力項目の詳細は「発行者情報管理」の章を参照してください。登録後、ログイン画面に移動します。
           - type: image
-            path: "docs/manual-images/issuer-info-setup.png"
+            path: "images/issuer-info-setup.png"
             caption: "発行者情報登録画面"
             width: "70%"
             align: center
@@ -152,7 +152,7 @@ sections:
             content: |
               システムを起動するとログイン画面が表示されます。
           - type: image
-            path: "docs/manual-images/login.png"
+            path: "images/login.png"
             caption: "ログイン画面"
             width: "70%"
             align: center
@@ -173,7 +173,7 @@ sections:
             content: |
               ログイン画面の「パスワードを忘れた場合」リンクから、パスワードの再設定ができます。
           - type: image
-            path: "docs/manual-images/forgot-password.png"
+            path: "images/forgot-password.png"
             caption: "パスワードを忘れた場合の画面"
             width: "70%"
             align: center
@@ -200,7 +200,7 @@ sections:
         content: |
           ログイン後の画面は、上部のタイトルバー、左側のメニュー、右側のメイン画面で構成されます。メニューから各機能の画面に移動します。
       - type: image
-        path: "docs/manual-images/main-layout.png"
+        path: "images/main-layout.png"
         caption: "画面構成（メニューとメイン画面）"
         width: "80%"
         align: center
@@ -231,7 +231,7 @@ sections:
       - title: "顧客の検索"
         blocks:
           - type: image
-            path: "docs/manual-images/client-list.png"
+            path: "images/client-list.png"
             caption: "顧客一覧画面"
             width: "80%"
             align: center
@@ -261,7 +261,7 @@ sections:
               - "顧客情報（名前、カナ、郵便番号、都道府県、住所、建物名、電話番号、メールアドレスなど）を入力します。"
               - "「OK」ボタンをクリックして保存します。"
           - type: image
-            path: "docs/manual-images/client-add.png"
+            path: "images/client-add.png"
             caption: "顧客登録画面"
             width: "70%"
             align: center
@@ -274,7 +274,7 @@ sections:
               - "編集画面で内容を修正し、「OK」ボタンをクリックして保存します。"
               - "削除する場合は、編集画面の「削除」ボタンをクリックします。"
           - type: image
-            path: "docs/manual-images/client-edit.png"
+            path: "images/client-edit.png"
             caption: "顧客編集画面"
             width: "70%"
             align: center
@@ -288,7 +288,7 @@ sections:
       - title: "車両の検索"
         blocks:
           - type: image
-            path: "docs/manual-images/vehicle-list.png"
+            path: "images/vehicle-list.png"
             caption: "車両一覧画面"
             width: "80%"
             align: center
@@ -328,7 +328,7 @@ sections:
               - "編集画面で内容を修正し、「OK」ボタンをクリックして保存します。"
               - "削除する場合は、編集画面の「削除」ボタンをクリックします。"
           - type: image
-            path: "docs/manual-images/vehicle-edit.png"
+            path: "images/vehicle-edit.png"
             caption: "車両編集画面"
             width: "70%"
             align: center
@@ -357,7 +357,7 @@ sections:
       - title: "部品の検索"
         blocks:
           - type: image
-            path: "docs/manual-images/part-list.png"
+            path: "images/part-list.png"
             caption: "部品一覧画面"
             width: "80%"
             align: center
@@ -375,7 +375,7 @@ sections:
               - "編集する場合は一覧の部品名をクリックします。"
               - "部品名、タイプ、単価を入力し、保存します。"
           - type: image
-            path: "docs/manual-images/part-edit.png"
+            path: "images/part-edit.png"
             caption: "部品編集画面"
             width: "70%"
             align: center
@@ -389,7 +389,7 @@ sections:
       - title: "請求書の検索"
         blocks:
           - type: image
-            path: "docs/manual-images/invoice-list.png"
+            path: "images/invoice-list.png"
             caption: "請求書一覧画面"
             width: "80%"
             align: center
@@ -412,7 +412,7 @@ sections:
               - "基本情報入力ダイアログで、顧客・車両・請求日・作業完了日などを入力します。"
               - "「保存」すると請求書が作成され、詳細画面に移動します。"
           - type: image
-            path: "docs/manual-images/invoice-new-dialog.png"
+            path: "images/invoice-new-dialog.png"
             caption: "請求書の基本情報入力ダイアログ"
             width: "70%"
             align: center
@@ -427,7 +427,7 @@ sections:
       - title: "請求書詳細画面"
         blocks:
           - type: image
-            path: "docs/manual-images/invoice-detail.png"
+            path: "images/invoice-detail.png"
             caption: "請求書詳細画面"
             width: "80%"
             align: center
@@ -456,7 +456,7 @@ sections:
               - "「保存」すると明細一覧に追加され、小計・合計が自動計算されます。"
               - "登録済みの明細は、明細一覧の項目名をクリックすると編集・削除できます。"
           - type: image
-            path: "docs/manual-images/invoice-detail-dialog.png"
+            path: "images/invoice-detail-dialog.png"
             caption: "明細編集ダイアログ"
             width: "70%"
             align: center
@@ -495,7 +495,7 @@ sections:
             content: |
               CSVまたはTXTファイルから、顧客情報と車両データを一括で取り込みます。
           - type: image
-            path: "docs/manual-images/vehicle-import.png"
+            path: "images/vehicle-import.png"
             caption: "車両データインポート画面"
             width: "80%"
             align: center
@@ -527,7 +527,7 @@ sections:
             content: |
               データベースの全データ（ユーザー、顧客、車両、車両カテゴリ、部品、法定費用、請求書、請求明細、発行者情報）をCSV形式（ZIP圧縮）でバックアップします。
           - type: image
-            path: "docs/manual-images/data-backup.png"
+            path: "images/data-backup.png"
             caption: "データバックアップ画面"
             width: "80%"
             align: center
@@ -548,7 +548,7 @@ sections:
             content: |
               バックアップファイル（ZIP形式またはJSON形式）からデータを復元します。
           - type: image
-            path: "docs/manual-images/data-restore.png"
+            path: "images/data-restore.png"
             caption: "データレストア画面"
             width: "80%"
             align: center
@@ -572,7 +572,7 @@ sections:
         content: |
           ユーザー管理画面では、システムを利用するユーザーの登録・編集を行います。
       - type: image
-        path: "docs/manual-images/user-list.png"
+        path: "images/user-list.png"
         caption: "ユーザー一覧画面"
         width: "80%"
         align: center
@@ -593,7 +593,7 @@ sections:
               - "編集する場合は一覧のユーザー名をクリックします。"
               - "名前、メールアドレス、パスワード、権限を入力し、保存します。"
           - type: image
-            path: "docs/manual-images/user-edit.png"
+            path: "images/user-edit.png"
             caption: "ユーザー編集画面"
             width: "70%"
             align: center
@@ -610,7 +610,7 @@ sections:
         content: |
           発行者情報管理画面では、請求書に印字される自社情報と、パスワードリセットメールなどの送信に使用するメール（SMTP）設定を管理します。
       - type: image
-        path: "docs/manual-images/issuer-info.png"
+        path: "images/issuer-info.png"
         caption: "発行者情報管理画面"
         width: "80%"
         align: center
