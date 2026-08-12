@@ -111,14 +111,21 @@ class DocumentRenderer:
             --font-mincho: "游明朝", "Yu Mincho", "YuMincho", "ＭＳ 明朝", "MS Mincho", serif;
         }}
         
+        /* 画面表示は可読性優先でゴシック体。明朝体は印刷時のみ（@media print参照） */
         body {{
-            font-family: var(--font-mincho);
+            font-family: var(--font-gothic);
             font-size: 10.5pt;
             line-height: 1.5;
             color: #000;
             margin: 0;
             padding: 20px;
             max-width: 210mm;
+        }}
+
+        @media print {{
+            body {{
+                font-family: var(--font-mincho);
+            }}
         }}
         
         /* ヘッダー */
@@ -274,7 +281,13 @@ class DocumentRenderer:
             text-align: center;
         }}
         .mermaid {{
-            display: inline-block;
+            display: block;
+        }}
+        /* Mermaidが付ける自然サイズのmax-widthを上書きし、本文幅まで拡大する */
+        .mermaid svg {{
+            max-width: 100% !important;
+            width: 100%;
+            height: auto;
         }}
         
         /* コードブロック */
@@ -325,6 +338,9 @@ class DocumentRenderer:
         }}
         .image-container img {{
             max-width: 100%;
+        }}
+        .image-container .image-item + .image-item {{
+            margin-top: 4pt;
         }}
         .image-missing {{
             display: inline-block;
@@ -641,17 +657,20 @@ class DocumentRenderer:
         """画像ブロック"""
         self.image_count += 1
         path = block.get('path', '')
+        path2 = block.get('path2', '')
         caption = block.get('caption', '')
         alt = block.get('alt', caption)
         width = block.get('width', '')
         align = block.get('align', 'left')
-        
+
         align_class = f' align-{align}' if align != 'left' else ''
         parts = [f'<div class="image-container{align_class}">']
-        
+
         # 画像が存在するかチェック（簡易版：パスがあれば表示）
         style = f' style="width:{width};"' if width else ''
-        parts.append(f'<img src="{html.escape(path)}" alt="{html.escape(alt)}"{style}>')
+        # path2 指定時は1つの図として2枚を縦に並べる（キャプション・図番号は共通）
+        for p in [path] + ([path2] if path2 else []):
+            parts.append(f'<div class="image-item"><img src="{html.escape(p)}" alt="{html.escape(alt)}"{style}></div>')
         
         caption_text = f'{self.t["figure"]} {self.image_count}'
         if caption:

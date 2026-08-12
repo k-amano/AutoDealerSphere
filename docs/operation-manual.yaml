@@ -48,7 +48,6 @@ sections:
           - type: image
             path: "images/installer.png"
             caption: "インストーラー画面"
-            width: "70%"
             align: center
           - type: note
             style: important
@@ -65,7 +64,6 @@ sections:
           - type: image
             path: "images/services.png"
             caption: "サービス一覧での確認"
-            width: "70%"
             align: center
       - title: "アップデート（再インストール）"
         blocks:
@@ -111,7 +109,6 @@ sections:
           - type: image
             path: "images/setup.png"
             caption: "初回セットアップ画面"
-            width: "70%"
             align: center
           - type: table
             caption: "初回セットアップの入力項目"
@@ -140,8 +137,8 @@ sections:
               入力項目の詳細は「発行者情報管理」の章を参照してください。登録後、ログイン画面に移動します。
           - type: image
             path: "images/issuer-info-setup.png"
+            path2: "images/issuer-info-setup2.png"
             caption: "発行者情報登録画面"
-            width: "70%"
             align: center
   - title: "ログイン・ログアウト"
     page_break_before: true
@@ -154,15 +151,19 @@ sections:
           - type: image
             path: "images/login.png"
             caption: "ログイン画面"
-            width: "70%"
             align: center
           - type: list
             style: number
             items:
               - "メールアドレスを入力します。"
               - "パスワードを入力します。"
+              - "次回から入力を省略したい場合は、「パスワードを保存する」にチェックを入れます。"
               - "「ログイン」ボタンをクリックします。"
               - "ログインに成功すると、顧客管理画面が表示されます。"
+          - type: note
+            style: info
+            content: |
+              「パスワードを保存する」にチェックを入れてログインすると、メールアドレスとパスワードが保存され、次回からログイン画面を開いたときに自動で入力されます。チェックを外してログインすると、保存されている値はクリアされます。
           - type: note
             style: info
             content: |
@@ -171,23 +172,27 @@ sections:
         blocks:
           - type: text
             content: |
-              ログイン画面の「パスワードを忘れた場合」リンクから、パスワードの再設定ができます。
+              ログイン画面の「パスワードを忘れた場合」リンクから、パスワードの再設定ができます。登録メールアドレス宛に届く6桁の認証コードを使って、新しいパスワードを設定します。
           - type: image
             path: "images/forgot-password.png"
             caption: "パスワードを忘れた場合の画面"
-            width: "70%"
             align: center
           - type: list
             style: number
             items:
               - "ログイン画面の「パスワードを忘れた場合」をクリックします。"
-              - "登録されているメールアドレスを入力し、「送信」ボタンをクリックします。"
-              - "届いたメールに記載されたリンクを開きます。"
-              - "新しいパスワードを設定し、ログイン画面から再度ログインします。"
+              - "ユーザーの一覧から自分を選択し、「認証コードを送信」ボタンをクリックします。"
+              - "登録されているメールアドレス（画面には a***@example.com のように一部を伏せて表示されます）宛に、6桁の認証コードが記載されたメールが届きます。"
+              - "メールに記載された認証コードと、新しいパスワード（6文字以上）を入力し、「パスワードを変更」ボタンをクリックします。"
+              - "「ログインへ」ボタンでログイン画面に戻り、新しいパスワードでログインします。"
+          - type: note
+            style: info
+            content: |
+              認証コードの有効期限は送信から15分間です。期限が切れた場合や、コードの誤入力が5回続いてコードが無効になった場合は、もう一度「認証コードを送信」からやり直してください。
           - type: note
             style: warning
             content: |
-              パスワードリセットメールを送信するには、発行者情報管理画面でメール送信（SMTP）設定が完了している必要があります。
+              認証コードのメールを送信するには、発行者情報管理画面でメール送信（SMTP）設定が完了している必要があります。
       - title: "ログアウト"
         blocks:
           - type: text
@@ -202,7 +207,6 @@ sections:
       - type: image
         path: "images/main-layout.png"
         caption: "画面構成（メニューとメイン画面）"
-        width: "80%"
         align: center
       - type: table
         caption: "メニュー一覧"
@@ -233,7 +237,6 @@ sections:
           - type: image
             path: "images/client-list.png"
             caption: "顧客一覧画面"
-            width: "80%"
             align: center
           - type: table
             caption: "検索条件"
@@ -263,7 +266,6 @@ sections:
           - type: image
             path: "images/client-add.png"
             caption: "顧客登録画面"
-            width: "70%"
             align: center
       - title: "顧客の編集・削除"
         blocks:
@@ -276,7 +278,6 @@ sections:
           - type: image
             path: "images/client-edit.png"
             caption: "顧客編集画面"
-            width: "70%"
             align: center
   - title: "車両管理"
     page_break_before: true
@@ -290,7 +291,6 @@ sections:
           - type: image
             path: "images/vehicle-list.png"
             caption: "車両一覧画面"
-            width: "80%"
             align: center
           - type: table
             caption: "検索条件"
@@ -329,8 +329,8 @@ sections:
               - "削除する場合は、編集画面の「削除」ボタンをクリックします。"
           - type: image
             path: "images/vehicle-edit.png"
+            path2: "images/vehicle-edit2.png"
             caption: "車両編集画面"
-            width: "70%"
             align: center
       - title: "車検証JSONの取り込み"
         blocks:
@@ -359,7 +359,6 @@ sections:
           - type: image
             path: "images/part-list.png"
             caption: "部品一覧画面"
-            width: "80%"
             align: center
           - type: list
             style: number
@@ -377,7 +376,6 @@ sections:
           - type: image
             path: "images/part-edit.png"
             caption: "部品編集画面"
-            width: "70%"
             align: center
   - title: "請求書管理"
     page_break_before: true
@@ -391,7 +389,6 @@ sections:
           - type: image
             path: "images/invoice-list.png"
             caption: "請求書一覧画面"
-            width: "80%"
             align: center
           - type: table
             caption: "検索条件"
@@ -414,7 +411,6 @@ sections:
           - type: image
             path: "images/invoice-new-dialog.png"
             caption: "請求書の基本情報入力ダイアログ"
-            width: "70%"
             align: center
           - type: note
             style: warning
@@ -428,8 +424,8 @@ sections:
         blocks:
           - type: image
             path: "images/invoice-detail.png"
+            path2: "images/invoice-detail2.png"
             caption: "請求書詳細画面"
-            width: "80%"
             align: center
           - type: text
             content: |
@@ -458,7 +454,6 @@ sections:
           - type: image
             path: "images/invoice-detail-dialog.png"
             caption: "明細編集ダイアログ"
-            width: "70%"
             align: center
       - title: "法定費用の追加"
         blocks:
@@ -497,7 +492,6 @@ sections:
           - type: image
             path: "images/vehicle-import.png"
             caption: "車両データインポート画面"
-            width: "80%"
             align: center
           - type: list
             style: number
@@ -529,7 +523,6 @@ sections:
           - type: image
             path: "images/data-backup.png"
             caption: "データバックアップ画面"
-            width: "80%"
             align: center
           - type: list
             style: number
@@ -550,7 +543,6 @@ sections:
           - type: image
             path: "images/data-restore.png"
             caption: "データレストア画面"
-            width: "80%"
             align: center
           - type: list
             style: number
@@ -574,7 +566,6 @@ sections:
       - type: image
         path: "images/user-list.png"
         caption: "ユーザー一覧画面"
-        width: "80%"
         align: center
     sections:
       - title: "ユーザーの検索"
@@ -595,7 +586,6 @@ sections:
           - type: image
             path: "images/user-edit.png"
             caption: "ユーザー編集画面"
-            width: "70%"
             align: center
           - type: table
             caption: "権限の種類"
@@ -611,8 +601,8 @@ sections:
           発行者情報管理画面では、請求書に印字される自社情報と、パスワードリセットメールなどの送信に使用するメール（SMTP）設定を管理します。
       - type: image
         path: "images/issuer-info.png"
+        path2: "images/issuer-info2.png"
         caption: "発行者情報管理画面"
-        width: "80%"
         align: center
     sections:
       - title: "発行者情報の入力項目"

@@ -2,6 +2,8 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationService AuthService
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@using Microsoft.JSInterop
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.DataForm
 @using Syncfusion.Blazor.Inputs
@@ -25,6 +27,9 @@
                     <label>パスワード</label>
                     <SfTextBox @bind-Value="@loginModel.Password" Type="InputType.Password" Placeholder="パスワードを入力"></SfTextBox>
                     <ValidationMessage For="@(() => loginModel.Password)" />
+                </div>
+                <div class="save-password-row">
+                    <SfCheckBox Label="パスワードを保存する" @bind-Checked="@savePassword"></SfCheckBox>
                 </div>
             </div>
         </EditForm>
@@ -110,6 +115,11 @@
         min-width: 120px;
     }
     
+    .login-box .save-password-row {
+        margin-left: 160px;
+        margin-bottom: 1rem;
+    }
+
     .error-message {
         color: #d32f2f;
         text-align: center;
@@ -134,8 +144,12 @@
 </style>
 
 @code {
+    private const string SavedEmailKey = "AutoDealerSphere.SavedEmail";
+    private const string SavedPasswordKey = "AutoDealerSphere.SavedPassword";
+
     private LoginModel loginModel = new LoginModel();
     private string errorMessage = "";
+    private bool savePassword = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -149,6 +163,16 @@
         if (!issuerRegistered)
         {
             NavigationManager.NavigateTo("/issuerinfo", replace: true);
+            return;
+        }
+
+        // 保存済みのメールアドレス・パスワードがあれば入力欄に反映する
+        var savedEmail = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", SavedEmailKey);
+        if (!string.IsNullOrEmpty(savedEmail))
+        {
+            loginModel.Email = savedEmail;
+            loginModel.Password = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", SavedPasswordKey) ?? "";
+            savePassword = true;
         }
     }
 
@@ -175,6 +199,16 @@
 
         if (loginResponse != null && loginResponse.Success)
         {
+            if (savePassword)
+            {
+                await JSRuntime.InvokeVoidAsync("localStorage.setItem", SavedEmailKey, loginModel.Email);
+                await JSRuntime.InvokeVoidAsync("localStorage.setItem", SavedPasswordKey, loginModel.Password);
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", SavedEmailKey);
+                await JSRuntime.InvokeVoidAsync("localStorage.removeItem", SavedPasswordKey);
+            }
             NavigationManager.NavigateTo("/clientlist");
         }
         else

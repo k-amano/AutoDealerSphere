@@ -233,6 +233,7 @@ Raster images that already exist as files — typically E2E screenshots.
 ```yaml
 - type: image
   path: "e2e/screenshots/login.png"   # required
+  path2: "e2e/screenshots/login2.png" # optional — second image stacked below the first
   caption: "Login screen"             # optional
   alt: "Screenshot of the login form" # optional
   width: "60%"                        # optional — CSS-style width
@@ -248,6 +249,9 @@ Raster images that already exist as files — typically E2E screenshots.
   rendered as a placeholder box with the caption and a localized
   "(image missing)" marker — generation never fails because a screenshot
   vanished.
+- `path2` renders a second image vertically below the first, inside the same
+  figure: one caption, one figure number. Use it when a screen is too tall to
+  fit in a single screenshot and had to be captured in two parts.
 - **HTML**: embedded as base64 `data:` URI (self-contained file). **Excel**:
   embedded via openpyxl.
 
@@ -726,6 +730,10 @@ the prompt (max 2 retries), then surfaces an error.
           "const": "image"
         },
         "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path2": {
           "type": "string",
           "minLength": 1
         },

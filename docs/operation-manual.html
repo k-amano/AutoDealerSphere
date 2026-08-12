@@ -16,14 +16,21 @@
             --font-mincho: "游明朝", "Yu Mincho", "YuMincho", "ＭＳ 明朝", "MS Mincho", serif;
         }
         
+        /* 画面表示は可読性優先でゴシック体。明朝体は印刷時のみ（@media print参照） */
         body {
-            font-family: var(--font-mincho);
+            font-family: var(--font-gothic);
             font-size: 10.5pt;
             line-height: 1.5;
             color: #000;
             margin: 0;
             padding: 20px;
             max-width: 210mm;
+        }
+
+        @media print {
+            body {
+                font-family: var(--font-mincho);
+            }
         }
         
         /* ヘッダー */
@@ -179,7 +186,13 @@
             text-align: center;
         }
         .mermaid {
-            display: inline-block;
+            display: block;
+        }
+        /* Mermaidが付ける自然サイズのmax-widthを上書きし、本文幅まで拡大する */
+        .mermaid svg {
+            max-width: 100% !important;
+            width: 100%;
+            height: auto;
         }
         
         /* コードブロック */
@@ -230,6 +243,9 @@
         }
         .image-container img {
             max-width: 100%;
+        }
+        .image-container .image-item + .image-item {
+            margin-top: 4pt;
         }
         .image-missing {
             display: inline-block;
@@ -302,7 +318,7 @@
 <li>インストールが完了すると、Windowsサービス「AutoDealerSphere」が登録され、デスクトップに「AutoDealerSphere」アイコンが作成されます。</li>
 </ol>
 <div class="image-container align-center">
-<img src="images/installer.png" alt="インストーラー画面" style="width:70%;">
+<div class="image-item"><img src="images/installer.png" alt="インストーラー画面"></div>
 <div class="figure-caption">図 1 インストーラー画面</div>
 </div>
 <div class="note note-important">インストーラーは必ず「管理者として実行」してください。管理者権限がない場合、Windowsサービスの登録に失敗します。</div>
@@ -313,7 +329,7 @@
 <li>デスクトップの「AutoDealerSphere」アイコンをダブルクリックし、操作画面が表示されることを確認します。</li>
 </ol>
 <div class="image-container align-center">
-<img src="images/services.png" alt="サービス一覧での確認" style="width:70%;">
+<div class="image-item"><img src="images/services.png" alt="サービス一覧での確認"></div>
 <div class="figure-caption">図 2 サービス一覧での確認</div>
 </div>
 <h2>2.3. アップデート（再インストール）</h2>
@@ -344,7 +360,7 @@ flowchart LR
 <h2>3.1. 管理者アカウントの登録</h2>
 <p>初回起動時に「初回セットアップ」画面が表示されます。システムを管理する管理者アカウントを登録してください。</p>
 <div class="image-container align-center">
-<img src="images/setup.png" alt="初回セットアップ画面" style="width:70%;">
+<div class="image-item"><img src="images/setup.png" alt="初回セットアップ画面"></div>
 <div class="figure-caption">図 3 初回セットアップ画面</div>
 </div>
 <div class="table-caption">表 3.1-2 初回セットアップの入力項目</div>
@@ -385,7 +401,8 @@ flowchart LR
 <p>発行者情報は、請求書に印字される自社の情報です。管理者アカウントの登録後、続けて登録します。</p>
 <p>入力項目の詳細は「発行者情報管理」の章を参照してください。登録後、ログイン画面に移動します。</p>
 <div class="image-container align-center">
-<img src="images/issuer-info-setup.png" alt="発行者情報登録画面" style="width:70%;">
+<div class="image-item"><img src="images/issuer-info-setup.png" alt="発行者情報登録画面"></div>
+<div class="image-item"><img src="images/issuer-info-setup2.png" alt="発行者情報登録画面"></div>
 <div class="figure-caption">図 4 発行者情報登録画面</div>
 </div>
 <div class="page-break"></div>
@@ -393,36 +410,40 @@ flowchart LR
 <h2>4.1. ログイン</h2>
 <p>システムを起動するとログイン画面が表示されます。</p>
 <div class="image-container align-center">
-<img src="images/login.png" alt="ログイン画面" style="width:70%;">
+<div class="image-item"><img src="images/login.png" alt="ログイン画面"></div>
 <div class="figure-caption">図 5 ログイン画面</div>
 </div>
 <ol>
 <li>メールアドレスを入力します。</li>
 <li>パスワードを入力します。</li>
+<li>次回から入力を省略したい場合は、「パスワードを保存する」にチェックを入れます。</li>
 <li>「ログイン」ボタンをクリックします。</li>
 <li>ログインに成功すると、顧客管理画面が表示されます。</li>
 </ol>
+<div class="note note-info">「パスワードを保存する」にチェックを入れてログインすると、メールアドレスとパスワードが保存され、次回からログイン画面を開いたときに自動で入力されます。チェックを外してログインすると、保存されている値はクリアされます。</div>
 <div class="note note-info">メールアドレスまたはパスワードが誤っている場合は、エラーメッセージが表示されます。入力内容を確認して再度お試しください。</div>
 <h2>4.2. パスワードを忘れた場合</h2>
-<p>ログイン画面の「パスワードを忘れた場合」リンクから、パスワードの再設定ができます。</p>
+<p>ログイン画面の「パスワードを忘れた場合」リンクから、パスワードの再設定ができます。登録メールアドレス宛に届く6桁の認証コードを使って、新しいパスワードを設定します。</p>
 <div class="image-container align-center">
-<img src="images/forgot-password.png" alt="パスワードを忘れた場合の画面" style="width:70%;">
+<div class="image-item"><img src="images/forgot-password.png" alt="パスワードを忘れた場合の画面"></div>
 <div class="figure-caption">図 6 パスワードを忘れた場合の画面</div>
 </div>
 <ol>
 <li>ログイン画面の「パスワードを忘れた場合」をクリックします。</li>
-<li>登録されているメールアドレスを入力し、「送信」ボタンをクリックします。</li>
-<li>届いたメールに記載されたリンクを開きます。</li>
-<li>新しいパスワードを設定し、ログイン画面から再度ログインします。</li>
+<li>ユーザーの一覧から自分を選択し、「認証コードを送信」ボタンをクリックします。</li>
+<li>登録されているメールアドレス（画面には a***@example.com のように一部を伏せて表示されます）宛に、6桁の認証コードが記載されたメールが届きます。</li>
+<li>メールに記載された認証コードと、新しいパスワード（6文字以上）を入力し、「パスワードを変更」ボタンをクリックします。</li>
+<li>「ログインへ」ボタンでログイン画面に戻り、新しいパスワードでログインします。</li>
 </ol>
-<div class="note note-warning">パスワードリセットメールを送信するには、発行者情報管理画面でメール送信（SMTP）設定が完了している必要があります。</div>
+<div class="note note-info">認証コードの有効期限は送信から15分間です。期限が切れた場合や、コードの誤入力が5回続いてコードが無効になった場合は、もう一度「認証コードを送信」からやり直してください。</div>
+<div class="note note-warning">認証コードのメールを送信するには、発行者情報管理画面でメール送信（SMTP）設定が完了している必要があります。</div>
 <h2>4.3. ログアウト</h2>
 <p>画面左側のメニューの「ログアウト」をクリックすると、ログイン画面に戻ります。</p>
 <div class="page-break"></div>
 <h1>5. 画面構成</h1>
 <p>ログイン後の画面は、上部のタイトルバー、左側のメニュー、右側のメイン画面で構成されます。メニューから各機能の画面に移動します。</p>
 <div class="image-container align-center">
-<img src="images/main-layout.png" alt="画面構成（メニューとメイン画面）" style="width:80%;">
+<div class="image-item"><img src="images/main-layout.png" alt="画面構成（メニューとメイン画面）"></div>
 <div class="figure-caption">図 7 画面構成（メニューとメイン画面）</div>
 </div>
 <div class="table-caption">表 5-3 メニュー一覧</div>
@@ -478,7 +499,7 @@ flowchart LR
 <p>顧客管理画面では、顧客情報の検索・登録・編集・削除を行います。</p>
 <h2>6.1. 顧客の検索</h2>
 <div class="image-container align-center">
-<img src="images/client-list.png" alt="顧客一覧画面" style="width:80%;">
+<div class="image-item"><img src="images/client-list.png" alt="顧客一覧画面"></div>
 <div class="figure-caption">図 8 顧客一覧画面</div>
 </div>
 <div class="table-caption">表 6.1-4 検索条件</div>
@@ -517,7 +538,7 @@ flowchart LR
 <li>「OK」ボタンをクリックして保存します。</li>
 </ol>
 <div class="image-container align-center">
-<img src="images/client-add.png" alt="顧客登録画面" style="width:70%;">
+<div class="image-item"><img src="images/client-add.png" alt="顧客登録画面"></div>
 <div class="figure-caption">図 9 顧客登録画面</div>
 </div>
 <h2>6.3. 顧客の編集・削除</h2>
@@ -527,7 +548,7 @@ flowchart LR
 <li>削除する場合は、編集画面の「削除」ボタンをクリックします。</li>
 </ol>
 <div class="image-container align-center">
-<img src="images/client-edit.png" alt="顧客編集画面" style="width:70%;">
+<div class="image-item"><img src="images/client-edit.png" alt="顧客編集画面"></div>
 <div class="figure-caption">図 10 顧客編集画面</div>
 </div>
 <div class="page-break"></div>
@@ -535,7 +556,7 @@ flowchart LR
 <p>車両管理画面では、車両情報の検索・登録・編集・削除を行います。車両は顧客（所有者）に紐付けて管理します。</p>
 <h2>7.1. 車両の検索</h2>
 <div class="image-container align-center">
-<img src="images/vehicle-list.png" alt="車両一覧画面" style="width:80%;">
+<div class="image-item"><img src="images/vehicle-list.png" alt="車両一覧画面"></div>
 <div class="figure-caption">図 11 車両一覧画面</div>
 </div>
 <div class="table-caption">表 7.1-5 検索条件</div>
@@ -598,7 +619,8 @@ flowchart LR
 <li>削除する場合は、編集画面の「削除」ボタンをクリックします。</li>
 </ol>
 <div class="image-container align-center">
-<img src="images/vehicle-edit.png" alt="車両編集画面" style="width:70%;">
+<div class="image-item"><img src="images/vehicle-edit.png" alt="車両編集画面"></div>
+<div class="image-item"><img src="images/vehicle-edit2.png" alt="車両編集画面"></div>
 <div class="figure-caption">図 12 車両編集画面</div>
 </div>
 <h2>7.4. 車検証JSONの取り込み</h2>
@@ -614,7 +636,7 @@ flowchart LR
 <p>部品管理画面では、請求書の明細で使用する部品の情報（部品名、タイプ、単価）を管理します。</p>
 <h2>8.1. 部品の検索</h2>
 <div class="image-container align-center">
-<img src="images/part-list.png" alt="部品一覧画面" style="width:80%;">
+<div class="image-item"><img src="images/part-list.png" alt="部品一覧画面"></div>
 <div class="figure-caption">図 13 部品一覧画面</div>
 </div>
 <ol>
@@ -628,7 +650,7 @@ flowchart LR
 <li>部品名、タイプ、単価を入力し、保存します。</li>
 </ol>
 <div class="image-container align-center">
-<img src="images/part-edit.png" alt="部品編集画面" style="width:70%;">
+<div class="image-item"><img src="images/part-edit.png" alt="部品編集画面"></div>
 <div class="figure-caption">図 14 部品編集画面</div>
 </div>
 <div class="page-break"></div>
@@ -636,7 +658,7 @@ flowchart LR
 <p>請求書管理画面では、整備・修理などの請求書を作成し、Excel形式で出力できます。請求書は「基本情報」「明細」「法定費用」で構成されます。</p>
 <h2>9.1. 請求書の検索</h2>
 <div class="image-container align-center">
-<img src="images/invoice-list.png" alt="請求書一覧画面" style="width:80%;">
+<div class="image-item"><img src="images/invoice-list.png" alt="請求書一覧画面"></div>
 <div class="figure-caption">図 15 請求書一覧画面</div>
 </div>
 <div class="table-caption">表 9.1-7 検索条件</div>
@@ -666,14 +688,15 @@ flowchart LR
 <li>「保存」すると請求書が作成され、詳細画面に移動します。</li>
 </ol>
 <div class="image-container align-center">
-<img src="images/invoice-new-dialog.png" alt="請求書の基本情報入力ダイアログ" style="width:70%;">
+<div class="image-item"><img src="images/invoice-new-dialog.png" alt="請求書の基本情報入力ダイアログ"></div>
 <div class="figure-caption">図 16 請求書の基本情報入力ダイアログ</div>
 </div>
 <div class="note note-warning">請求書の作成には顧客データが必要です。顧客が1件も登録されていない場合、「新規追加」ボタンは無効になります。先に顧客情報を登録してください。</div>
 <div class="note note-info">請求書番号は保存時に自動採番されます。</div>
 <h2>9.3. 請求書詳細画面</h2>
 <div class="image-container align-center">
-<img src="images/invoice-detail.png" alt="請求書詳細画面" style="width:80%;">
+<div class="image-item"><img src="images/invoice-detail.png" alt="請求書詳細画面"></div>
+<div class="image-item"><img src="images/invoice-detail2.png" alt="請求書詳細画面"></div>
 <div class="figure-caption">図 17 請求書詳細画面</div>
 </div>
 <p>請求書詳細画面では、基本情報・明細一覧・法定費用一覧・合計金額・備考を確認できます。小計・消費税・合計金額は明細と法定費用から自動計算されます。</p>
@@ -724,7 +747,7 @@ flowchart LR
 <li>登録済みの明細は、明細一覧の項目名をクリックすると編集・削除できます。</li>
 </ol>
 <div class="image-container align-center">
-<img src="images/invoice-detail-dialog.png" alt="明細編集ダイアログ" style="width:70%;">
+<div class="image-item"><img src="images/invoice-detail-dialog.png" alt="明細編集ダイアログ"></div>
 <div class="figure-caption">図 18 明細編集ダイアログ</div>
 </div>
 <h2>9.5. 法定費用の追加</h2>
@@ -746,7 +769,7 @@ flowchart LR
 <h2>10.1. データインポート</h2>
 <p>CSVまたはTXTファイルから、顧客情報と車両データを一括で取り込みます。</p>
 <div class="image-container align-center">
-<img src="images/vehicle-import.png" alt="車両データインポート画面" style="width:80%;">
+<div class="image-item"><img src="images/vehicle-import.png" alt="車両データインポート画面"></div>
 <div class="figure-caption">図 19 車両データインポート画面</div>
 </div>
 <ol>
@@ -787,7 +810,7 @@ flowchart LR
 <h2>10.2. バックアップ</h2>
 <p>データベースの全データ（ユーザー、顧客、車両、車両カテゴリ、部品、法定費用、請求書、請求明細、発行者情報）をCSV形式（ZIP圧縮）でバックアップします。</p>
 <div class="image-container align-center">
-<img src="images/data-backup.png" alt="データバックアップ画面" style="width:80%;">
+<div class="image-item"><img src="images/data-backup.png" alt="データバックアップ画面"></div>
 <div class="figure-caption">図 20 データバックアップ画面</div>
 </div>
 <ol>
@@ -800,7 +823,7 @@ flowchart LR
 <h2>10.3. レストア</h2>
 <p>バックアップファイル（ZIP形式またはJSON形式）からデータを復元します。</p>
 <div class="image-container align-center">
-<img src="images/data-restore.png" alt="データレストア画面" style="width:80%;">
+<div class="image-item"><img src="images/data-restore.png" alt="データレストア画面"></div>
 <div class="figure-caption">図 21 データレストア画面</div>
 </div>
 <ol>
@@ -815,7 +838,7 @@ flowchart LR
 <h1>11. ユーザー管理</h1>
 <p>ユーザー管理画面では、システムを利用するユーザーの登録・編集を行います。</p>
 <div class="image-container align-center">
-<img src="images/user-list.png" alt="ユーザー一覧画面" style="width:80%;">
+<div class="image-item"><img src="images/user-list.png" alt="ユーザー一覧画面"></div>
 <div class="figure-caption">図 22 ユーザー一覧画面</div>
 </div>
 <h2>11.1. ユーザーの検索</h2>
@@ -830,7 +853,7 @@ flowchart LR
 <li>名前、メールアドレス、パスワード、権限を入力し、保存します。</li>
 </ol>
 <div class="image-container align-center">
-<img src="images/user-edit.png" alt="ユーザー編集画面" style="width:70%;">
+<div class="image-item"><img src="images/user-edit.png" alt="ユーザー編集画面"></div>
 <div class="figure-caption">図 23 ユーザー編集画面</div>
 </div>
 <div class="table-caption">表 11.2-10 権限の種類</div>
@@ -852,7 +875,8 @@ flowchart LR
 <h1>12. 発行者情報管理</h1>
 <p>発行者情報管理画面では、請求書に印字される自社情報と、パスワードリセットメールなどの送信に使用するメール（SMTP）設定を管理します。</p>
 <div class="image-container align-center">
-<img src="images/issuer-info.png" alt="発行者情報管理画面" style="width:80%;">
+<div class="image-item"><img src="images/issuer-info.png" alt="発行者情報管理画面"></div>
+<div class="image-item"><img src="images/issuer-info2.png" alt="発行者情報管理画面"></div>
 <div class="figure-caption">図 24 発行者情報管理画面</div>
 </div>
 <h2>12.1. 発行者情報の入力項目</h2>
@@ -989,5 +1013,5 @@ flowchart LR
 </tr>
 </table>
 <div class="note note-info">上記で解決しない場合は、システム管理者にお問い合わせください。</div>
-<div class="footer">生成日時：2026-07-07 17:53</div>
+<div class="footer">生成日時：2026-08-12 15:59</div>
 </body></html>
