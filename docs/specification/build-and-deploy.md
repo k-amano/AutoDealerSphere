@@ -31,7 +31,7 @@
 | 登録先 | 内容 |
 |---|---|
 | Windowsサービス | サービス名 `AutoDealerSphere`（自動起動、`C:\AutoDealerSphere\Server\AutoDealerSphere.Server.exe`）。インストーラーが `sc create` で登録し、即時開始する |
-| ランタイム | .NET 9 デスクトップランタイン、WebView2ランタイム（未インストールの場合のみ同梱版をサイレントインストール） |
+| ランタイム | WebView2ランタイム（未インストールの場合のみ同梱版をサイレントインストール）。**.NETランタイムのインストールは不要**（サーバー・ランチャーとも自己完結型発行でランタイム同梱済み） |
 
 > **注意**: データベースはインストール先（`C:\AutoDealerSphere`）ではなく `C:\ProgramData\AutoDealerSphere` に作られる。プログラムとデータが分離されているため、プログラムを消してもデータは残る（後述「再インストールで消えるもの」参照）。
 >
@@ -95,13 +95,20 @@ C:\ProgramData\AutoDealerSphere\logs\app-*.log    ← サーバーログ
 
 ```powershell
 cd C:\Users\Administrator\VisualStudioProjects\blazor\AutoDealerSphere
-dotnet publish Server -c Release -o publish\Server
-dotnet publish Launcher -c Release -o publish\Launcher
+Remove-Item -Recurse -Force publish\Server, publish\Launcher -ErrorAction SilentlyContinue
+dotnet publish Server -c Release -r win-x64 --self-contained true -o publish\Server
+dotnet publish Launcher -c Release -r win-x64 --self-contained true -o publish\Launcher
 ```
 
 発行結果は以下に出力される:
-- `publish\Server\` — サーバー一式
-- `publish\Launcher\` — ランチャー一式
+- `publish\Server\` — サーバー一式（.NET / ASP.NET Core ランタイム同梱）
+- `publish\Launcher\` — ランチャー一式（.NET デスクトップランタイム同梱）
+
+> **重要（`-r win-x64 --self-contained true` を省略しないこと）**:
+> - 開発機は Windows on ARM（ARM64）のため、ランタイム指定なしで発行すると **ARM64 の EXE** が生成される。これを配布すると、一般的な Intel/AMD の PC では「このアプリはお使いの PC では実行できません」と表示され起動できない。
+> - 自己完結型（`--self-contained true`）にすることで、配布先 PC への .NET ランタイムのインストールが不要になる（インストーラーにもランタイムを同梱していない）。
+> - x64 の EXE は Windows 11 の ARM 機でもエミュレーションで動作する。
+> - 発行前に `publish\` 配下を削除するのは、古い発行結果（別アーキテクチャの EXE 等）が混在したままインストーラーに取り込まれるのを防ぐため。
 
 ---
 
@@ -202,6 +209,10 @@ cd C:\AutoDealerSphere\Server
 ```
 
 ※ ポート5259が他プロセスに使用されていると起動に失敗する。`netstat -ano | findstr :5259` で確認。
+
+### 「このアプリはお使いの PC では実行できません」と表示される場合
+
+EXE のアーキテクチャが PC と合っていない（ARM64 ビルドを x64 の PC に配布した等）。開発機が ARM64 のため、`-r win-x64` を付けずに発行するとこの状態になる。「発行手順」のとおり `-r win-x64 --self-contained true` を付けて発行し直し、インストーラーを作り直すこと。
 
 ### 管理者パスワードを忘れた場合（リセットメールも送れない場合）
 

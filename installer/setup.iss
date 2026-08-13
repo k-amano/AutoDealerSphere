@@ -28,8 +28,6 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 [Files]
 Source: "..\publish\Server\*"; DestDir: "{app}\Server"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\publish\Launcher\*"; DestDir: "{app}\Launcher"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\installer\dotnet-runtime\windowsdesktop-runtime-9.0.15-win-x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: IsX64Compatible
-Source: "..\installer\dotnet-runtime\windowsdesktop-runtime-9.0.15-win-arm64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: IsArm64
 Source: "..\installer\webview2\MicrosoftEdgeWebView2RuntimeInstallerX64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: IsX64Compatible
 Source: "..\installer\webview2\MicrosoftEdgeWebView2RuntimeInstallerARM64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: IsArm64
 
@@ -45,9 +43,7 @@ Name: "{group}\{#AppName}"; Filename: "{app}\Launcher\{#LauncherExe}"
 Name: "{group}\{#AppName}のアンインストール"; Filename: "{uninstallexe}"
 
 [Run]
-; .NET 9 デスクトップランタイム（未インストールの場合のみインストール）
-Filename: "{tmp}\windowsdesktop-runtime-9.0.15-win-x64.exe"; Parameters: "/silent /norestart"; Flags: runhidden waituntilterminated; Check: IsX64Compatible
-Filename: "{tmp}\windowsdesktop-runtime-9.0.15-win-arm64.exe"; Parameters: "/silent /norestart"; Flags: runhidden waituntilterminated; Check: IsArm64
+; .NET ランタイムは自己完結型公開（win-x64）で同梱済みのため個別インストール不要
 ; WebView2 ランタイム（未インストールの場合のみインストール）
 Filename: "{tmp}\MicrosoftEdgeWebView2RuntimeInstallerX64.exe"; Parameters: "/silent /install"; Flags: runhidden waituntilterminated; Check: IsX64Compatible
 Filename: "{tmp}\MicrosoftEdgeWebView2RuntimeInstallerARM64.exe"; Parameters: "/silent /install"; Flags: runhidden waituntilterminated; Check: IsArm64
