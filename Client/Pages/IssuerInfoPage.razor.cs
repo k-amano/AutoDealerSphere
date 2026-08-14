@@ -21,6 +21,7 @@ namespace AutoDealerSphere.Client.Pages
         private bool isEmailProcessing = false;
         private string testConnectionMessage = "";
         private bool testConnectionSuccess = false;
+        private string saveMessage = "";
 
         protected override async Task OnInitializedAsync()
         {
@@ -41,6 +42,7 @@ namespace AutoDealerSphere.Client.Pages
 
         private async Task SaveIssuerInfo(IssuerInfo issuer)
         {
+            saveMessage = "";
             var issuerResponse = await Http.PostAsJsonAsync("api/IssuerInfo", issuer);
 
             if (issuerResponse.IsSuccessStatusCode)
@@ -68,6 +70,10 @@ namespace AutoDealerSphere.Client.Pages
             {
                 Navigation.NavigateTo("/", replace: true);
                 return;
+            }
+            if (issuerResponse.IsSuccessStatusCode)
+            {
+                saveMessage = "保存しました。";
             }
             StateHasChanged();
         }

@@ -23,12 +23,12 @@ namespace AutoDealerSphere.Shared.Models
         public int ClientId { get; set; }
 
         [ForeignKey("ClientId")]
-        public Client? Client { get; set; }
+        public Client Client { get; set; }
 
         public int? VehicleId { get; set; }
 
         [ForeignKey("VehicleId")]
-        public Vehicle? Vehicle { get; set; }
+        public Vehicle Vehicle { get; set; }
 
         [Required(ErrorMessage = "請求日は必須です。")]
         public DateTime InvoiceDate { get; set; } = DateTime.Today;
@@ -51,7 +51,7 @@ namespace AutoDealerSphere.Shared.Models
         public decimal Total { get; set; }
 
         [StringLength(500, ErrorMessage = "備考は500文字以内で入力してください。")]
-        public string? Notes { get; set; }
+        public string Notes { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

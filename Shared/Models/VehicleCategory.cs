@@ -14,7 +14,7 @@ namespace AutoDealerSphere.Shared.Models
         public string CategoryName { get; set; } = string.Empty;
 
         [StringLength(200, ErrorMessage = "説明は200文字以内で入力してください。")]
-        public string? Description { get; set; }
+        public string Description { get; set; }
 
         public int DisplayOrder { get; set; }
     }

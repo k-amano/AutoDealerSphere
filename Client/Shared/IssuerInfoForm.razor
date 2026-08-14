@@ -220,6 +220,12 @@
 				<SfButton OnClick="HandleTestConnection" Disabled="@IsEmailProcessing">@(IsEmailProcessing ? "テスト中..." : "接続テスト")</SfButton>
 				<SfButton OnClick="OnCancel">キャンセル</SfButton>
 			</div>
+			@if (!string.IsNullOrEmpty(SaveMessage))
+			{
+				<div class="alert-success" style="margin-top: 0.75rem; padding: 0.6rem 1rem; border-radius: 4px; font-size: 0.9rem;">
+					@SaveMessage
+				</div>
+			}
 			@if (!string.IsNullOrEmpty(TestConnectionMessage))
 			{
 				<div class="@(TestConnectionSuccess ? "alert-success" : "alert-error")" style="margin-top: 0.75rem; padding: 0.6rem 1rem; border-radius: 4px; font-size: 0.9rem;">

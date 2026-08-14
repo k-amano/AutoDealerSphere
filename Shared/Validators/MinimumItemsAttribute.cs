@@ -13,7 +13,7 @@ namespace AutoDealerSphere.Shared.Validators
             _minimumItems = minimumItems;
         }
 
-        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (value is IList list)
             {

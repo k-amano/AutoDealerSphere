@@ -36,11 +36,6 @@ namespace AutoDealerSphere.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<IssuerInfo>> CreateOrUpdateIssuerInfo([FromBody] IssuerInfo issuerInfo)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var result = await _issuerInfoService.CreateOrUpdateIssuerInfoAsync(issuerInfo);
             return Ok(result);
         }

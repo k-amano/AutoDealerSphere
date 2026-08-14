@@ -26,6 +26,8 @@ namespace AutoDealerSphere.Client.Shared
         public string TestConnectionMessage { get; set; } = "";
         [Parameter]
         public bool TestConnectionSuccess { get; set; }
+        [Parameter]
+        public string SaveMessage { get; set; } = "";
 
         private bool _submitted = false;
         private bool _showPassword = false;

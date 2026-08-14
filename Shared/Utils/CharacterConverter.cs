@@ -15,7 +15,7 @@ namespace AutoDealerSphere.Shared.Utils
         /// </summary>
         /// <param name="input">変換対象の文字列</param>
         /// <returns>変換後の文字列</returns>
-        public static string? NormalizeVehicleData(string? input)
+        public static string NormalizeVehicleData(string input)
         {
             if (string.IsNullOrEmpty(input))
                 return input;

@@ -37,15 +37,18 @@ namespace AutoDealerSphere.Server.Services
                 existingInfo.Name = issuerInfo.Name;
                 existingInfo.PhoneNumber = issuerInfo.PhoneNumber;
                 existingInfo.FaxNumber = issuerInfo.FaxNumber;
+                existingInfo.InvoiceNumber = issuerInfo.InvoiceNumber;
                 existingInfo.Bank1Name = issuerInfo.Bank1Name;
                 existingInfo.Bank1BranchName = issuerInfo.Bank1BranchName;
                 existingInfo.Bank1AccountType = issuerInfo.Bank1AccountType;
                 existingInfo.Bank1AccountNumber = issuerInfo.Bank1AccountNumber;
+                existingInfo.Bank1AccountHolder = issuerInfo.Bank1AccountHolder;
                 existingInfo.Bank2Name = issuerInfo.Bank2Name;
                 existingInfo.Bank2BranchName = issuerInfo.Bank2BranchName;
                 existingInfo.Bank2AccountType = issuerInfo.Bank2AccountType;
                 existingInfo.Bank2AccountNumber = issuerInfo.Bank2AccountNumber;
-                
+                existingInfo.Bank2AccountHolder = issuerInfo.Bank2AccountHolder;
+
                 context.IssuerInfos.Update(existingInfo);
             }
             

@@ -14,22 +14,22 @@ namespace AutoDealerSphere.Shared.Models
         public int InvoiceId { get; set; }
 
         [ForeignKey("InvoiceId")]
-        public Invoice? Invoice { get; set; }
+        public Invoice Invoice { get; set; }
 
         public int? PartId { get; set; }
 
         [ForeignKey("PartId")]
-        public Part? Part { get; set; }
+        public Part Part { get; set; }
 
         [Required(ErrorMessage = "項目名は必須です。")]
         [StringLength(100, ErrorMessage = "項目名は100文字以内で入力してください。")]
         public string ItemName { get; set; } = string.Empty;
 
         [StringLength(50, ErrorMessage = "タイプは50文字以内で入力してください。")]
-        public string? Type { get; set; }
+        public string Type { get; set; }
 
         [StringLength(100, ErrorMessage = "修理方法は100文字以内で入力してください。")]
-        public string? RepairMethod { get; set; }
+        public string RepairMethod { get; set; }
 
         [Required(ErrorMessage = "数量は必須です。")]
         [Range(0.01, 9999.99, ErrorMessage = "数量は0.01～9999.99の範囲で入力してください。")]

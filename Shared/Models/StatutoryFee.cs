@@ -14,7 +14,7 @@ namespace AutoDealerSphere.Shared.Models
         public int VehicleCategoryId { get; set; }
 
         [ForeignKey("VehicleCategoryId")]
-        public VehicleCategory? VehicleCategory { get; set; }
+        public VehicleCategory VehicleCategory { get; set; }
 
         [Required(ErrorMessage = "費用種別は必須です。")]
         [StringLength(50, ErrorMessage = "費用種別は50文字以内で入力してください。")]

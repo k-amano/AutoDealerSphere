@@ -95,6 +95,31 @@ builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    })
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        // 入力検証エラー(400)も一元管理に乗せる。既定の自動応答はログに残らず、
+        // クライアントのエラーページにも理由が表示されないため、ここで書式を統一する
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var messages = context.ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .Where(m => !string.IsNullOrEmpty(m))
+                .Distinct()
+                .ToArray();
+            var logger = context.HttpContext.RequestServices
+                .GetRequiredService<ILoggerFactory>()
+                .CreateLogger("ValidationError");
+            logger.LogWarning("入力検証エラーが発生しました。Path: {Path} Errors: {Errors}",
+                context.HttpContext.Request.Path, string.Join(" / ", messages));
+            return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(new AutoDealerSphere.Shared.Models.ApiErrorResponse
+            {
+                TraceId = context.HttpContext.TraceIdentifier,
+                Message = "入力内容に誤りがあります。" + string.Join(" / ", messages),
+                StatusCode = StatusCodes.Status400BadRequest,
+            });
+        };
     });
 builder.Services.AddDbContextFactory<SQLDBContext>(options => options.UseSqlite(connectionString));
 

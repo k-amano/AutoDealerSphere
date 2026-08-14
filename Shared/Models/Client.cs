@@ -14,10 +14,10 @@ namespace AutoDealerSphere.Shared.Models
         public string Name { get; set; } = "";
         
         [StringLength(40, ErrorMessage = "カナは40文字までです。")]
-        public string? Kana { get; set; }
+        public string Kana { get; set; }
         
         [StringLength(50, ErrorMessage = "メールアドレスは50文字までです。")]
-        public string? Email { get; set; }
+        public string Email { get; set; }
         
         [Required(ErrorMessage = "郵便番号を入力してください。")]
         [StringLength(8, ErrorMessage = "郵便番号は8文字までです。")]
@@ -31,9 +31,9 @@ namespace AutoDealerSphere.Shared.Models
         public string Address { get; set; } = "";
         
         [StringLength(100, ErrorMessage = "建物名は100文字までです。")]
-        public string? Building { get; set; }
+        public string Building { get; set; }
         
         [StringLength(20, ErrorMessage = "電話番号は20文字までです。")]
-        public string? Phone { get; set; }
+        public string Phone { get; set; }
     }
 }

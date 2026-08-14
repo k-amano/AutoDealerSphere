@@ -1,6 +1,7 @@
 using AutoDealerSphere.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace AutoDealerSphere.Server.Services
 {
@@ -40,6 +41,7 @@ namespace AutoDealerSphere.Server.Services
                 CreateInvoicesTableIfNotExists();
                 CreateInvoiceDetailsTableIfNotExists();
                 CreateIssuerInfoTableIfNotExists();
+                FixIssuerInfosNullableColumnsIfNeeded();
                 CreateEmailSettingsTableIfNotExists();
                 CreatePasswordResetTokensTableIfNotExists();
 
@@ -547,6 +549,75 @@ namespace AutoDealerSphere.Server.Services
             {
                 _logger.LogWarning(ex, "テーブル/データ作成時に警告が発生しました: IssuerInfos table");
             }
+        }
+
+        private void FixIssuerInfosNullableColumnsIfNeeded()
+        {
+            // 旧モデル（全プロパティ null 非許容）の時期に EnsureCreated が作成した IssuerInfos は
+            // 任意項目まで NOT NULL になっており、任意項目を未入力（null）で保存できない。
+            // SQLite は制約変更ができないため、該当する場合はテーブルを作り直してデータを移行する。
+            bool needsRebuild;
+            var connection = _context.Database.GetDbConnection();
+            if (connection.State != ConnectionState.Open)
+            {
+                connection.Open();
+            }
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    SELECT COUNT(*) FROM pragma_table_info('IssuerInfos')
+                    WHERE [notnull] = 1 AND name IN (
+                        'Position', 'FaxNumber', 'InvoiceNumber',
+                        'Bank2Name', 'Bank2BranchName', 'Bank2AccountType',
+                        'Bank2AccountNumber', 'Bank2AccountHolder')";
+                needsRebuild = Convert.ToInt64(command.ExecuteScalar()) > 0;
+            }
+
+            if (!needsRebuild)
+            {
+                return;
+            }
+
+            _logger.LogInformation("IssuerInfos テーブルの任意項目を NULL 許容に作り直します");
+            _context.Database.ExecuteSqlRaw(@"
+                BEGIN TRANSACTION;
+                CREATE TABLE IssuerInfos_new (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    PostalCode TEXT NOT NULL,
+                    Address TEXT NOT NULL,
+                    CompanyName TEXT NOT NULL,
+                    Position TEXT,
+                    Name TEXT NOT NULL,
+                    PhoneNumber TEXT NOT NULL,
+                    FaxNumber TEXT,
+                    InvoiceNumber TEXT,
+                    Bank1Name TEXT NOT NULL,
+                    Bank1BranchName TEXT NOT NULL,
+                    Bank1AccountType TEXT NOT NULL,
+                    Bank1AccountNumber TEXT NOT NULL,
+                    Bank1AccountHolder TEXT NOT NULL,
+                    Bank2Name TEXT,
+                    Bank2BranchName TEXT,
+                    Bank2AccountType TEXT,
+                    Bank2AccountNumber TEXT,
+                    Bank2AccountHolder TEXT
+                );
+                INSERT INTO IssuerInfos_new (
+                    Id, PostalCode, Address, CompanyName, Position, Name, PhoneNumber,
+                    FaxNumber, InvoiceNumber,
+                    Bank1Name, Bank1BranchName, Bank1AccountType, Bank1AccountNumber, Bank1AccountHolder,
+                    Bank2Name, Bank2BranchName, Bank2AccountType, Bank2AccountNumber, Bank2AccountHolder)
+                SELECT
+                    Id, PostalCode, Address, CompanyName, Position, Name, PhoneNumber,
+                    FaxNumber, InvoiceNumber,
+                    COALESCE(Bank1Name, ''), COALESCE(Bank1BranchName, ''), COALESCE(Bank1AccountType, ''),
+                    COALESCE(Bank1AccountNumber, ''), COALESCE(Bank1AccountHolder, ''),
+                    Bank2Name, Bank2BranchName, Bank2AccountType, Bank2AccountNumber, Bank2AccountHolder
+                FROM IssuerInfos;
+                DROP TABLE IssuerInfos;
+                ALTER TABLE IssuerInfos_new RENAME TO IssuerInfos;
+                COMMIT;
+            ");
         }
 
         private void CreateEmailSettingsTableIfNotExists()

@@ -15,7 +15,7 @@ namespace AutoDealerSphere.Shared.Models
         public string PartName { get; set; } = string.Empty;
 
         [StringLength(50, ErrorMessage = "タイプは50文字以内で入力してください。")]
-        public string? Type { get; set; }
+        public string Type { get; set; }
 
         [Required(ErrorMessage = "単価は必須です。")]
         [Range(0, 99999999.99, ErrorMessage = "単価は0～99,999,999.99の範囲で入力してください。")]

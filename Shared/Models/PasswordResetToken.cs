@@ -27,6 +27,6 @@ namespace AutoDealerSphere.Shared.Models
         /// <summary>コードの誤入力回数。上限に達するとコードは無効化される。</summary>
         public int FailedCount { get; set; } = 0;
 
-        public User? User { get; set; }
+        public User User { get; set; }
     }
 }
