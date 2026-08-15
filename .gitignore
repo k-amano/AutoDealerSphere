@@ -69,3 +69,6 @@ SqliteTest/
 # Documentation assets (generated images)
 docs/*.ico
 docs/*.png
+
+# Syncfusion license key (copy SyncfusionLicense.cs.template and set the key)
+Shared/SyncfusionLicense.cs

@@ -89,6 +89,17 @@ C:\ProgramData\AutoDealerSphere\logs\app-*.log    ← サーバーログ
 
 ---
 
+## クローン後の初期設定（Syncfusion ライセンスキー）
+
+Syncfusion のライセンスキーはリポジトリにコミットしない運用のため、クローン直後はビルドに必要なファイルが存在しない。以下の手順でキーを設定する:
+
+1. `Shared\SyncfusionLicense.cs.template` をコピーして `Shared\SyncfusionLicense.cs` を作成する。
+2. `Key` 定数の `XXXX...` を実際のライセンスキーに置き換える。
+
+`Shared\SyncfusionLicense.cs` は `.gitignore` に登録済みのため、キーを設定してもコミットされない。キーは Syncfusion のアカウントページ（License & Downloads）から取得できる。使用中のパッケージバージョン（Essential Studio のメジャーバージョン）に対応したキーであること。
+
+---
+
 ## 発行手順
 
 ソリューションルート（`AutoDealerSphere.sln` があるフォルダ）で実行する:

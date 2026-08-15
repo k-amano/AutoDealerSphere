@@ -6,7 +6,7 @@ using Serilog;
 using System.Diagnostics;
 
 // Syncfusionライセンスキーを設定
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("***REMOVED***");
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(AutoDealerSphere.Shared.SyncfusionLicense.Key);
 
 WebApplicationBuilder builder;
 string connectionString;

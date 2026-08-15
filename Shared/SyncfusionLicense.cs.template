@@ -1,0 +1,12 @@
+namespace AutoDealerSphere.Shared
+{
+    /// <summary>
+    /// Syncfusion のライセンスキー。
+    /// このファイルをコピーして SyncfusionLicense.cs を作成し、Key に実際のライセンスキーを設定すること。
+    /// SyncfusionLicense.cs は .gitignore によりコミット対象外（キーをリポジトリに含めないため）。
+    /// </summary>
+    public static class SyncfusionLicense
+    {
+        public const string Key = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    }
+}
