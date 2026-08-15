@@ -15,9 +15,9 @@
         <div class="form-section">
             <div class="form-row">
                 <label class="required">所有者</label>
-                <SfDropDownList TValue="int" TItem="Client" @bind-Value="Item.ClientId" 
-                    DataSource="@Clients" Placeholder="所有者を選択">
-                    <DropDownListFieldSettings Text="Name" Value="Id"></DropDownListFieldSettings>
+                <SfDropDownList TValue="int" TItem="Client" @bind-Value="Item.ClientId"
+                    DataSource="@Clients" Placeholder="所有者を選択" AllowFiltering="true">
+                    <DropDownListFieldSettings Text="DisplayName" Value="Id"></DropDownListFieldSettings>
                 </SfDropDownList>
                 <ValidationMessage For="@(() => Item.ClientId)" />
             </div>

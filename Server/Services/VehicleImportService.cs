@@ -53,21 +53,19 @@ namespace AutoDealerSphere.Server.Services
                 {
                     try
                     {
-                        // 既存の車両データをすべて削除
-                        var existingVehicles = await context.Vehicles.ToListAsync();
-                        context.Vehicles.RemoveRange(existingVehicles);
+                        // 外部キーの参照関係に従い、子から順にすべて削除する（請求書明細 → 請求書 → 車両 → 顧客）
+                        context.InvoiceDetails.RemoveRange(await context.InvoiceDetails.ToListAsync());
+                        context.Invoices.RemoveRange(await context.Invoices.ToListAsync());
                         await context.SaveChangesAsync();
 
-                        // 車両の連番をリセット（SQLiteの場合）
-                        await context.Database.ExecuteSqlRawAsync("DELETE FROM sqlite_sequence WHERE name='Vehicles'");
-
-                        // 既存の顧客データをすべて削除
-                        var existingClients = await context.Clients.ToListAsync();
-                        context.Clients.RemoveRange(existingClients);
+                        context.Vehicles.RemoveRange(await context.Vehicles.ToListAsync());
                         await context.SaveChangesAsync();
-                        
-                        // 顧客の連番もリセット
-                        await context.Database.ExecuteSqlRawAsync("DELETE FROM sqlite_sequence WHERE name='Clients'");
+
+                        context.Clients.RemoveRange(await context.Clients.ToListAsync());
+                        await context.SaveChangesAsync();
+
+                        // 連番をリセット（SQLiteの場合）
+                        await context.Database.ExecuteSqlRawAsync("DELETE FROM sqlite_sequence WHERE name IN ('InvoiceDetails', 'Invoices', 'Vehicles', 'Clients')");
                     }
                     catch (Exception ex)
                     {

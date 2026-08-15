@@ -25,6 +25,18 @@ namespace AutoDealerSphere.Server.Services
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Invoice>> GetInvoicesByClientAsync(int clientId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Invoices
+                .Include(i => i.Client)
+                .Include(i => i.Vehicle)
+                .Include(i => i.InvoiceDetails)
+                .Where(i => i.ClientId == clientId)
+                .OrderBy(i => i.Id)
+                .ToListAsync();
+        }
+
         public async Task<Invoice?> GetInvoiceByIdAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();

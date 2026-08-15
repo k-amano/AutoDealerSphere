@@ -35,5 +35,18 @@ namespace AutoDealerSphere.Shared.Models
         
         [StringLength(20, ErrorMessage = "電話番号は20文字までです。")]
         public string Phone { get; set; }
+
+        /// <summary>プルダウン等での表示用（氏名＋住所）。同姓同名の顧客を区別する。読み取り専用のためDBには保存されない</summary>
+        public string DisplayName
+        {
+            get
+            {
+                var address = $"{AutoDealerSphere.Shared.Models.Prefecture.GetName(Prefecture)}{Address}".Trim();
+                var detail = !string.IsNullOrWhiteSpace(address) ? address
+                    : !string.IsNullOrWhiteSpace(Phone) ? Phone
+                    : $"ID: {Id}";
+                return $"{Name}（{detail}）";
+            }
+        }
     }
 }

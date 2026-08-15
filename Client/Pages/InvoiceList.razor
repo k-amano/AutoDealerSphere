@@ -100,7 +100,7 @@
                 <Template>
                     @{
                         var invoice = (context as Invoice);
-                        <span>@(invoice?.Vehicle?.LicensePlateNumber ?? "-")</span>
+                        <span>@(invoice?.Vehicle?.LicensePlateDisplay ?? "-")</span>
                     }
                 </Template>
             </GridColumn>

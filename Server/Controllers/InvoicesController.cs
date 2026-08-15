@@ -23,6 +23,13 @@ namespace AutoDealerSphere.Server.Controllers
             return Ok(invoices);
         }
 
+        [HttpGet("byClient/{clientId}")]
+        public async Task<ActionResult<IEnumerable<Invoice>>> GetInvoicesByClient(int clientId)
+        {
+            var invoices = await _invoiceService.GetInvoicesByClientAsync(clientId);
+            return Ok(invoices);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Invoice>> GetInvoice(int id)
         {

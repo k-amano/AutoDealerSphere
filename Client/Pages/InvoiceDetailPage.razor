@@ -94,30 +94,37 @@
         </div>
     </div>
 
-    <div class="statutory-fees @StatutoryFeesClass">
-        <h3>法定費用一覧</h3>
-        <SfGrid DataSource="@StatutoryFees" AllowSorting="false" AllowPaging="false" CssClass="statutory-fee-grid">
-            <GridColumns>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.ItemName)" HeaderText="項目名" Width="300"></GridColumn>
-                <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.SubTotal)" HeaderText="金額" Width="150">
-                    <Template>
-                        @{
-                            var detail = (context as AutoDealerSphere.Shared.Models.InvoiceDetail);
-                            <span>¥@($"{detail?.SubTotal:N0}")</span>
-                        }
-                    </Template>
-                </GridColumn>
-            </GridColumns>
-            <GridTemplates>
-                <EmptyRecordTemplate>
-                    <div class="empty-record">法定費用データがありません</div>
-                </EmptyRecordTemplate>
-            </GridTemplates>
-        </SfGrid>
-        <div class="form-buttons">
-            <SfButton @onclick="OpenStatutoryFeeDialog" CssClass="e-info">法定費用</SfButton>
+    @* 法定費用は車両カテゴリから決まるため、車両未選択の請求書では欄ごと表示しない（既存の法定費用がある場合は一覧のみ表示） *@
+    @if (_invoice?.VehicleId > 0 || StatutoryFees.Any())
+    {
+        <div class="statutory-fees @StatutoryFeesClass">
+            <h3>法定費用一覧</h3>
+            <SfGrid DataSource="@StatutoryFees" AllowSorting="false" AllowPaging="false" CssClass="statutory-fee-grid">
+                <GridColumns>
+                    <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.ItemName)" HeaderText="項目名" Width="300"></GridColumn>
+                    <GridColumn Field="@nameof(AutoDealerSphere.Shared.Models.InvoiceDetail.SubTotal)" HeaderText="金額" Width="150">
+                        <Template>
+                            @{
+                                var detail = (context as AutoDealerSphere.Shared.Models.InvoiceDetail);
+                                <span>¥@($"{detail?.SubTotal:N0}")</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+                <GridTemplates>
+                    <EmptyRecordTemplate>
+                        <div class="empty-record">法定費用データがありません</div>
+                    </EmptyRecordTemplate>
+                </GridTemplates>
+            </SfGrid>
+            @if (_invoice?.VehicleId > 0)
+            {
+                <div class="form-buttons">
+                    <SfButton @onclick="OpenStatutoryFeeDialog" CssClass="e-info">法定費用</SfButton>
+                </div>
+            }
         </div>
-    </div>
+    }
 
     <div class="invoice-summary @InvoiceSummaryClass">
         <h3>合計</h3>

@@ -35,13 +35,20 @@ namespace AutoDealerSphere.Server.Controllers
             if (System.IO.File.Exists(tempPath))
                 System.IO.File.Delete(tempPath);
 
+            var success = result.errors.Count == 0;
+            var message = success
+                ? $"インポートが完了しました。顧客: {result.clientsImported}件、車両: {result.vehiclesImported}件"
+                : result.clientsImported + result.vehiclesImported > 0
+                    ? $"インポートは完了しましたが、一部エラーがあります。顧客: {result.clientsImported}件、車両: {result.vehiclesImported}件"
+                    : "インポートできませんでした。";
+
             return Ok(new
             {
-                success = true,
+                success,
                 clientsImported = result.clientsImported,
                 vehiclesImported = result.vehiclesImported,
                 errors = result.errors,
-                message = $"インポートが完了しました。顧客: {result.clientsImported}件、車両: {result.vehiclesImported}件"
+                message
             });
         }
     }

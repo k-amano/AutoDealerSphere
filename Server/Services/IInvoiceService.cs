@@ -5,6 +5,7 @@ namespace AutoDealerSphere.Server.Services
     public interface IInvoiceService
     {
         Task<IEnumerable<Invoice>> GetAllInvoicesAsync();
+        Task<IEnumerable<Invoice>> GetInvoicesByClientAsync(int clientId);
         Task<Invoice?> GetInvoiceByIdAsync(int id);
         Task<Invoice> CreateInvoiceAsync(Invoice invoice);
         Task<bool> UpdateInvoiceAsync(Invoice invoice);

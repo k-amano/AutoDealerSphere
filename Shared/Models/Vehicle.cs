@@ -28,6 +28,20 @@ namespace AutoDealerSphere.Shared.Models
         [StringLength(20)]
         public string LicensePlateNumber { get; set; }
 
+        /// <summary>プルダウン等での表示用（ナンバープレート一式＋車名）。読み取り専用のためDBには保存されない</summary>
+        public string LicensePlateDisplay
+        {
+            get
+            {
+                var parts = new[] { LicensePlateLocation, LicensePlateClassification, LicensePlateHiragana, LicensePlateNumber };
+                var plate = string.Join(" ", Array.FindAll(parts, p => !string.IsNullOrWhiteSpace(p)));
+                var name = !string.IsNullOrWhiteSpace(VehicleName) ? VehicleName : ChassisNumber;
+                if (string.IsNullOrWhiteSpace(plate))
+                    return !string.IsNullOrWhiteSpace(name) ? name : $"車両ID: {Id}";
+                return !string.IsNullOrWhiteSpace(name) ? $"{plate}（{name}）" : plate;
+            }
+        }
+
         [StringLength(20)]
         public string KeyNumber { get; set; }
 

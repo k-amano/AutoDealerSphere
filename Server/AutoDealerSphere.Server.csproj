@@ -25,5 +25,11 @@
     <ProjectReference Include="..\Shared\AutoDealerSphere.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Templates\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 
 </Project>

@@ -551,6 +551,31 @@ flowchart LR
 <div class="image-item"><img src="images/client-edit.png" alt="顧客編集画面"></div>
 <div class="figure-caption">図 10 顧客編集画面</div>
 </div>
+<h2>6.4. 顧客編集画面からの車両・請求書の操作</h2>
+<p>顧客編集画面の下部には、その顧客の「車両一覧」と「請求書一覧」が表示されます。顧客を起点に、車両の登録・編集や請求書の作成・確認ができます。</p>
+<div class="table-caption">表 6.4-5 顧客編集画面からできる操作</div>
+<table>
+<tr>
+<th>操作</th>
+<th>説明</th>
+</tr>
+<tr>
+<td>車両の確認・編集</td>
+<td>車両一覧にナンバー・型式・車台番号・車検満了日が表示されます。ナンバーをクリックすると車両編集画面に移動します。</td>
+</tr>
+<tr>
+<td>車両の追加</td>
+<td>「車両を追加」ボタンをクリックすると、この顧客が所有者として選択済みの状態で車両登録画面が開きます。</td>
+</tr>
+<tr>
+<td>請求書の確認</td>
+<td>請求書一覧に請求書番号・車両・請求日・合計金額が表示されます。請求書番号をクリックすると請求書詳細画面に移動します。</td>
+</tr>
+<tr>
+<td>請求書の作成</td>
+<td>「請求書を作成」ボタンをクリックすると、この顧客が選択済みの状態で請求書の基本情報入力ダイアログが開きます。車両が1台だけの場合は車両も自動で選択されます。</td>
+</tr>
+</table>
 <div class="page-break"></div>
 <h1>7. 車両管理</h1>
 <p>車両管理画面では、車両情報の検索・登録・編集・削除を行います。車両は顧客（所有者）に紐付けて管理します。</p>
@@ -559,7 +584,7 @@ flowchart LR
 <div class="image-item"><img src="images/vehicle-list.png" alt="車両一覧画面"></div>
 <div class="figure-caption">図 11 車両一覧画面</div>
 </div>
-<div class="table-caption">表 7.1-5 検索条件</div>
+<div class="table-caption">表 7.1-6 検索条件</div>
 <table>
 <tr>
 <th>項目</th>
@@ -586,10 +611,10 @@ flowchart LR
 <h2>7.2. 車両の新規登録</h2>
 <ol>
 <li>車両一覧画面の「新規追加」ボタンをクリックします。</li>
-<li>車両情報を入力します。所有者は登録済みの顧客から選択します。</li>
+<li>車両情報を入力します。所有者は登録済みの顧客から選択します。プルダウンには「氏名（住所）」の形式で表示されるため、同姓同名の顧客も住所で区別できます。文字を入力して絞り込むこともできます。</li>
 <li>「OK」ボタンをクリックして保存します。</li>
 </ol>
-<div class="table-caption">表 7.2-6 車両情報の主な入力項目</div>
+<div class="table-caption">表 7.2-7 車両情報の主な入力項目</div>
 <table>
 <tr>
 <th>分類</th>
@@ -661,7 +686,7 @@ flowchart LR
 <div class="image-item"><img src="images/invoice-list.png" alt="請求書一覧画面"></div>
 <div class="figure-caption">図 15 請求書一覧画面</div>
 </div>
-<div class="table-caption">表 9.1-7 検索条件</div>
+<div class="table-caption">表 9.1-8 検索条件</div>
 <table>
 <tr>
 <th>項目</th>
@@ -691,6 +716,8 @@ flowchart LR
 <div class="image-item"><img src="images/invoice-new-dialog.png" alt="請求書の基本情報入力ダイアログ"></div>
 <div class="figure-caption">図 16 請求書の基本情報入力ダイアログ</div>
 </div>
+<div class="note note-info">顧客のプルダウンは「氏名（住所）」の形式で表示されるため、同姓同名の顧客も住所で区別できます。車両のプルダウンは「登録地域 分類番号 ひらがな ナンバー（車名）」の形式で表示されるため、複数台所有する顧客の車両も見分けられます。</div>
+<div class="note note-info">顧客編集画面の「請求書を作成」ボタンからも、顧客が選択済みの状態で請求書を作成できます（「顧客管理」の章を参照）。</div>
 <div class="note note-warning">請求書の作成には顧客データが必要です。顧客が1件も登録されていない場合、「新規追加」ボタンは無効になります。先に顧客情報を登録してください。</div>
 <div class="note note-info">請求書番号は保存時に自動採番されます。</div>
 <h2>9.3. 請求書詳細画面</h2>
@@ -700,7 +727,7 @@ flowchart LR
 <div class="figure-caption">図 17 請求書詳細画面</div>
 </div>
 <p>請求書詳細画面では、基本情報・明細一覧・法定費用一覧・合計金額・備考を確認できます。小計・消費税・合計金額は明細と法定費用から自動計算されます。</p>
-<div class="table-caption">表 9.3-8 請求書詳細画面のボタン</div>
+<div class="table-caption">表 9.3-9 請求書詳細画面のボタン</div>
 <table>
 <tr>
 <th>ボタン</th>
@@ -757,6 +784,7 @@ flowchart LR
 <li>「保存」すると法定費用一覧に追加されます。</li>
 </ol>
 <div class="note note-info">法定費用は非課税として扱われ、消費税の計算対象には含まれません。</div>
+<div class="note note-info">法定費用の候補は車両のカテゴリ（軽自動車・小型車など）から決まるため、法定費用の欄は車両が選択されている請求書でのみ表示されます。車両を選択していない請求書に法定費用を追加する場合は、先に「基本編集」で車両を選択してください。</div>
 <h2>9.6. Excel出力</h2>
 <ol>
 <li>請求書詳細画面の「Excel出力」ボタンをクリックします。</li>
@@ -775,11 +803,11 @@ flowchart LR
 <ol>
 <li>メニューの「データ管理」&gt;「データインポート」を開きます。</li>
 <li>「インポートファイルを選択してください」からCSVまたはTXTファイルを選択します。</li>
-<li>既存の車両データをすべて削除してから取り込む場合は、「既存データを置き換える」にチェックを入れます。</li>
+<li>既存の顧客・車両・請求書データをすべて削除してから取り込む場合は、「既存データを置き換える」にチェックを入れます。</li>
 <li>「インポート開始」ボタンをクリックします。</li>
 <li>インポート結果（新規顧客件数、車両データ件数、エラー詳細）を確認します。</li>
 </ol>
-<div class="table-caption">表 10.1-9 インポートファイルの主なカラム</div>
+<div class="table-caption">表 10.1-10 インポートファイルの主なカラム</div>
 <table>
 <tr>
 <th>カラム名</th>
@@ -806,7 +834,7 @@ flowchart LR
 <td>車両番号、車体番号、車検証情報などの車両情報カラム</td>
 </tr>
 </table>
-<div class="note note-warning">「既存データを置き換える」にチェックを入れると、既存の車両データはすべて削除されます。実行前にバックアップを取得することを推奨します。<br>アップロードできるファイルサイズは最大10MBです。</div>
+<div class="note note-warning">「既存データを置き換える」にチェックを入れると、既存の顧客・車両・請求書データはすべて削除されます。実行前にバックアップを取得することを推奨します。<br>アップロードできるファイルサイズは最大10MBです。</div>
 <h2>10.2. バックアップ</h2>
 <p>データベースの全データ（ユーザー、顧客、車両、車両カテゴリ、部品、法定費用、請求書、請求明細、発行者情報）をCSV形式（ZIP圧縮）でバックアップします。</p>
 <div class="image-container align-center">
@@ -856,7 +884,7 @@ flowchart LR
 <div class="image-item"><img src="images/user-edit.png" alt="ユーザー編集画面"></div>
 <div class="figure-caption">図 23 ユーザー編集画面</div>
 </div>
-<div class="table-caption">表 11.2-10 権限の種類</div>
+<div class="table-caption">表 11.2-11 権限の種類</div>
 <table>
 <tr>
 <th>権限</th>
@@ -880,7 +908,7 @@ flowchart LR
 <div class="figure-caption">図 24 発行者情報管理画面</div>
 </div>
 <h2>12.1. 発行者情報の入力項目</h2>
-<div class="table-caption">表 12.1-11 発行者情報の入力項目</div>
+<div class="table-caption">表 12.1-12 発行者情報の入力項目</div>
 <table>
 <tr>
 <th>分類</th>
@@ -928,7 +956,7 @@ flowchart LR
 </ol>
 <h2>12.2. メール送信（SMTP）設定</h2>
 <p>パスワードリセットメールを送信するためのメールサーバー設定です。ご利用のメールサービスの情報を入力してください。</p>
-<div class="table-caption">表 12.2-12 メール設定の入力項目</div>
+<div class="table-caption">表 12.2-13 メール設定の入力項目</div>
 <table>
 <tr>
 <th>項目</th>
@@ -979,7 +1007,7 @@ flowchart LR
 <div class="note note-info">接続テストを実行するには、SMTP認証パスワードの入力が必要です。パスワードが未入力の場合、メール設定は保存されません。</div>
 <div class="page-break"></div>
 <h1>13. トラブルシューティング</h1>
-<div class="table-caption">表 13-13 よくあるトラブルと対処方法</div>
+<div class="table-caption">表 13-14 よくあるトラブルと対処方法</div>
 <table>
 <tr>
 <th>症状</th>
@@ -1013,5 +1041,5 @@ flowchart LR
 </tr>
 </table>
 <div class="note note-info">上記で解決しない場合は、システム管理者にお問い合わせください。</div>
-<div class="footer">生成日時：2026-08-12 15:59</div>
+<div class="footer">生成日時：2026-08-15 14:02</div>
 </body></html>

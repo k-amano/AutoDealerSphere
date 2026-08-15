@@ -277,7 +277,8 @@ namespace AutoDealerSphere.Server.Services
                 application.DefaultVersion = ExcelVersion.Excel2016;
 
                 // テンプレートファイルを開く
-                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "invoice-template.xlsx");
+                // Windows サービスではカレントディレクトリが System32 になるため EXE 基準で解決する
+                var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "invoice-template.xlsx");
                 if (!File.Exists(templatePath))
                 {
                     throw new FileNotFoundException($"Template file not found: {templatePath}");

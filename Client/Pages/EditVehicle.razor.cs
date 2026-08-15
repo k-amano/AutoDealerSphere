@@ -14,6 +14,11 @@ namespace AutoDealerSphere.Client.Pages
         [Parameter]
         public int VehicleId { get; set; }
 
+        /// <summary>顧客詳細画面から新規作成する際に所有者を事前選択するためのクエリパラメータ</summary>
+        [Parameter]
+        [SupplyParameterFromQuery(Name = "clientId")]
+        public int? PreselectClientId { get; set; }
+
         private AutoDealerSphere.Shared.Models.Vehicle? _item;
         private List<AutoDealerSphere.Shared.Models.Client> _clients = new();
         private List<VehicleCategory> _vehicleCategories = new();
@@ -85,7 +90,7 @@ namespace AutoDealerSphere.Client.Pages
             {
                 _item = new AutoDealerSphere.Shared.Models.Vehicle()
                 {
-                    ClientId = 0,
+                    ClientId = PreselectClientId ?? 0,
                     CreatedAt = DateTime.Now
                 };
             }
